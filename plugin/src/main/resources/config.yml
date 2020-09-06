@@ -1,0 +1,4 @@
+WorldSwitchCooldownTime: 10
+IgnoreProtectedRegions: false
+MaxRadiusFromPlanetWorldSpawn: -1
+MinDistanceToOtherCrafts: -1

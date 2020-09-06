@@ -1,0 +1,4 @@
+name: RedProtectExpansion
+main: io.github.eirikh1996.movecraftspace.expansion.redprotect.RedProtectExpansion
+depend:
+  - RedProtect

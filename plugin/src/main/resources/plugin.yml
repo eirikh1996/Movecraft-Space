@@ -1,0 +1,15 @@
+name: Movecraft-Space
+main: io.github.eirikh1996.movecraftspace.MovecraftSpace
+version: '${project.version}'
+api-version: 1.13
+depend:
+  - Movecraft
+commands:
+  planet:
+    usage: /planet <add|remove|list>
+  star:
+    usage: /star <create|remove>
+  movecraftspace:
+    aliases:
+      - ms
+      - mspace

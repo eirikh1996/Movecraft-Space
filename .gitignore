@@ -1,0 +1,5 @@
+# Project exclude paths
+/api/target/
+/expansions/Factions3Expansion/target/
+/expansions/FactionsUUIDExpansion/target/
+/target/

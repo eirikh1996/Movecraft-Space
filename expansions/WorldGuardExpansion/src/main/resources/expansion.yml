@@ -1,0 +1,4 @@
+name: WorldGuardExpansion
+main: io.github.eirikh1996.movecraftspace.expansion.worldguard.WorldGuardExpansion
+depend:
+  - WorldGuard

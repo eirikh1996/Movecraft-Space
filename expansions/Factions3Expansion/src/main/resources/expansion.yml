@@ -1,0 +1,4 @@
+name: Factions3Expansion
+main: io.github.eirikh1996.movecraftspace.expansion.factions3.Factions3Expansion
+depend:
+  - Factions

@@ -1,0 +1,79 @@
+package io.github.eirikh1996.movecraftspace
+
+import io.github.eirikh1996.movecraftspace.commands.PlanetCommand
+import io.github.eirikh1996.movecraftspace.commands.StarCommand
+import io.github.eirikh1996.movecraftspace.expansion.ExpansionManager
+import io.github.eirikh1996.movecraftspace.listener.ExplosionListener
+import io.github.eirikh1996.movecraftspace.listener.MovecraftListener
+import io.github.eirikh1996.movecraftspace.listener.PlayerListener
+import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
+import io.github.eirikh1996.movecraftspace.objects.StarCollection
+import net.countercraft.movecraft.WorldHandler
+import org.bukkit.Location
+import org.bukkit.Material
+import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.scheduler.BukkitRunnable
+import java.lang.Exception
+import java.lang.System.currentTimeMillis
+import java.lang.reflect.Method
+
+class MovecraftSpace : JavaPlugin() {
+    private var ticks = 0
+    private var tickTimeStamp = 0L
+
+    companion object {
+        lateinit var instance : MovecraftSpace
+    }
+
+    override fun onEnable() {
+        saveDefaultConfig()
+        ConfigHolder.config = config
+        ExpansionManager.enableExpansions()
+
+
+        val packageName = server.javaClass.`package`.name
+        val ver = packageName.substring(packageName.lastIndexOf(".") + 1).split("_")[1].toInt()
+        Settings.IsLegacy = ver <= 12
+        PlanetCollection.pl = this
+        PlanetCollection.loadPlanets()
+        StarCollection.pl = this
+        StarCollection.loadStars()
+        server.pluginManager.registerEvents(MovecraftListener, this)
+        server.pluginManager.registerEvents(PlayerListener, this)
+        server.pluginManager.registerEvents(ExplosionListener, this)
+        getCommand("planet")!!.setExecutor(PlanetCommand)
+        getCommand("star")!!.setExecutor(StarCommand)
+        if (Settings.RotatePlanets)
+            PlanetaryMotionManager.runTaskTimerAsynchronously(this, 100, 20)
+        tickTimeStamp = currentTimeMillis()
+        object : BukkitRunnable() {
+            override fun run() {
+                //Reset tick counter if it reaches max value, to avoid overflows
+                if (ticks >= Int.MAX_VALUE) {
+                    ticks = 0
+                    tickTimeStamp = currentTimeMillis()
+                }
+                ticks++
+            }
+
+        }.runTaskTimer(this, 0, 1)
+    }
+
+    fun averageTicks() : Double {
+        val tps = ticks / ((currentTimeMillis() - tickTimeStamp) / 1000.0)
+        tickTimeStamp = currentTimeMillis()
+        ticks = 0
+        return tps
+    }
+
+    override fun onLoad() {
+        instance = this
+        ExpansionManager.pl = this
+        ExpansionManager.loadExpansions()
+    }
+
+    override fun onDisable() {
+        ExpansionManager.disableExpansions()
+        server.scheduler.cancelTasks(this)
+    }
+}

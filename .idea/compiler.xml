@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="movecraft-space-api" />
+      </profile>
+      <profile name="Annotation profile for DynmapExpansion" enabled="true">
+        <sourceOutputDir name="../../target/expansions/dynmap/generated-sources/annotations" />
+        <sourceTestOutputDir name="../../target/expansions/dynmap/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="DynmapExpansion" />
+      </profile>
+      <profile name="Annotation profile for WorldBorderExpansion" enabled="true">
+        <sourceOutputDir name="../../target/expansions/worldborder/generated-sources/annotations" />
+        <sourceTestOutputDir name="../../target/expansions/worldborder/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="WorldBorderExpansion" />
+      </profile>
+      <profile name="Annotation profile for FactionsExpansion" enabled="true">
+        <sourceOutputDir name="../../target/expansions/factions/generated-sources/annotations" />
+        <sourceTestOutputDir name="../../target/expansions/factions/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="FactionsExpansion" />
+      </profile>
+      <profile name="Annotation profile for WorldGuardExpansion" enabled="true">
+        <sourceOutputDir name="../../target/expansions/worldguard/generated-sources/annotations" />
+        <sourceTestOutputDir name="../../target/expansions/worldguard/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="WorldGuardExpansion" />
+      </profile>
+      <profile name="Annotation profile for RedProtectExpansion" enabled="true">
+        <sourceOutputDir name="../../target/expansions/factions/generated-sources/annotations" />
+        <sourceTestOutputDir name="../../target/expansions/factions/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="RedProtectExpansion" />
+      </profile>
+      <profile name="Annotation profile for FactionsUUIDExpansion" enabled="true">
+        <sourceOutputDir name="../../target/expansions/factionsuuid/generated-sources/annotations" />
+        <sourceTestOutputDir name="../../target/expansions/factionsuuid/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="FactionsUUIDExpansion" />
+      </profile>
+      <profile name="Annotation profile for Factions3Expansion" enabled="true">
+        <sourceOutputDir name="../../target/expansions/factions3/generated-sources/annotations" />
+        <sourceTestOutputDir name="../../target/expansions/factions3/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="Factions3Expansion" />
+      </profile>
+      <profile name="Annotation profile for Movecraft-Space-Parent" enabled="true">
+        <sourceOutputDir name="../target/generated-sources/annotations" />
+        <sourceTestOutputDir name="../target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="Movecraft-Space" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="Movecraft-Space-Parent" target="1.5" />
+      <module name="movecraft-space-WE6" target="1.5" />
+      <module name="movecraft-space-WE7" target="1.5" />
+      <module name="MovecraftSpace" target="1.5" />
+      <module name="plugin" target="1.5" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
