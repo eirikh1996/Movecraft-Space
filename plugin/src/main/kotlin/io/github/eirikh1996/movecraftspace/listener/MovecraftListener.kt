@@ -14,10 +14,12 @@ import net.countercraft.movecraft.events.CraftPreTranslateEvent
 import net.countercraft.movecraft.events.CraftSinkEvent
 import net.countercraft.movecraft.mapUpdater.MapUpdateManager
 import net.countercraft.movecraft.mapUpdater.update.ExplosionUpdateCommand
+import net.countercraft.movecraft.mapUpdater.update.UpdateCommand
 import net.countercraft.movecraft.utils.BitmapHitBox
 import net.countercraft.movecraft.utils.MathUtils
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
+import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -173,18 +175,21 @@ object MovecraftListener : Listener {
             return
         }
         event.isCancelled = true
-        val explosionLocations = HashSet<MovecraftLocation>()
-        for (ml in event.craft.hitBox) {
-            if (ml.x % 15 != 0 && ml.y % 15 != 0 && ml.z % 15 != 0)
-                continue
-            explosionLocations.add(ml)
+        val explosionLocations = HashSet<UpdateCommand>()
+        val hitBox = event.craft.hitBox
+        for (x in hitBox.minX..hitBox.maxX step 5) {
+            for (y in hitBox.minY..hitBox.maxY) {
+                for (z in hitBox.minZ..hitBox.maxZ) {
+                    if (!hitBox.contains(x, y, z))
+                        continue
+                    explosionLocations.add(ExplosionUpdateCommand(Location(event.craft.w, x.toDouble(), y.toDouble(), z.toDouble()), 6f))
+                }
+            }
         }
         if (explosionLocations.isEmpty()) {
-            explosionLocations.add(event.craft.hitBox.midPoint)
+            explosionLocations.add(ExplosionUpdateCommand(hitBox.midPoint.toBukkit(event.craft.w), 6f))
         }
-        for (ml in explosionLocations) {
-            MapUpdateManager.getInstance().scheduleUpdate(ExplosionUpdateCommand(ml.toBukkit(event.craft.w), 20f))
-        }
+
         object : BukkitRunnable() {
             override fun run() {
                 for (ml in event.craft.hitBox) {

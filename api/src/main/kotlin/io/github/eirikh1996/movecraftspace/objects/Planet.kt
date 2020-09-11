@@ -103,10 +103,6 @@ data class Planet(var center: ImmutableVector, var orbitCenter : ImmutableVector
                 queue.add(test)
             }
         }
-        Bukkit.broadcastMessage(visited.size.toString())
-        Bukkit.broadcastMessage(destination.name)
-        Bukkit.broadcastMessage("Moon: " + moon)
-        Bukkit.broadcastMessage(displacement.toString())
         val newLocMap = HashMap<ImmutableVector, Pair<Material, Any>>()
         for (loc in visited) {
             val b = loc.toLocation(space).block

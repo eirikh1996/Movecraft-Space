@@ -107,7 +107,7 @@ object PlanetCommand : TabExecutor {
                 moon = true
             }
             if (!moon && spacing < Settings.MinimumDistanceBetweenOrbits) {
-                sender.sendMessage(COMMAND_PREFIX + ERROR + "Planet is too close to the outer orbit of " + nearestStar.name + "'s planetary system. Move " + (Settings.MinimumDistanceBetweenOrbits - spacing) + " blocks away")
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "Planet is too close to the outer orbit around " + nearestStar.name + "'s planetary system. Move " + (Settings.MinimumDistanceBetweenOrbits - spacing) + " blocks away")
                 return true
             } else if (!moon && spacing > Settings.MaximumDistanceBetweenOrbits) {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "Planet is too far away from the outer orbit of " + nearestStar.name + "'s planetary system. Move " + (spacing - Settings.MaximumDistanceBetweenOrbits ) + " blocks closer")
@@ -132,10 +132,6 @@ object PlanetCommand : TabExecutor {
             }
             PlanetCollection.add(planet)
         } else if (args[0].equals("remove", true)) {
-            if (sender !is Player) {
-                sender.sendMessage(COMMAND_PREFIX + ERROR + "You must be a player to use this command")
-                return true
-            }
             if (args.size == 1) {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "You must specify a planet")
                 return true
@@ -161,17 +157,13 @@ object PlanetCommand : TabExecutor {
             }.runTaskTimer(MovecraftSpace.instance,0,1)
         } else if (args[0].equals("toggleplayerteleport", true)) {
             if (PlayerListener.disabledPlayers.contains(sender.uniqueId)) {
-                sender.sendMessage("Player teleportation to planets enabled")
+                sender.sendMessage(COMMAND_PREFIX + "Player teleportation to planets enabled")
                 PlayerListener.disabledPlayers.remove(sender.uniqueId)
                 return true
             }
             sender.sendMessage("Player teleportation to planets disabled")
             PlayerListener.disabledPlayers.add(sender.uniqueId)
         } else if (args[0].equals("move", true)) {
-            if (sender !is Player) {
-                sender.sendMessage("You must be a player to use this command")
-                return true
-            }
             if (args.size == 1) {
                 sender.sendMessage("You must specify a planet")
                 return true
@@ -193,6 +185,8 @@ object PlanetCommand : TabExecutor {
             for (moon in planet.moons) {
                 moon.move(displacement, true)
             }
+        } else if (args[0].equals("test")) {
+
         }
         return true
     }

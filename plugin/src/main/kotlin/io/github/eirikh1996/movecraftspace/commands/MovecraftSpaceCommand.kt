@@ -6,7 +6,10 @@ import org.bukkit.command.TabExecutor
 
 object MovecraftSpaceCommand : TabExecutor {
     override fun onCommand(sender : CommandSender, cmd : Command, label : String, args : Array<out String>): Boolean {
-        TODO("Not yet implemented")
+        if (!cmd.name.equals("movecraftspace", true))
+            return false
+
+        return true
     }
 
     override fun onTabComplete(sender : CommandSender, cmd : Command, label : String, args : Array<out String>) : List<String> {

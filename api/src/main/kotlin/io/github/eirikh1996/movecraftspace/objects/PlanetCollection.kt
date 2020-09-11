@@ -176,14 +176,14 @@ object PlanetCollection : Iterable<Planet> {
         printWriter.close()
     }
 
-    fun intersectingOtherPlanetaryOrbit(planet: Planet) : Boolean {
+    fun intersectingOtherPlanetaryOrbit(loc : Location) : Boolean {
         for (pl in this) {
-            if (pl == planet)
+            if (pl.space != loc.world)
                 continue
             val distance = pl.orbitCenter.distance(pl.center)
             val minDistance = distance - pl.radius
             val maxDistance = distance + pl.radius
-            val planetDistance = planet.orbitCenter.distance(planet.center)
+            val planetDistance = pl.orbitCenter.distance(ImmutableVector.fromLocation(loc))
             if (planetDistance < minDistance || planetDistance > maxDistance)
                 return true
 
