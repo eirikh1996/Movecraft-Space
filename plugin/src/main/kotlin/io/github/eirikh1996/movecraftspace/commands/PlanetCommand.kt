@@ -10,6 +10,7 @@ import io.github.eirikh1996.movecraftspace.objects.StarCollection
 import io.github.eirikh1996.movecraftspace.utils.MSUtils
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
+import io.github.eirikh1996.movecraftspace.utils.Paginator
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -161,23 +162,23 @@ object PlanetCommand : TabExecutor {
                 PlayerListener.disabledPlayers.remove(sender.uniqueId)
                 return true
             }
-            sender.sendMessage("Player teleportation to planets disabled")
+            sender.sendMessage(COMMAND_PREFIX + "Player teleportation to planets disabled")
             PlayerListener.disabledPlayers.add(sender.uniqueId)
         } else if (args[0].equals("move", true)) {
             if (args.size == 1) {
-                sender.sendMessage("You must specify a planet")
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "You must specify a planet")
                 return true
             }
             val planet = PlanetCollection.getPlanetByName(args[1])
             if (planet == null) {
-                sender.sendMessage("Planet " + args[1] + " does not exist!")
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "Planet " + args[1] + " does not exist!")
                 return true
             }
             val tx = sender.location.blockX
             val tz = sender.location.blockZ
             val dx = tx - planet.center.x
             val dz = tz - planet.center.z
-            sender.sendMessage("Moved planet to x: " + sender.location.blockX + ", z: " + sender.location.blockZ)
+            sender.sendMessage(COMMAND_PREFIX + "Moved planet to x: " + sender.location.blockX + ", z: " + sender.location.blockZ)
             val displacement = ImmutableVector(dx, 0, dz)
             planet.move(displacement)
             if (planet.moons.isEmpty())
@@ -185,8 +186,6 @@ object PlanetCommand : TabExecutor {
             for (moon in planet.moons) {
                 moon.move(displacement, true)
             }
-        } else if (args[0].equals("test")) {
-
         }
         return true
     }
