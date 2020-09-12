@@ -1,5 +1,6 @@
 package io.github.eirikh1996.movecraftspace.listener
 
+import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionManager
 import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
@@ -22,14 +23,7 @@ object PlayerListener : Listener {
     @EventHandler
     fun onPlayerMove(event : PlayerMoveEvent) {
         val planet = PlanetCollection.getPlanetAt(event.to!!)
-        if (planet == null) {
-            return
-        }
-        if (planet.destination.equals(event.to!!.world) && event.to!!.blockY < planet.exitHeight) {
-            return
-        }
-
-        if (teleportingPlayers.contains(event.player.uniqueId) || disabledPlayers.contains(event.player.uniqueId)) {
+        if (planet == null || planet.destination.equals(event.to!!.world) && event.to!!.blockY < planet.exitHeight || teleportingPlayers.contains(event.player.uniqueId) || disabledPlayers.contains(event.player.uniqueId) || !Settings.AllowPlayersTeleportationToPlanets) {
             return
         }
         var dest : Location? = null

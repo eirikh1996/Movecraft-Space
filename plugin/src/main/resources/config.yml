@@ -4,5 +4,6 @@ MaxRadiusFromPlanetWorldSpawn: -1
 MinDistanceToOtherCrafts: -1
 MinimumDistanceBetweenOrbits: 7000
 MaximumDistanceBetweenOrbits: 15000
-MinMoonSpacing
-MaxMoonSpacing
+MinMoonSpacing: 500
+MaxMoonSpacing: 3500
+AllowPlayersTeleportationToPlanets: true

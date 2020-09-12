@@ -7,6 +7,7 @@ object Settings {
     val MinimumDistanceBetweenStars : Int get() { return ConfigHolder.config["MinimumDistanceBetweenStars", 130000] as Int }
     val MinMoonSpacing : Int get() { return ConfigHolder.config["MinMoonSpacing", 500] as Int }
     val MaxMoonSpacing : Int get() { return ConfigHolder.config["MaxMoonSpacing", 3500] as Int }
+    val AllowPlayersTeleportationToPlanets : Boolean get() { return ConfigHolder.config["AllowPlayersTeleportationToPlanets", true] as Boolean}
     var IsLegacy = false
     val WorldSwitchCooldownTime : Int get() { return ConfigHolder.config["WorldSwitchCooldownTime", 10] as Int }
     val ExplodeSinkingCraftsInWorlds : Set<String> get() { return (ConfigHolder.config["ExplodeSinkingCraftsInWorlds", ArrayList<String>()] as List<String>).toHashSet() }
