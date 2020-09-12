@@ -95,7 +95,7 @@ object PlanetCommand : TabExecutor {
             }
             val spacing = planet.orbitRadius - nearestStar.radius()
             var moon = false
-            if (nearestPlanet != null) {
+            if (nearestPlanet != null && nearestPlanet.center.distance(planet.center) < nearestStar.loc.distance(planet.center)) {
                 val moonSpacing = nearestPlanet.center.distance(planet.center)
                 if (moonSpacing < Settings.MinMoonSpacing) {
                     sender.sendMessage(COMMAND_PREFIX + ERROR + "Planet is too close to the outer orbit of " + nearestPlanet.destination.name + "'s moons. Move " + (Settings.MinMoonSpacing - moonSpacing) + " blocks away")
@@ -127,8 +127,8 @@ object PlanetCommand : TabExecutor {
                 }
             }.runTaskTimer(MovecraftSpace.instance,0,1)
 
-            if (nearestPlanet != null) {
-                nearestPlanet.moons.add(planet)
+            if (moon) {
+                nearestPlanet!!.moons.add(planet)
             }
             PlanetCollection.add(planet)
         } else if (args[0].equals("remove", true)) {
