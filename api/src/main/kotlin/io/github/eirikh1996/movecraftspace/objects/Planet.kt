@@ -25,7 +25,7 @@ data class Planet(var center: ImmutableVector, var orbitCenter : ImmutableVector
 
         }
     }
-
+    val name : String get() { return destination.name }
     val moons = HashSet<Planet>()
     val id = UUID.randomUUID()
     fun contains(location: Location) : Boolean {

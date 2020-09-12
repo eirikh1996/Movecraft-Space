@@ -42,4 +42,5 @@ object MSUtils {
 
     val COMMAND_PREFIX = "§5[§9Movecraft-Space§5]§r "
     val ERROR = "§4Error: "
+    val COMMAND_NO_PERMISSION = "You have no permission to execute this command!"
 }

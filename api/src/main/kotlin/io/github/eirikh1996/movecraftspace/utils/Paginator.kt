@@ -9,8 +9,8 @@ import kotlin.math.ceil
 class Paginator constructor(val name : String = "") {
     val content = ArrayList<TextComponent>()
 
-    fun addLine(line : String) {
-        content.add(TextComponent(line))
+    fun addLine(line : TextComponent) {
+        content.add(line)
     }
 
     fun getPage(pageNo : Int, command : String) : Array<TextComponent?> {

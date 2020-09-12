@@ -8,9 +8,12 @@ import io.github.eirikh1996.movecraftspace.objects.Planet
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
 import io.github.eirikh1996.movecraftspace.objects.StarCollection
 import io.github.eirikh1996.movecraftspace.utils.MSUtils
+import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_NO_PERMISSION
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import io.github.eirikh1996.movecraftspace.utils.Paginator
+import net.md_5.bungee.api.ChatMessageType
+import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -29,7 +32,10 @@ object PlanetCommand : TabExecutor {
         if (!cmd.name.equals("planet", true)) {
             return false
         }
-
+        if (!sender.hasPermission("movecraftspace.command.planet")) {
+            sender.sendMessage(COMMAND_PREFIX + ERROR + COMMAND_NO_PERMISSION)
+            return true
+        }
         if (sender !is Player) {
             sender.sendMessage("You must be player to use this command")
             return true
@@ -40,6 +46,10 @@ object PlanetCommand : TabExecutor {
             return true
         }
         if (args[0].equals("create", true)) {
+            if (!sender.hasPermission("movecraftspace.command.planet.create")) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + COMMAND_NO_PERMISSION)
+                return true
+            }
             if (sender !is Player) {
                 sender.sendMessage("You must be a player to use this command")
                 return true
@@ -133,6 +143,10 @@ object PlanetCommand : TabExecutor {
             }
             PlanetCollection.add(planet)
         } else if (args[0].equals("remove", true)) {
+            if (!sender.hasPermission("movecraftspace.command.planet.remove")) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + COMMAND_NO_PERMISSION)
+                return true
+            }
             if (args.size == 1) {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "You must specify a planet")
                 return true
@@ -157,6 +171,14 @@ object PlanetCommand : TabExecutor {
                 }
             }.runTaskTimer(MovecraftSpace.instance,0,1)
         } else if (args[0].equals("toggleplayerteleport", true)) {
+            if (!sender.hasPermission("movecraftspace.command.planet.toggleplayerteleport")) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + COMMAND_NO_PERMISSION)
+                return true
+            }
+            if (!Settings.AllowPlayersTeleportationToPlanets) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "Player teleportation to planets disabled in config")
+                return true
+            }
             if (PlayerListener.disabledPlayers.contains(sender.uniqueId)) {
                 sender.sendMessage(COMMAND_PREFIX + "Player teleportation to planets enabled")
                 PlayerListener.disabledPlayers.remove(sender.uniqueId)
@@ -186,12 +208,44 @@ object PlanetCommand : TabExecutor {
             for (moon in planet.moons) {
                 moon.move(displacement, true)
             }
+        } else if (args[0].equals("list", true)) {
+            val paginator = Paginator("Planets")
+            for (pl in PlanetCollection) {
+                val orbitCenterPlanet = PlanetCollection.getPlanetAt(pl.orbitCenter.toLocation(pl.space))
+                val orbitCenterStar = StarCollection.closestStar(pl.orbitCenter.toLocation(pl.space),2)
+                val systemName = if (orbitCenterPlanet != null) {
+                    orbitCenterPlanet.name
+                } else if (orbitCenterStar != null) {
+                    orbitCenterStar.name
+                } else {
+                    ""
+                }
+                val component = TextComponent(pl.name + ", §cSystem:§r " + systemName + ", §cOrbit time:§r " + pl.orbitTime)
+                paginator.addLine(component)
+            }
+            val pageNo = if (args.size > 2) {
+                try {
+                    args[1].toInt()
+                } catch (e : NumberFormatException) {
+                    sender.sendMessage(COMMAND_PREFIX + ERROR + args[1] + " is not a number")
+                    return true
+                }
+            } else {
+                1
+            }
+            val page = paginator.getPage(pageNo, "/planet list")
+            for (l in page) {
+                if (l == null) {
+                    continue
+                }
+                sender.spigot().sendMessage(ChatMessageType.CHAT, l)
+            }
         }
         return true
     }
 
     override fun onTabComplete(sender: CommandSender, cmd: Command, label: String, args: Array<out String>) : List<String> {
-        var tabCompletions = listOf("create", "remove", "move", "list", "toggleplayerteleport")
+        var tabCompletions = listOf("create", "remove", "move", "list", "toggleplayerteleport").filter { str -> sender.hasPermission("movecraftspace.command.planet." + str) }
         tabCompletions = tabCompletions.sorted()
         if (args.size == 0) {
             return tabCompletions
