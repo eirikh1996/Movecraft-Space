@@ -1,10 +1,12 @@
 package io.github.eirikh1996.movecraftspace.expansion
 
+import com.google.common.collect.ImmutableMap
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
+import org.bukkit.plugin.PluginDescriptionFile
 import java.io.File
 import java.io.InputStreamReader
 import java.util.jar.JarFile
@@ -88,6 +90,12 @@ object ExpansionManager {
                 pl.logger.severe("Dependenc" + if (disabledDependencies.size > 1 ) "ies " else "y " + disabledDependencies.joinToString(", ") + if (disabledDependencies.size > 1 ) " are " else " is " + "required, but disabled")
                 continue
             }
+            val commandsField = PluginDescriptionFile::class.java.getDeclaredField("commands")
+            commandsField.isAccessible = true
+            val cmds = commandsField.get(pl.description) as Map<String, Map<String, Any>>
+            val newCmds = HashMap<String, Map<String, Any>>(cmds)
+            newCmds.putAll(ex.commands)
+            commandsField.set(pl.description, ImmutableMap.copyOf(newCmds))
             try {
                 ex.load()
                 pl.logger.info("Expansion " + name + " loaded")

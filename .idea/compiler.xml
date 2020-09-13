@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="movecraft-space-api" />
+        <module name="HyperspaceExpansion" />
       </profile>
       <profile name="Annotation profile for DynmapExpansion" enabled="true">
         <sourceOutputDir name="../../target/expansions/dynmap/generated-sources/annotations" />
@@ -33,8 +34,8 @@
         <module name="WorldGuardExpansion" />
       </profile>
       <profile name="Annotation profile for RedProtectExpansion" enabled="true">
-        <sourceOutputDir name="../../target/expansions/factions/generated-sources/annotations" />
-        <sourceTestOutputDir name="../../target/expansions/factions/generated-test-sources/test-annotations" />
+        <sourceOutputDir name="../../target/expansions/redprotect/generated-sources/annotations" />
+        <sourceTestOutputDir name="../../target/expansions/redprotect/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="RedProtectExpansion" />
       </profile>

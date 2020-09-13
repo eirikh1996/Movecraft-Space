@@ -223,7 +223,7 @@ object PlanetCommand : TabExecutor {
                 val component = TextComponent(pl.name + ", §cSystem:§r " + systemName + ", §cOrbit time:§r " + pl.orbitTime)
                 paginator.addLine(component)
             }
-            val pageNo = if (args.size > 2) {
+            val pageNo = if (args.size > 1) {
                 try {
                     args[1].toInt()
                 } catch (e : NumberFormatException) {

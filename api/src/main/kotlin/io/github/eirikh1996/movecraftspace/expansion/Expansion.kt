@@ -9,6 +9,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.util.*
+import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 import kotlin.math.min
 
@@ -19,9 +20,17 @@ abstract class Expansion {
     val dataFolder = classLoader.datafolder
     val depend = HashSet<String>()
     val softdepend = HashSet<String>()
+    val commands = HashMap<String, Map<String, Any>>()
     val plugin = classLoader.plugin
     val logger = classLoader.plugin.logger
     var state = ExpansionState.NOT_LOADED
+    set(state) {
+        field = state
+        if (state == ExpansionState.ENABLED)
+            enable()
+        else if (state == ExpansionState.DISABLED)
+            disable()
+    }
     val uuid = UUID.randomUUID()
 
     init {
@@ -33,6 +42,14 @@ abstract class Expansion {
         if (tempSoftDepend != null) {
             depend.addAll(tempSoftDepend)
         }
+        val cmds = classLoader.desc.getConfigurationSection("commands")
+        if (cmds != null) {
+            val cmdMap = cmds.getValues(true)
+            for (k in cmdMap.keys) {
+                val v = cmdMap.get(k) as Map<String, Any>
+                commands.put(k, v)
+            }
+        }
     }
     open fun worldBoundrary(world : World) : IntArray {
         val wb = world.worldBorder;
@@ -43,7 +60,9 @@ abstract class Expansion {
         val maxZ = (wb.center.blockZ + wbRadius)
         return intArrayOf(minX, maxX, minZ, maxZ)
     }
-    abstract fun allowedArea(p : Player, loc : Location) : Boolean
+    open fun allowedArea(p : Player, loc : Location) : Boolean {
+        return true
+    }
 
     fun saveDefaultConfig() {
         saveResource("config.yml", false)

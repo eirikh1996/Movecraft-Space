@@ -178,8 +178,8 @@ object MovecraftListener : Listener {
         val explosionLocations = HashSet<UpdateCommand>()
         val hitBox = event.craft.hitBox
         for (x in hitBox.minX..hitBox.maxX step 5) {
-            for (y in hitBox.minY..hitBox.maxY) {
-                for (z in hitBox.minZ..hitBox.maxZ) {
+            for (y in hitBox.minY..hitBox.maxY step 5) {
+                for (z in hitBox.minZ..hitBox.maxZ step 5) {
                     if (!hitBox.contains(x, y, z))
                         continue
                     explosionLocations.add(ExplosionUpdateCommand(Location(event.craft.w, x.toDouble(), y.toDouble(), z.toDouble()), 6f))
@@ -189,6 +189,7 @@ object MovecraftListener : Listener {
         if (explosionLocations.isEmpty()) {
             explosionLocations.add(ExplosionUpdateCommand(hitBox.midPoint.toBukkit(event.craft.w), 6f))
         }
+        MapUpdateManager.getInstance().scheduleUpdates(explosionLocations)
 
         object : BukkitRunnable() {
             override fun run() {

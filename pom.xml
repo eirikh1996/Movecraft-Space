@@ -16,6 +16,7 @@
         <module>expansions/FactionsUUIDExpansion</module>
         <module>expansions/WorldGuardExpansion</module>
         <module>expansions/RedProtectExpansion</module>
+        <module>expansions/HyperspaceExpansion</module>
     </modules>
     <packaging>pom</packaging>
 

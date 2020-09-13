@@ -31,15 +31,12 @@ object FactionsListener : Listener {
                         if (!PlanetCollection.withinPlanetOrbit(Location(ps.asBukkitWorld(),
                                 x.toDouble(), y.toDouble(), z.toDouble())))
                             continue
-
+                        event.mPlayer.message("Cannot claim in planetary orbits")
+                        event.isCancelled = true
+                        return
                     }
                 }
             }
-            if (!PlanetCollection.withinPlanetOrbit(ps.asBukkitLocation()))
-                continue
-            event.mPlayer.message("Cannot claim in planetary orbits")
-            event.isCancelled = true
-            return
         }
     }
 }

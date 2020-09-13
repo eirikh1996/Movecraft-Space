@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>movecraft-space-parent</artifactId>
+        <groupId>io.github.eirikh1996</groupId>
+        <version>Parent</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.github.eirikh1996</groupId>
-    <artifactId>RedProtectExpansion</artifactId>
-    <version>Parent</version>
+    <artifactId>HyperspaceExpansion</artifactId>
     <packaging>jar</packaging>
 
-    <name>RedProtectExpansion</name>
+    <name>io.github.eirikh1996 HyperspaceExpansion</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -17,12 +22,6 @@
         <junit.version>4.12</junit.version>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>redprotect-repo</id>
-            <url>https://raw.githubusercontent.com/FabioZumbi12/RedProtect/mvn-repo/</url>
-        </repository>
-    </repositories>
     <dependencies>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -54,25 +53,12 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/../../libs/Movecraft.jar</systemPath>
         </dependency>
-        <!--RedProtect-->
-        <dependency>
-            <groupId>br.net.fabiozumbi12.RedProtect</groupId>
-            <artifactId>RedProtect-Core</artifactId>
-            <version>LATEST</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>br.net.fabiozumbi12.RedProtect</groupId>
-            <artifactId>RedProtect-Spigot</artifactId>
-            <version>LATEST</version>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 
     <build>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
-        <directory>../../target/expansions/redprotect</directory>
+
         <plugins>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>

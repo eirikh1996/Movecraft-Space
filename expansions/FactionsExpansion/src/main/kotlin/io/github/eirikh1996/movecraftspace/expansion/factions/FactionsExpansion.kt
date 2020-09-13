@@ -9,6 +9,7 @@ import com.massivecraft.factions.entity.MPlayer
 import com.massivecraft.massivecore.ps.PS
 import io.github.eirikh1996.movecraftspace.expansion.Expansion
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionState
+import io.github.eirikh1996.movecraftspace.expansion.factions.listener.FactionsListener
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
@@ -26,6 +27,7 @@ class FactionsExpansion : Expansion(){
             state = ExpansionState.DISABLED
             return
         }
+        plugin.server.pluginManager.registerEvents(FactionsListener, plugin)
     }
 
 }
