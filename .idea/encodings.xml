@@ -4,12 +4,12 @@
     <file url="file://$PROJECT_DIR$/api/src/main/kotlin" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/expansions/DynmapExpansion/src/main/kotlin" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/expansions/DynmapExpansion/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/expansions/Factions3Expansion/src/main/kotlin" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/expansions/Factions3Expansion/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/expansions/FactionsExpansion/src/main/kotlin" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/expansions/FactionsExpansion/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/expansions/FactionsUUIDExpansion/src/main/kotlin" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/expansions/FactionsUUIDExpansion/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/expansions/GriefPreventionExpansion/src/main/kotlin" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/expansions/GriefPreventionExpansion/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/expansions/RedProtectExpansion/src/main/kotlin" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/expansions/RedProtectExpansion/src/main/resources" charset="UTF-8" />

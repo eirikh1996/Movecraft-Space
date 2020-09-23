@@ -10,7 +10,9 @@ import net.countercraft.movecraft.MovecraftChunk
 import net.countercraft.movecraft.MovecraftLocation
 import net.countercraft.movecraft.craft.ChunkManager
 import net.countercraft.movecraft.craft.Craft
+import net.countercraft.movecraft.craft.CraftManager
 import net.countercraft.movecraft.events.CraftPreTranslateEvent
+import net.countercraft.movecraft.events.CraftReleaseEvent
 import net.countercraft.movecraft.events.CraftSinkEvent
 import net.countercraft.movecraft.mapUpdater.MapUpdateManager
 import net.countercraft.movecraft.mapUpdater.update.ExplosionUpdateCommand
@@ -189,15 +191,15 @@ object MovecraftListener : Listener {
         if (explosionLocations.isEmpty()) {
             explosionLocations.add(ExplosionUpdateCommand(hitBox.midPoint.toBukkit(event.craft.w), 6f))
         }
+        val collapsed = BitmapHitBox(hitBox)
+        hitBox.clear()
+        CraftManager.getInstance().removeCraft(event.craft, CraftReleaseEvent.Reason.SUNK)
         MapUpdateManager.getInstance().scheduleUpdates(explosionLocations)
-
         object : BukkitRunnable() {
             override fun run() {
-                for (ml in event.craft.hitBox) {
-                    if (ml.toBukkit(event.craft.w).block.type.name.endsWith("AIR"))
-                        continue
-                    event.craft.collapsedHitBox.add(ml)
-                }
+                event.craft.collapsedHitBox.addAll(collapsed.filter {
+                        loc -> !loc.toBukkit(event.craft.w).block.type.name.endsWith("AIR")
+                })
                 Movecraft.getInstance().asyncManager.addWreck(event.craft)
             }
 

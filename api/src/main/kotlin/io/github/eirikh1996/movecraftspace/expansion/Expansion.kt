@@ -1,5 +1,6 @@
 package io.github.eirikh1996.movecraftspace.expansion
 
+import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.World
@@ -26,10 +27,16 @@ abstract class Expansion {
     var state = ExpansionState.NOT_LOADED
     set(state) {
         field = state
-        if (state == ExpansionState.ENABLED)
+        if (state == ExpansionState.ENABLED) {
+            Bukkit.getConsoleSender().sendMessage(COMMAND_PREFIX + "Enabling expansion " + name)
             enable()
-        else if (state == ExpansionState.DISABLED)
+        } else if (state == ExpansionState.DISABLED) {
+            Bukkit.getConsoleSender().sendMessage(COMMAND_PREFIX + "Disabling expansion " + name)
             disable()
+        } else if (state == ExpansionState.LOADED) {
+            Bukkit.getConsoleSender().sendMessage(COMMAND_PREFIX + "Loading expansion " + name)
+            load()
+        }
     }
     val uuid = UUID.randomUUID()
 

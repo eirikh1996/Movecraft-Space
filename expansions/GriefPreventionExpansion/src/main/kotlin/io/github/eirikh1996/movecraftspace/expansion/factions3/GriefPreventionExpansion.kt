@@ -12,7 +12,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
 
-class Factions3Expansion : Expansion(){
+class GriefPreventionExpansion : Expansion(){
     override fun allowedArea(p: Player, loc: Location): Boolean {
         val faction = BoardColl.get().getFactionAt(PS.valueOf(loc))
         return faction == FactionColl.get().none || faction.isPlayerPermitted(MPlayer.get(p), MPerm.getPermBuild())

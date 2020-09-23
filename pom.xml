@@ -12,7 +12,7 @@
         <module>expansions/DynmapExpansion</module>
         <module>expansions/WorldBorderExpansion</module>
         <module>expansions/FactionsExpansion</module>
-        <module>expansions/Factions3Expansion</module>
+        <module>expansions/GriefPreventionExpansion</module>
         <module>expansions/FactionsUUIDExpansion</module>
         <module>expansions/WorldGuardExpansion</module>
         <module>expansions/RedProtectExpansion</module>

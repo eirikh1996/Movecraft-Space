@@ -1,5 +1,6 @@
 package io.github.eirikh1996.movecraftspace
 
+import io.github.eirikh1996.movecraftspace.commands.MovecraftSpaceCommand
 import io.github.eirikh1996.movecraftspace.commands.PlanetCommand
 import io.github.eirikh1996.movecraftspace.commands.StarCommand
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionManager
@@ -42,6 +43,7 @@ class MovecraftSpace : JavaPlugin() {
         server.pluginManager.registerEvents(PlayerListener, this)
         server.pluginManager.registerEvents(ExplosionListener, this)
         getCommand("planet")!!.setExecutor(PlanetCommand)
+        getCommand("movecraftspace")!!.setExecutor(MovecraftSpaceCommand)
         getCommand("star")!!.setExecutor(StarCommand)
         if (Settings.RotatePlanets)
             PlanetaryMotionManager.runTaskTimerAsynchronously(this, 100, 20)

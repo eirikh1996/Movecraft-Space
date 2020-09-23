@@ -1,6 +1,8 @@
 package io.github.eirikh1996.movecraftspace.expansion
 
 import com.google.common.collect.ImmutableMap
+import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.configuration.file.YamlConfiguration
@@ -9,9 +11,13 @@ import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.PluginDescriptionFile
 import java.io.File
 import java.io.InputStreamReader
+import java.util.*
+import java.util.Collections.unmodifiableSet
 import java.util.jar.JarFile
+import kotlin.collections.HashMap
+import kotlin.collections.HashSet
 
-object ExpansionManager {
+object ExpansionManager : Iterable<Expansion> {
     val expansions = HashSet<Expansion>()
     lateinit var pl: Plugin
 
@@ -97,7 +103,7 @@ object ExpansionManager {
             newCmds.putAll(ex.commands)
             commandsField.set(pl.description, ImmutableMap.copyOf(newCmds))
             try {
-                ex.load()
+                ex.state = ExpansionState.LOADED
                 pl.logger.info("Expansion " + name + " loaded")
                 expansions.add(ex)
             } catch (t : Throwable) {
@@ -110,14 +116,13 @@ object ExpansionManager {
     }
 
     fun enableExpansions() {
+        Bukkit.getConsoleSender().sendMessage(COMMAND_PREFIX + "Enabling " + expansions.size + " loaded expansions")
         for (ex in expansions) {
             try {
-                ex.enable()
                 ex.state = ExpansionState.ENABLED
             } catch (t : Throwable) {
-                pl.logger.severe("Failure to enable expansion " + ex.name)
+                pl.logger.severe(COMMAND_PREFIX + "Failure to enable expansion " + ex.name)
                 t.printStackTrace()
-                ex.disable()
                 ex.state = ExpansionState.DISABLED
             }
 
@@ -126,7 +131,14 @@ object ExpansionManager {
 
     fun disableExpansions() {
         for (ex in expansions) {
-            ex.disable()
+            ex.state = ExpansionState.DISABLED
         }
+    }
+
+    /**
+     * Returns an iterator over the elements of this object.
+     */
+    override fun iterator(): Iterator<Expansion> {
+        return unmodifiableSet(expansions).iterator()
     }
 }

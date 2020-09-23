@@ -11,6 +11,7 @@ import io.github.eirikh1996.movecraftspace.utils.MSUtils
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_NO_PERMISSION
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
+import io.github.eirikh1996.movecraftspace.utils.MSUtils.WARNING
 import io.github.eirikh1996.movecraftspace.utils.Paginator
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.TextComponent
@@ -23,11 +24,16 @@ import org.bukkit.command.TabExecutor
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
 import java.lang.NumberFormatException
+import java.lang.System.currentTimeMillis
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 import kotlin.math.min
+import kotlin.random.Random
 
 object PlanetCommand : TabExecutor {
+    val planetRemoveTimeMap = HashMap<UUID, Long>()
+
     override fun onCommand(sender: CommandSender, cmd: Command, label: String, args: Array<out String>): Boolean {
         if (!cmd.name.equals("planet", true)) {
             return false
@@ -156,10 +162,25 @@ object PlanetCommand : TabExecutor {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "Planet " + args[1] + " does not exist!")
                 return true
             }
+            if (planet.moons.size > 0 &&
+                !planetRemoveTimeMap.containsKey(sender.uniqueId) ||
+                currentTimeMillis() - planetRemoveTimeMap.get(sender.uniqueId)!! > 10000) {
+                sender.sendMessage(COMMAND_PREFIX + WARNING + "Planet " + planet.name + " is center of a moon system. Removal will also remove its moons. Type /planet remove " + planet.name + " again within 10 seconds to remove.")
+                planetRemoveTimeMap.put(sender.uniqueId, currentTimeMillis())
+                return true
+            }
             sender.sendMessage(COMMAND_PREFIX + "Successfully removed planet " + args[1] + "!")
             PlanetCollection.remove(planet)
             val structureRadius = planet.radius - 30
             val sphere = LinkedList(MSUtils.createSphere(structureRadius, planet.center))
+            if (!planet.moons.isEmpty()) {
+                for (moon in planet.moons) {
+                    sphere.addAll(MSUtils.createSphere(moon.radius - 30, moon.center))
+                    PlanetCollection.remove(moon)
+                }
+                sender.sendMessage(COMMAND_PREFIX + "Removed " + planet.moons.size + " moons attached to " + planet.name)
+                planet.moons.clear()
+            }
             object : BukkitRunnable() {
                 override fun run() {
                     val size = min(sphere.size, 20000)
@@ -240,12 +261,108 @@ object PlanetCommand : TabExecutor {
                 }
                 sender.spigot().sendMessage(ChatMessageType.CHAT, l)
             }
+        } else if (args[0].equals("regensphere", true)) {
+            if (args.size <= 1) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "You must specify a planet")
+                return true
+            }
+            val planet = PlanetCollection.getPlanetByName(args[1])
+            if (planet == null) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "Planet " + args[1] + " does not exist!")
+                return true
+            }
+            val newSphere = LinkedList(MSUtils.createSphere(planet.radius - 30, planet.center))
+            object : BukkitRunnable() {
+                var x = planet.minX
+                var y = planet.minY
+                var z = planet.minZ
+                val cx = planet.center.x
+                val cy = planet.center.y
+                val cz = planet.center.z
+                var clearedOldSphere = false
+                override fun run() {
+                    if (!clearedOldSphere) {
+                        for (i in 0..30000) {
+                            x++
+                            if (x > planet.maxX) {
+                                x = planet.minX
+                                z++
+                                if (z > planet.maxz) {
+                                    z = planet.minZ
+                                    y++
+                                }
+                            }
+                            if (x >= planet.maxX && y >= planet.maxY && z >= planet.maxz) {
+                                clearedOldSphere = true
+                                break
+                            }
+                            val diffx = x - cx
+                            val diffy = y - cy
+                            val diffz = z - cz
+                            val distSquared  = diffx * diffx + diffy * diffy + diffz * diffz
+                            val radiusSquared = planet.radius * planet.radius
+                            if (distSquared > radiusSquared)
+                                continue
+                            planet.space.getBlockAt(x,y,z).type = Material.AIR
+
+                        }
+                    } else if (!newSphere.isEmpty()) {
+                        for (i in 1..min(newSphere.size, 25000)) {
+                            val pop = newSphere.pop()
+                            pop.toLocation(planet.space).block.type = Material.STONE
+                        }
+                    } else {
+                        cancel()
+                    }
+                }
+
+            }.runTaskTimer(MovecraftSpace.instance, 0, 3)
+        } else if (args[0].equals("addclouds", true)) {
+            if (args.size <= 1) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "You must specify a planet")
+                return true
+            }
+            val planet = PlanetCollection.getPlanetByName(args[1])
+            if (planet == null) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "Planet " + args[1] + " does not exist!")
+                return true
+            }
+            val percentage : Double
+            if (args.size <= 2) {
+                try {
+                    percentage = args[1].toDouble()
+                } catch (e : NumberFormatException) {
+                    sender.sendMessage(COMMAND_PREFIX + ERROR + "Invalid argument " + args[1])
+                    return true
+                }
+            } else {
+                percentage = 100.0
+            }
+            val oldSphere = LinkedList(MSUtils.createSphere(planet.radius - 26, planet.center))
+            val sphere = LinkedList(oldSphere.filter { loc -> Random.nextDouble(0.0, 100.0) <= percentage })
+            object : BukkitRunnable() {
+                override fun run() {
+                    if (!oldSphere.isEmpty()) {
+                        val size = min(oldSphere.size, 20000)
+                        for (i in 1..size) {
+                            oldSphere.pop().toLocation(planet.space).block.type = Material.AIR
+                        }
+                    } else if (!sphere.isEmpty()) {
+                        val size = min(sphere.size, 20000)
+                        for (i in 1..size) {
+                            sphere.pop().toLocation(planet.space).block.type =
+                                if (Settings.IsLegacy) Material.getMaterial("STAINED_GLASS")!! else Material.WHITE_STAINED_GLASS
+                        }
+                    } else
+                        cancel()
+                }
+            }.runTaskTimer(MovecraftSpace.instance,0,1)
         }
         return true
     }
 
     override fun onTabComplete(sender: CommandSender, cmd: Command, label: String, args: Array<out String>) : List<String> {
-        var tabCompletions = listOf("create", "remove", "move", "list", "toggleplayerteleport").filter { str -> sender.hasPermission("movecraftspace.command.planet." + str) }
+        var tabCompletions = listOf("create", "remove", "move", "list", "toggleplayerteleport", "regensphere", "addclouds").filter { str -> sender.hasPermission("movecraftspace.command.planet." + str) }
         tabCompletions = tabCompletions.sorted()
         if (args.size == 0) {
             return tabCompletions
@@ -258,7 +375,10 @@ object PlanetCommand : TabExecutor {
                 worlds.add(world.name)
             }
             tabCompletions = worlds
-        } else if (args[0].equals("remove", true) || args[0].equals("move", true)) {
+        } else if (args[0].equals("remove", true) ||
+            args[0].equals("move", true) ||
+            args[0].equals("regensphere", true) ||
+            args[0].equals("addclouds", true)) {
             val worlds = ArrayList<String>()
             for (planet in PlanetCollection) {
                 worlds.add(planet.destination.name)

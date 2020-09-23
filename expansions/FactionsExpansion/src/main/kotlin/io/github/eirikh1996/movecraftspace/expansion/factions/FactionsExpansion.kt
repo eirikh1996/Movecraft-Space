@@ -2,10 +2,7 @@ package io.github.eirikh1996.movecraftspace.expansion.factions
 
 import com.massivecraft.factions.Factions
 import com.massivecraft.factions.Perm
-import com.massivecraft.factions.entity.BoardColl
-import com.massivecraft.factions.entity.FactionColl
-import com.massivecraft.factions.entity.MPerm
-import com.massivecraft.factions.entity.MPlayer
+import com.massivecraft.factions.entity.*
 import com.massivecraft.massivecore.ps.PS
 import io.github.eirikh1996.movecraftspace.expansion.Expansion
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionState
@@ -13,11 +10,13 @@ import io.github.eirikh1996.movecraftspace.expansion.factions.listener.FactionsL
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
+import java.lang.reflect.Method
 
 class FactionsExpansion : Expansion(){
+    var IsMPlayerPermitted : Method? = null
     override fun allowedArea(p: Player, loc: Location): Boolean {
         val faction = BoardColl.get().getFactionAt(PS.valueOf(loc))
-        return faction == FactionColl.get().none || faction.isPermitted(MPerm.getPermBuild(), faction.getRelationTo(MPlayer.get(p)))
+        return faction == FactionColl.get().none || if (!factions3) faction.isPermitted(MPerm.getPermBuild(), faction.getRelationTo(MPlayer.get(p))) else IsMPlayerPermitted!!.invoke(faction, MPlayer.get(p), MPerm.getPermBuild()) as Boolean
     }
 
     override fun enable() {
@@ -27,7 +26,15 @@ class FactionsExpansion : Expansion(){
             state = ExpansionState.DISABLED
             return
         }
+        factions3 = f.description.version.split(".")[0].toInt() >= 3
+        if (factions3) {
+            IsMPlayerPermitted = Faction::class.java.getDeclaredMethod("isPlayerPermitted", MPlayer::class.java, MPerm::class.java)
+        }
         plugin.server.pluginManager.registerEvents(FactionsListener, plugin)
+    }
+
+    companion object {
+        var factions3 = false
     }
 
 }

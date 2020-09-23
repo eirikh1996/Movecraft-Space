@@ -45,11 +45,11 @@
         <outputRelativeToContentRoot value="true" />
         <module name="FactionsUUIDExpansion" />
       </profile>
-      <profile name="Annotation profile for Factions3Expansion" enabled="true">
+      <profile name="Annotation profile for GriefPreventionExpansion" enabled="true">
         <sourceOutputDir name="../../target/expansions/factions3/generated-sources/annotations" />
         <sourceTestOutputDir name="../../target/expansions/factions3/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="Factions3Expansion" />
+        <module name="GriefPreventionExpansion" />
       </profile>
       <profile name="Annotation profile for Movecraft-Space-Parent" enabled="true">
         <sourceOutputDir name="../target/generated-sources/annotations" />
