@@ -4,7 +4,7 @@
     <parent>
         <artifactId>movecraft-space-parent</artifactId>
         <groupId>io.github.eirikh1996</groupId>
-        <version>Parent</version>
+        <version>parent</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -13,7 +13,7 @@
     <artifactId>HyperspaceExpansion</artifactId>
     <packaging>jar</packaging>
 
-    <name>io.github.eirikh1996 HyperspaceExpansion</name>
+    <name>HyperspaceExpansion</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

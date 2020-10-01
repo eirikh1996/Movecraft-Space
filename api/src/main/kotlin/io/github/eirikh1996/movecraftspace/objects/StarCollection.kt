@@ -91,4 +91,13 @@ object StarCollection : Iterable<Star> {
         }
         return null
     }
+
+    fun getStarAt(testLoc: Location) : Star? {
+        for (star in this) {
+            if (star.space != testLoc.world || star.loc.distance(ImmutableVector.fromLocation(testLoc)) > 130)
+                continue
+            return star
+        }
+        return null
+    }
 }

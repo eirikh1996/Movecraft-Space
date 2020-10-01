@@ -1,7 +1,10 @@
 package io.github.eirikh1996.movecraftspace.expansion.dynmap
 
 import io.github.eirikh1996.movecraftspace.expansion.Expansion
+import io.github.eirikh1996.movecraftspace.expansion.ExpansionManager
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionState
+import io.github.eirikh1996.movecraftspace.expansion.hyperspace.HyperspaceExpansion
+import io.github.eirikh1996.movecraftspace.expansion.hyperspace.HyperspaceManager
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
 import io.github.eirikh1996.movecraftspace.objects.StarCollection
 import org.bukkit.Bukkit
@@ -16,8 +19,10 @@ import org.dynmap.markers.MarkerAPI
 class DynmapExpansion : Expansion() {
     val orbitMarkerByID = HashMap<String, CircleMarker>()
     val planetMarkerByID = HashMap<String, Marker>()
-    val moonMarkerByID = HashMap<String, Marker>()
+    val beaconMarkerByID = HashMap<String, Marker>()
     val starMarkerByID = HashMap<String, Marker>()
+
+    var hyperspaceExpansion: HyperspaceExpansion? = null
     override fun allowedArea(p: Player, loc: Location): Boolean {
         return true
     }
@@ -28,6 +33,10 @@ class DynmapExpansion : Expansion() {
             logger.severe("Dynmap is required, but was not found or disabled")
             state = ExpansionState.DISABLED
             return
+        }
+        val hsExpansion = ExpansionManager.getExpansion("HyperspaceExpansion")
+        if (hsExpansion is HyperspaceExpansion && hsExpansion.state == ExpansionState.ENABLED) {
+            hyperspaceExpansion = hsExpansion
         }
 
         object : BukkitRunnable() {
@@ -48,6 +57,12 @@ class DynmapExpansion : Expansion() {
                 dynmap.markerAPI.createMarkerSet("stars", "Stars", dynmap.markerAPI.markerIcons, false)
             } else {
                 sMarkers
+            }
+            val bMarkers = dynmap.markerAPI.getMarkerSet("hyperspace beacons")
+            val beaconMarkers = if (bMarkers == null) {
+                dynmap.markerAPI.createMarkerSet("hyperspace beacons", "Hyperspace beacons", dynmap.markerAPI.markerIcons, false)
+            } else {
+                bMarkers
             }
             override fun run() {
                 for (planet in PlanetCollection) {
@@ -155,6 +170,86 @@ class DynmapExpansion : Expansion() {
                         continue
                     starMarkerByID.remove(starMarker)
 
+                }
+                if (hyperspaceExpansion == null) {
+                    return
+                }
+                for (hsBeacon in HyperspaceManager.beaconLocations) {
+                    val beaconMarker = dynmap.markerAPI.getMarkerIcon("portal")
+                    val originBeaconMarkerID = hsBeacon.originName + "_" + hsBeacon.destinationName
+                    val originMarker = if (!beaconMarkerByID.containsKey(originBeaconMarkerID)) {
+                        val tempOriginBeaconMarker = beaconMarkers.findMarker(originBeaconMarkerID)
+                        if (tempOriginBeaconMarker == null) {
+                            beaconMarkers.createMarker(
+                                originBeaconMarkerID,
+                                originBeaconMarkerID,
+                                hsBeacon.origin.world!!.name,
+                                hsBeacon.origin.x,
+                                hsBeacon.origin.y,
+                                hsBeacon.origin.z,
+                                beaconMarker,
+                                false)
+                        } else {
+                            tempOriginBeaconMarker.setLocation(
+                                hsBeacon.origin.world!!.name,
+                                hsBeacon.origin.x,
+                                hsBeacon.origin.y,
+                                hsBeacon.origin.z
+                            )
+                            tempOriginBeaconMarker.setMarkerIcon(beaconMarker)
+                            tempOriginBeaconMarker
+                        }
+                    } else {
+                        val tempOriginBeaconMarker = beaconMarkerByID[originBeaconMarkerID]!!
+                        tempOriginBeaconMarker.setLocation(
+                            hsBeacon.origin.world!!.name,
+                            hsBeacon.origin.x,
+                            hsBeacon.origin.y,
+                            hsBeacon.origin.z
+                        )
+                        tempOriginBeaconMarker.setMarkerIcon(beaconMarker)
+                        tempOriginBeaconMarker
+                    }
+                    if (originMarker != null && !beaconMarkerByID.containsKey(originBeaconMarkerID)) {
+                        beaconMarkerByID.put(originBeaconMarkerID, originMarker)
+                    }
+                    val destinationBeaconMarkerID = hsBeacon.destinationName + "_" + hsBeacon.originName
+                    val destinationMarker = if (!beaconMarkerByID.containsKey(destinationBeaconMarkerID)) {
+                        val tempDestinationBeaconMarker = beaconMarkers.findMarker(destinationBeaconMarkerID)
+                        if (tempDestinationBeaconMarker == null) {
+                            beaconMarkers.createMarker(
+                                destinationBeaconMarkerID,
+                                destinationBeaconMarkerID,
+                                hsBeacon.destination.world!!.name,
+                                hsBeacon.destination.x,
+                                hsBeacon.destination.y,
+                                hsBeacon.destination.z,
+                                beaconMarker,
+                                false)
+                        } else {
+                            tempDestinationBeaconMarker.setLocation(
+                                hsBeacon.destination.world!!.name,
+                                hsBeacon.destination.x,
+                                hsBeacon.destination.y,
+                                hsBeacon.destination.z
+                            )
+                            tempDestinationBeaconMarker.setMarkerIcon(beaconMarker)
+                            tempDestinationBeaconMarker
+                        }
+                    } else {
+                        val tempDestinationBeaconMarker = beaconMarkerByID[destinationBeaconMarkerID]!!
+                        tempDestinationBeaconMarker.setLocation(
+                            hsBeacon.destination.world!!.name,
+                            hsBeacon.destination.x,
+                            hsBeacon.destination.y,
+                            hsBeacon.destination.z
+                        )
+                        tempDestinationBeaconMarker.setMarkerIcon(beaconMarker)
+                        tempDestinationBeaconMarker
+                    }
+                    if (destinationMarker != null && !beaconMarkerByID.containsKey(destinationBeaconMarkerID)) {
+                        beaconMarkerByID.put(destinationBeaconMarkerID, destinationMarker)
+                    }
                 }
 
             }

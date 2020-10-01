@@ -3,9 +3,13 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.github.eirikh1996</groupId>
+    <parent>
+        <artifactId>movecraft-space-parent</artifactId>
+        <groupId>io.github.eirikh1996</groupId>
+        <version>parent</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
     <artifactId>FactionsExpansion</artifactId>
-    <version>Parent</version>
     <packaging>jar</packaging>
 
     <name>FactionsExpansion</name>

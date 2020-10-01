@@ -5,6 +5,7 @@ import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionManager
 import io.github.eirikh1996.movecraftspace.objects.Planet
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
+import io.github.eirikh1996.movecraftspace.utils.MSUtils.hitboxObstructed
 import net.countercraft.movecraft.Movecraft
 import net.countercraft.movecraft.MovecraftChunk
 import net.countercraft.movecraft.MovecraftLocation
@@ -20,6 +21,7 @@ import net.countercraft.movecraft.mapUpdater.update.UpdateCommand
 import net.countercraft.movecraft.utils.BitmapHitBox
 import net.countercraft.movecraft.utils.MathUtils
 import org.bukkit.Bukkit
+import org.bukkit.Bukkit.getScheduler
 import org.bukkit.Chunk
 import org.bukkit.Location
 import org.bukkit.World
@@ -124,7 +126,7 @@ object MovecraftListener : Listener {
                 if (!testType.name.endsWith("AIR") && !craft.type.passthroughBlocks.contains(testType)) {
                     continue
                 }
-                val obstructed = hitboxObstructed(craft, planet, destWorld, diff).get()
+                val obstructed = getScheduler().callSyncMethod(MovecraftSpace.instance, { hitboxObstructed(craft, planet, destWorld, diff) }).get()
                 if (obstructed)
                     continue
                 destLoc = diff
@@ -152,9 +154,7 @@ object MovecraftListener : Listener {
                 val chunks = ChunkManager.getChunks(craft.hitBox, destWorld, diff.x, diff.y, diff.z)
                 MovecraftChunk.addSurroundingChunks(chunks, 3)
                 ChunkManager.syncLoadChunks(chunks)
-                val res = hitboxObstructed(craft, planet, destWorld, diff)
-                val obstructed = res.get()
-                Thread.sleep(6000)
+                val obstructed = getScheduler().callSyncMethod(MovecraftSpace.instance, { hitboxObstructed(craft, planet, destWorld, diff) }).get()
                 if (obstructed)
                     continue
                 destLoc = diff
@@ -206,27 +206,5 @@ object MovecraftListener : Listener {
         }.runTaskLater(MovecraftSpace.instance, 3)
     }
 
-    private fun hitboxObstructed(craft: Craft, planet: Planet, destWorld : World, diff : MovecraftLocation) : Future<Boolean> {
-        return Bukkit.getScheduler().callSyncMethod(MovecraftSpace.instance) {
-            var obstructed = false;
-            for (ml in craft.hitBox) {
-                val destHitBoxLoc = ml.add(diff)
-                val destHitBoxLocType = destHitBoxLoc.toBukkit(destWorld).block.type
-                if (planet.space.equals(destWorld) && planet.contains(ml.toBukkit(destWorld))) {
-                    obstructed = true
-                    break
-                }
-                if (!destHitBoxLocType.name.endsWith("AIR") && !craft.type.passthroughBlocks.contains(destHitBoxLocType)) {
-                    obstructed = true
-                    break
-                }
-                if (!MathUtils.withinWorldBorder(destWorld, destHitBoxLoc)) {
-                    obstructed = true
-                    break
-                }
 
-            }
-            obstructed
-        }
-    }
 }

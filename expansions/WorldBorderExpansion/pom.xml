@@ -4,7 +4,7 @@
     <parent>
         <artifactId>movecraft-space-parent</artifactId>
         <groupId>io.github.eirikh1996</groupId>
-        <version>Parent</version>
+        <version>parent</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 

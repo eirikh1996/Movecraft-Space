@@ -2,13 +2,16 @@ package io.github.eirikh1996.movecraftspace.expansion
 
 import com.google.common.collect.ImmutableMap
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
+import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import org.bukkit.Bukkit
+import org.bukkit.Bukkit.getConsoleSender
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.PluginDescriptionFile
+import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import java.io.InputStreamReader
 import java.util.*
@@ -19,10 +22,11 @@ import kotlin.collections.HashSet
 
 object ExpansionManager : Iterable<Expansion> {
     val expansions = HashSet<Expansion>()
-    lateinit var pl: Plugin
+    val classCache = HashMap<String, Class<*>>()
+    lateinit var pl: JavaPlugin
 
     fun worldBoundrary(world: World) : IntArray {
-        val lastBounds = intArrayOf(Int.MIN_VALUE, Int.MAX_VALUE, Int.MIN_VALUE, Int.MAX_VALUE)
+        val lastBounds = intArrayOf(-29999984, 29999984, -29999984, 29999984)
         for (ex in getExpansions(ExpansionState.ENABLED)) {
             val bounds = ex.worldBoundrary(world)
             if (bounds[0] > lastBounds[0])
@@ -102,10 +106,11 @@ object ExpansionManager : Iterable<Expansion> {
             val newCmds = HashMap<String, Map<String, Any>>(cmds)
             newCmds.putAll(ex.commands)
             commandsField.set(pl.description, ImmutableMap.copyOf(newCmds))
+            expansions.add(ex)
             try {
                 ex.state = ExpansionState.LOADED
                 pl.logger.info("Expansion " + name + " loaded")
-                expansions.add(ex)
+
             } catch (t : Throwable) {
                 pl.logger.severe("Failure to load expansion " + ex.name)
                 t.printStackTrace()
@@ -116,16 +121,30 @@ object ExpansionManager : Iterable<Expansion> {
     }
 
     fun enableExpansions() {
-        Bukkit.getConsoleSender().sendMessage(COMMAND_PREFIX + "Enabling " + expansions.size + " loaded expansions")
+        getConsoleSender().sendMessage(COMMAND_PREFIX + "Enabling " + expansions.size + " loaded expansions")
+        val softDependExpansions = HashSet<Expansion>()
         for (ex in expansions) {
+            if (ex.expansionSoftDepend.any { s -> getExpansion(s) != null }) {
+                softDependExpansions.add(ex)
+                continue
+            }
             try {
                 ex.state = ExpansionState.ENABLED
             } catch (t : Throwable) {
-                pl.logger.severe(COMMAND_PREFIX + "Failure to enable expansion " + ex.name)
+                getConsoleSender().sendMessage(COMMAND_PREFIX + ERROR + "Failure to enable expansion " + ex.name)
                 t.printStackTrace()
                 ex.state = ExpansionState.DISABLED
             }
 
+        }
+        for (ex in softDependExpansions) {
+            try {
+                ex.state = ExpansionState.ENABLED
+            } catch (t : Throwable) {
+                getConsoleSender().sendMessage(COMMAND_PREFIX + ERROR + "Failure to enable expansion " + ex.name)
+                t.printStackTrace()
+                ex.state = ExpansionState.DISABLED
+            }
         }
     }
 
@@ -140,5 +159,14 @@ object ExpansionManager : Iterable<Expansion> {
      */
     override fun iterator(): Iterator<Expansion> {
         return unmodifiableSet(expansions).iterator()
+    }
+
+    fun getExpansion(s: String): Expansion? {
+        for (ex in this) {
+            if (!ex.name.equals(s))
+                continue
+            return ex
+        }
+        return null
     }
 }

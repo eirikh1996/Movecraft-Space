@@ -14,13 +14,31 @@ import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 import kotlin.math.min
 
+/**
+ *
+ * Base class for all Movecraft-Space expansions
+ *
+ * @property config YamlConfiguration
+ * @property classLoader ExpansionClassLoader
+ * @property name String?
+ * @property dataFolder File
+ * @property depend HashSet<String>
+ * @property softdepend HashSet<String>
+ * @property commands HashMap<String, Map<String, Any>>
+ * @property plugin Plugin
+ * @property logger Logger
+ * @property state ExpansionState
+ * @property uuid (java.util.UUID..java.util.UUID?)
+ */
 abstract class Expansion {
     val config = YamlConfiguration()
     val classLoader = javaClass.classLoader as ExpansionClassLoader
-    val name = classLoader.desc.getString("name")
-    val dataFolder = classLoader.datafolder
+    val name = classLoader.desc.getString("name")!!
+    val dataFolder = File(classLoader.datafolder, name)
     val depend = HashSet<String>()
     val softdepend = HashSet<String>()
+    val expansionDepend = HashSet<String>()
+    val expansionSoftDepend = HashSet<String>()
     val commands = HashMap<String, Map<String, Any>>()
     val plugin = classLoader.plugin
     val logger = classLoader.plugin.logger
@@ -41,20 +59,24 @@ abstract class Expansion {
     val uuid = UUID.randomUUID()
 
     init {
-        val tempDepend = classLoader.desc.getStringList("depend")
-        if (tempDepend != null) {
-            depend.addAll(tempDepend)
-        }
-        val tempSoftDepend = classLoader.desc.getStringList("softdepend")
-        if (tempSoftDepend != null) {
-            depend.addAll(tempSoftDepend)
-        }
+        depend.addAll(classLoader.desc.getStringList("depend"))
+        softdepend.addAll(classLoader.desc.getStringList("softdepend"))
+        expansionDepend.addAll(classLoader.desc.getStringList("expansiondepend"))
+        expansionSoftDepend.addAll(classLoader.desc.getStringList("softdepend"))
         val cmds = classLoader.desc.getConfigurationSection("commands")
         if (cmds != null) {
-            val cmdMap = cmds.getValues(true)
+            val cmdMap = cmds.getValues(false)
             for (k in cmdMap.keys) {
-                val v = cmdMap.get(k) as Map<String, Any>
-                commands.put(k, v)
+                if (k == null)
+                    continue
+                val section = cmds.getConfigurationSection(k)
+                val commandDetails = HashMap<String, Any>()
+                commandDetails.put("aliases", section!!.getStringList("aliases"))
+                commandDetails.put("description", section.getString("description", "")!!)
+                commandDetails.put("usage", section.getString("usage", "")!!)
+                commandDetails.put("permission", section.getString("permission", "")!!)
+                commandDetails.put("permission-message", section.getString("permission-message", "")!!)
+                commands.put(k, commandDetails)
             }
         }
     }
@@ -67,8 +89,20 @@ abstract class Expansion {
         val maxZ = (wb.center.blockZ + wbRadius)
         return intArrayOf(minX, maxX, minZ, maxZ)
     }
+
+    /**
+     *
+     * Method that check if a ship can enter a certain area in either a planet or space world
+     *
+     * @param p the player to check if allowed or not
+     * @param loc Where to check
+     * @return true if player is allowed, false otherwise
+     */
     open fun allowedArea(p : Player, loc : Location) : Boolean {
         return true
+    }
+    fun logMessage(type : LogMessageType, message: String) {
+        Bukkit.getConsoleSender().sendMessage(COMMAND_PREFIX + "[" + name + "]" + type + ": " + message)
     }
 
     fun saveDefaultConfig() {
@@ -84,6 +118,8 @@ abstract class Expansion {
             Bukkit.getLogger().severe("[Movecraft-Space/Expansion] Resource " + path + "does not exist")
             return
         }
+        if (!dataFolder.exists())
+            dataFolder.mkdirs()
         val file = File(dataFolder, path)
         if (file.exists() && !replace) {
             Bukkit.getLogger().severe("[Movecraft-Space/Expansion] Resource " + path + "already exists at target location")
@@ -98,7 +134,7 @@ abstract class Expansion {
     }
 
     fun getResource(path : String) : InputStream? {
-        return javaClass.classLoader.getResourceAsStream(path)
+        return classLoader.getResourceAsStream(path)
     }
     open fun load() {
 
@@ -120,5 +156,9 @@ abstract class Expansion {
 
     override fun hashCode(): Int {
         return uuid.hashCode()
+    }
+
+    enum class LogMessageType(val message : String) {
+        INFO("INFO"), WARNING("§eWARNING"), ERROR("§cERROR"), CRITICAL("§4CRITICAL")
     }
 }

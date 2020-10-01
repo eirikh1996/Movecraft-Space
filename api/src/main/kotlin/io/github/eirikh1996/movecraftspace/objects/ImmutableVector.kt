@@ -31,6 +31,9 @@ data class ImmutableVector constructor(val x : Int, val y : Int, val z : Int) : 
         val dz = (other.z - z).toDouble()
         return ( dx * dx + dy * dy + dz * dz )
     }
+    val ZERO = ImmutableVector(0,0,0)
+
+
 
     val length = sqrt((x * x + y * y + z * z).toDouble())
 

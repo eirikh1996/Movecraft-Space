@@ -5,7 +5,7 @@
 
     <groupId>io.github.eirikh1996</groupId>
     <artifactId>FactionsUUIDExpansion</artifactId>
-    <version>Parent</version>
+    <version>parent</version>
     <packaging>jar</packaging>
 
     <name>io.github.eirikh1996 FactionsUUIDExpansion</name>

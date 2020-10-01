@@ -1,0 +1,13 @@
+Hyperspace world: Hyperspace
+Hypermatter: EMERALD
+Hyperspace travel warmup: 60
+Hyperspace travel speed: 300.0
+Beacon range: 200
+#
+#
+#
+Per craft type settings:
+  CraftTypeName:
+    Hypermatter: EMERALD
+    Hyperspace travel warmup: 60
+    Hyperspace travel speed: 300.0

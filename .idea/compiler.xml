@@ -46,8 +46,8 @@
         <module name="FactionsUUIDExpansion" />
       </profile>
       <profile name="Annotation profile for GriefPreventionExpansion" enabled="true">
-        <sourceOutputDir name="../../target/expansions/factions3/generated-sources/annotations" />
-        <sourceTestOutputDir name="../../target/expansions/factions3/generated-test-sources/test-annotations" />
+        <sourceOutputDir name="../../target/expansions/griefprevention/generated-sources/annotations" />
+        <sourceTestOutputDir name="../../target/expansions/griefprevention/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="GriefPreventionExpansion" />
       </profile>

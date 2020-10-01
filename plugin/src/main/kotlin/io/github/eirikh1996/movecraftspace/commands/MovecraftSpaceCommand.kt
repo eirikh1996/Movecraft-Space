@@ -1,8 +1,10 @@
 package io.github.eirikh1996.movecraftspace.commands
 
+import io.github.eirikh1996.movecraftspace.MovecraftSpace
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionManager
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionState
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
+import org.bukkit.Bukkit.*
 import org.bukkit.ChatColor
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
@@ -31,6 +33,11 @@ object MovecraftSpaceCommand : TabExecutor {
                 set.add(entry)
             }
             sender.sendMessage(COMMAND_PREFIX + "Expansions loaded: " + set.sortedBy { s: String -> ChatColor.stripColor(s) }.joinToString())
+        } else if (args[0].equals("reload", true)) {
+            getPluginManager().disablePlugin(MovecraftSpace.instance)
+            getScheduler().cancelTasks(MovecraftSpace.instance)
+            ExpansionManager.loadExpansions()
+            getPluginManager().enablePlugin(MovecraftSpace.instance)
         }
         return true
     }

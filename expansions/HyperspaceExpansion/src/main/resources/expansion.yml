@@ -1,0 +1,7 @@
+name: HyperspaceExpansion
+main: io.github.eirikh1996.movecraftspace.expansion.hyperspace.HyperspaceExpansion
+commands:
+  hyperspace:
+    aliases:
+      - hs
+    usage: /hyperspace

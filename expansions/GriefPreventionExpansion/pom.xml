@@ -4,16 +4,16 @@
     <parent>
         <artifactId>movecraft-space-parent</artifactId>
         <groupId>io.github.eirikh1996</groupId>
-        <version>Parent</version>
+        <version>parent</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>Factions3Expansion</artifactId>
+    <artifactId>GriefPreventionExpansion</artifactId>
     <packaging>jar</packaging>
 
-    <name>io.github.eirikh1996 Factions3Expansion</name>
+    <name>GriefPreventionExpansion</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -54,25 +54,18 @@
             <systemPath>${project.basedir}/../../libs/Movecraft.jar</systemPath>
         </dependency>
         <dependency>
-            <groupId>com.massivecraft</groupId>
-            <artifactId>MassiveCore</artifactId>
+            <groupId>me.ryanhamshire</groupId>
+            <artifactId>GriefPrevention</artifactId>
             <version>LATEST</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/../../libs/Factions 3.2.3/MassiveCore.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>com.massivecraft</groupId>
-            <artifactId>Factions</artifactId>
-            <version>LATEST</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/../../libs/Factions 3.2.3/Factions.jar</systemPath>
+            <systemPath>${project.basedir}/../../libs/GriefPrevention.jar</systemPath>
         </dependency>
     </dependencies>
 
     <build>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
-        <directory>../../target/expansions/factions3</directory>
+        <directory>../../target/expansions/griefprevention</directory>
         <plugins>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>

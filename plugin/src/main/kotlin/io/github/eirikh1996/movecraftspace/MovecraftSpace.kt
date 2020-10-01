@@ -9,6 +9,7 @@ import io.github.eirikh1996.movecraftspace.listener.MovecraftListener
 import io.github.eirikh1996.movecraftspace.listener.PlayerListener
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
 import io.github.eirikh1996.movecraftspace.objects.StarCollection
+import io.github.eirikh1996.movecraftspace.utils.MSUtils
 import net.countercraft.movecraft.WorldHandler
 import org.bukkit.Location
 import org.bukkit.Material
@@ -27,6 +28,7 @@ class MovecraftSpace : JavaPlugin() {
     }
 
     override fun onEnable() {
+        MSUtils.displayTitle()
         saveDefaultConfig()
         ConfigHolder.config = config
         ExpansionManager.enableExpansions()

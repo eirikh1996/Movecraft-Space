@@ -4,7 +4,7 @@
     <parent>
         <artifactId>movecraft-space-parent</artifactId>
         <groupId>io.github.eirikh1996</groupId>
-        <version>Parent</version>
+        <version>parent</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -51,6 +51,11 @@
             <artifactId>movecraft-space-api</artifactId>
             <version>API</version>
             <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>io.github.eirikh1996</groupId>
+            <artifactId>HyperspaceExpansion</artifactId>
+            <version>Parent</version>
         </dependency>
         <dependency>
             <groupId>net.countercraft</groupId>
