@@ -3,7 +3,6 @@ package io.github.eirikh1996.movecraftspace.expansion.hyperspace
 import io.github.eirikh1996.movecraftspace.expansion.Expansion
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionState
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.command.HyperspaceCommand
-import io.github.eirikh1996.movecraftspace.expansion.hyperspace.structures.StructureManager
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import org.bukkit.Bukkit
@@ -37,7 +36,6 @@ class HyperspaceExpansion : Expansion() {
         plugin.getCommand("hyperspace")!!.setExecutor(HyperspaceCommand)
         HyperspaceManager.runTaskTimerAsynchronously(plugin, 0, 1)
         getPluginManager().registerEvents(HyperspaceManager, plugin)
-        getPluginManager().registerEvents(StructureManager, plugin)
     }
 
     override fun load() {
