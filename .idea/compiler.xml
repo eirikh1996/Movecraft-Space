@@ -7,7 +7,6 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="movecraft-space-api" />
-        <module name="HyperspaceExpansion" />
       </profile>
       <profile name="Annotation profile for DynmapExpansion" enabled="true">
         <sourceOutputDir name="../../target/expansions/dynmap/generated-sources/annotations" />
@@ -51,11 +50,29 @@
         <outputRelativeToContentRoot value="true" />
         <module name="GriefPreventionExpansion" />
       </profile>
+      <profile name="Annotation profile for LandsExpansion" enabled="true">
+        <sourceOutputDir name="../../target/expansions/lands/generated-sources/annotations" />
+        <sourceTestOutputDir name="../../target/expansions/lands/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="LandsExpansion" />
+      </profile>
+      <profile name="Annotation profile for TownyExpansion" enabled="true">
+        <sourceOutputDir name="../../target/expansions/towny/generated-sources/annotations" />
+        <sourceTestOutputDir name="../../target/expansions/towny/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="TownyExpansion" />
+      </profile>
       <profile name="Annotation profile for Movecraft-Space-Parent" enabled="true">
         <sourceOutputDir name="../target/generated-sources/annotations" />
         <sourceTestOutputDir name="../target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="Movecraft-Space" />
+      </profile>
+      <profile name="Annotation profile for HyperspaceExpansion" enabled="true">
+        <sourceOutputDir name="../../target/expansions/hyperspace/generated-sources/annotations" />
+        <sourceTestOutputDir name="../../target/expansions/hyperspace/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="HyperspaceExpansion" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

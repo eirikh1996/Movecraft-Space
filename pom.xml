@@ -17,6 +17,8 @@
         <module>expansions/WorldGuardExpansion</module>
         <module>expansions/RedProtectExpansion</module>
         <module>expansions/HyperspaceExpansion</module>
+        <module>expansions/TownyExpansion</module>
+        <module>expansions/LandsExpansion</module>
     </modules>
     <packaging>pom</packaging>
 

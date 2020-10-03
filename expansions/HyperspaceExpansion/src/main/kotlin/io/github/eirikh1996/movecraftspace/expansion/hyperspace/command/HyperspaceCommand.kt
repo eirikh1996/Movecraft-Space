@@ -1,5 +1,6 @@
 package io.github.eirikh1996.movecraftspace.expansion.hyperspace.command
 
+import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionManager
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.HyperspaceBeacon
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.HyperspaceExpansion
@@ -17,6 +18,7 @@ import org.bukkit.Bukkit.getScheduler
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Sound
+import org.bukkit.block.Block
 import org.bukkit.boss.BarColor
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
@@ -25,9 +27,11 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
+import java.lang.Math.pow
 import java.math.RoundingMode
 import java.util.*
 import kotlin.collections.HashMap
+import kotlin.math.hypot
 import kotlin.math.min
 import kotlin.random.Random
 
@@ -167,6 +171,8 @@ object HyperspaceCommand : TabExecutor {
                     return true
                 }
                 p0.sendMessage(COMMAND_PREFIX + "Successfully created hyperspace link between " + originStar.name + " and " + destinationStar.name)
+                createBeacon(origin)
+                createBeacon(second)
                 HyperspaceManager.beaconLocations.add(HyperspaceBeacon(originStar.name, origin, destinationStar.name, second))
                 HyperspaceManager.saveFile()
                 return true
@@ -185,18 +191,82 @@ object HyperspaceCommand : TabExecutor {
             }
             p0.sendMessage(COMMAND_PREFIX + "Set the first location for the hyperspace beacon. Select a second location in a different start system")
             locationMap.put(p0.uniqueId, origin)
-        } else if (p3[0].equals("selectionTool", true)) {
-            if (!p0.hasPermission("movecraftspace.hyperspace.command.selectiontool")) {
-                p0.sendMessage(COMMAND_PREFIX + ERROR + COMMAND_NO_PERMISSION)
-                return true
-            }
-            val inHand = p0.inventory.itemInHand
-            if (inHand.type == Material.AIR) {
-                p0.sendMessage(COMMAND_PREFIX + ERROR + "Item type not allowed: " + inHand.type)
-
-            }
-            p0.sendMessage(COMMAND_PREFIX + "Selected " + inHand.type + " as selection wand")
         }
         return true
+    }
+
+    private fun createBeacon(loc : Location) {
+        for (y in loc.blockY - 1..loc.blockY + 1) {
+            for (x in loc.blockX - 30 .. loc.blockX + 30)
+                for (z in loc.blockZ - 30 .. loc.blockZ + 30) {
+                    val dSquared = (loc.blockX - x) * (loc.blockX - x) + (loc.blockZ - z) * (loc.blockZ - z)
+                    if (dSquared != 900 && dSquared != 625 && dSquared != 400 && dSquared != 225 && dSquared != 100) {
+                        continue
+                    }
+                    val block = loc.world!!.getBlockAt(x, y, z)
+                    block.type = if (Settings.IsLegacy) {
+                        Material.getMaterial("STAINED_CLAY")!!
+                    } else {
+                        Material.WHITE_TERRACOTTA
+                    }
+
+                }
+        }
+        for (y in loc.blockY - 1..loc.blockY + 1) {
+            for (x in loc.blockX - 30 .. loc.blockX + 30) {
+                val block = loc.world!!.getBlockAt(x, y, loc.blockZ)
+                block.type = if (Settings.IsLegacy) {
+                    Material.getMaterial("STAINED_CLAY")!!
+                } else {
+                    Material.WHITE_TERRACOTTA
+                }
+            }
+        }
+        for (y in loc.blockY - 1..loc.blockY + 1) {
+            for (z in loc.blockZ - 30 .. loc.blockZ + 30) {
+                val block = loc.world!!.getBlockAt(loc.blockX, y, z)
+                block.type = if (Settings.IsLegacy) {
+                    Material.getMaterial("STAINED_CLAY")!!
+                } else {
+                    Material.WHITE_TERRACOTTA
+                }
+            }
+        }
+        for (y in loc.blockY - 10 .. loc.blockY + 40) {
+            val diff = (loc.blockY + 40) - y
+            val radius = diff / 12
+            for (x in loc.blockX - 2 .. loc.blockX + 2)
+                for (z in loc.blockZ - 2 .. loc.blockZ + 2) {
+
+                    val dSquared = (loc.blockX - x) * (loc.blockX - x) + (loc.blockZ - z) * (loc.blockZ - z)
+                    if (dSquared != radius * radius) {
+                        continue
+                    }
+                    val block = loc.world!!.getBlockAt(x, y, z)
+                    block.type = if (Settings.IsLegacy) {
+                        Material.getMaterial("STAINED_CLAY")!!
+                    } else {
+                        Material.WHITE_TERRACOTTA
+                    }
+
+                }
+        }
+        val sLoc = loc.clone().subtract(0.0, 15.0, 0.0)
+        for (y in sLoc.blockY - 15 .. sLoc.blockY + 15) {
+            for (x in sLoc.blockX - 15 .. sLoc.blockX + 15)
+                for (z in sLoc.blockZ - 15 .. sLoc.blockZ + 15) {
+                    val dSquared = (sLoc.blockX - x) * (sLoc.blockX - x) + (sLoc.blockY - y) * (sLoc.blockY - y) + (sLoc.blockZ - z) * (sLoc.blockZ - z)
+                    if (dSquared != 255) {
+                        continue
+                    }
+                    val block = loc.world!!.getBlockAt(x, y, z)
+                    block.type = if (Settings.IsLegacy) {
+                        Material.getMaterial("STAINED_CLAY")!!
+                    } else {
+                        Material.WHITE_TERRACOTTA
+                    }
+
+                }
+        }
     }
 }
