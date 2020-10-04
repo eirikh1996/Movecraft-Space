@@ -14,6 +14,7 @@ import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.hitboxObstructed
 import net.countercraft.movecraft.MovecraftLocation
 import net.countercraft.movecraft.craft.CraftManager
+import org.bukkit.Bukkit
 import org.bukkit.Bukkit.getScheduler
 import org.bukkit.Location
 import org.bukkit.Material
@@ -31,6 +32,7 @@ import java.lang.Math.pow
 import java.math.RoundingMode
 import java.util.*
 import kotlin.collections.HashMap
+import kotlin.math.abs
 import kotlin.math.hypot
 import kotlin.math.min
 import kotlin.random.Random
@@ -125,7 +127,7 @@ object HyperspaceCommand : TabExecutor {
                     if (timePassed <= warmupTime)
                         return
                     notifyP.sendMessage("Initiating hyperspace jump")
-                    notifyP.playSound(notifyP.location, Sound.ENTITY_ENDERMAN_TELEPORT, 0f, 0f)
+                    notifyP.playSound(notifyP.location, if (Settings.IsLegacy) Sound.valueOf("ENTITY_ENDERMEN_TELEPORT") else Sound.ENTITY_ENDERMAN_TELEPORT, 3f, 0f)
                     cancel()
                     val hyperspaceWorld = HyperspaceExpansion.instance.hyperspaceWorld
                     val bounds = ExpansionManager.worldBoundrary(hyperspaceWorld)
@@ -133,6 +135,7 @@ object HyperspaceCommand : TabExecutor {
                     val maxX = (bounds[1] - (hitBox.xLength / 2)) - 10
                     val minZ = (bounds[2] + (hitBox.zLength / 2)) + 10
                     val maxZ = (bounds[3] - (hitBox.zLength / 2)) - 10
+                    Bukkit.broadcastMessage(String.format("%d, %d, %d, %d", minX, maxX, minZ, maxZ))
                     var x = Random.nextInt(minX, maxX)
                     var z = Random.nextInt(minZ, maxZ)
                     var hitboxObstructed = true
@@ -200,7 +203,7 @@ object HyperspaceCommand : TabExecutor {
             for (x in loc.blockX - 30 .. loc.blockX + 30)
                 for (z in loc.blockZ - 30 .. loc.blockZ + 30) {
                     val dSquared = (loc.blockX - x) * (loc.blockX - x) + (loc.blockZ - z) * (loc.blockZ - z)
-                    if (dSquared != 900 && dSquared != 625 && dSquared != 400 && dSquared != 225 && dSquared != 100) {
+                    if (abs(dSquared - 900) > 30 && abs(dSquared - 625) > 25 && abs(dSquared - 400) > 20 && abs(dSquared - 225) > 15 && abs(dSquared - 100) > 10) {
                         continue
                     }
                     val block = loc.world!!.getBlockAt(x, y, z)
@@ -239,7 +242,7 @@ object HyperspaceCommand : TabExecutor {
                 for (z in loc.blockZ - 2 .. loc.blockZ + 2) {
 
                     val dSquared = (loc.blockX - x) * (loc.blockX - x) + (loc.blockZ - z) * (loc.blockZ - z)
-                    if (dSquared != radius * radius) {
+                    if (abs(dSquared - radius * radius) > radius) {
                         continue
                     }
                     val block = loc.world!!.getBlockAt(x, y, z)
@@ -256,7 +259,7 @@ object HyperspaceCommand : TabExecutor {
             for (x in sLoc.blockX - 15 .. sLoc.blockX + 15)
                 for (z in sLoc.blockZ - 15 .. sLoc.blockZ + 15) {
                     val dSquared = (sLoc.blockX - x) * (sLoc.blockX - x) + (sLoc.blockY - y) * (sLoc.blockY - y) + (sLoc.blockZ - z) * (sLoc.blockZ - z)
-                    if (dSquared != 255) {
+                    if (abs(dSquared - 255) > 15) {
                         continue
                     }
                     val block = loc.world!!.getBlockAt(x, y, z)

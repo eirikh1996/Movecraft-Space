@@ -56,6 +56,9 @@ abstract class Expansion {
             load()
         }
     }
+    val version : String get() {
+        return classLoader.desc.getString("version", plugin.description.version)!!
+    }
     val uuid = UUID.randomUUID()
 
     init {

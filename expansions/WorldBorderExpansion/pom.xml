@@ -13,7 +13,7 @@
     <artifactId>WorldBorderExpansion</artifactId>
     <packaging>jar</packaging>
 
-    <name>io.github.eirikh1996 WorldBorderExpansion</name>
+    <name>WorldBorderExpansion</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -63,6 +63,7 @@
     </dependencies>
 
     <build>
+        <finalName>WorldBorderExpansion</finalName>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
         <directory>../../target/expansions/worldborder</directory>

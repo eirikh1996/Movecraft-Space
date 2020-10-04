@@ -63,6 +63,7 @@
     </dependencies>
 
     <build>
+        <finalName>GriefPreventionExpansion</finalName>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
         <directory>../../target/expansions/griefprevention</directory>

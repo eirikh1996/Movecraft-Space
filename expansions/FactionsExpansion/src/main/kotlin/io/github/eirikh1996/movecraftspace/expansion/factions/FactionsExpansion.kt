@@ -16,6 +16,12 @@ class FactionsExpansion : Expansion(){
     var IsMPlayerPermitted : Method? = null
     override fun allowedArea(p: Player, loc: Location): Boolean {
         val faction = BoardColl.get().getFactionAt(PS.valueOf(loc))
+        for (s in config.getStringList("Allow entry to factions")) {
+            val allowedFaction = FactionColl.get().getByName(s)
+            if (allowedFaction == null || !faction.equals(allowedFaction))
+                continue
+            return true
+        }
         return faction == FactionColl.get().none || if (!factions3) faction.isPermitted(MPerm.getPermBuild(), faction.getRelationTo(MPlayer.get(p))) else IsMPlayerPermitted!!.invoke(faction, MPlayer.get(p), MPerm.getPermBuild()) as Boolean
     }
 
@@ -26,6 +32,7 @@ class FactionsExpansion : Expansion(){
             state = ExpansionState.DISABLED
             return
         }
+        saveDefaultConfig()
         factions3 = f.description.version.split(".")[0].toInt() >= 3
         if (factions3) {
             IsMPlayerPermitted = Faction::class.java.getDeclaredMethod("isPlayerPermitted", MPlayer::class.java, MPerm::class.java)

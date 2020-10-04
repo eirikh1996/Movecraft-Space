@@ -48,7 +48,7 @@ object PlanetCommand : TabExecutor {
         }
 
         if (args.size == 0) {
-            sender.sendMessage("Usage: /planet <create|remove|list> <radius> <destination> [exit height] [orbit time] [planet]")
+            sender.sendMessage("Usage: /planet <create|remove|list> <radius> <destination> [exitheight:numValue orbit time:numValue] ")
             return true
         }
         if (args[0].equals("create", true)) {
@@ -84,19 +84,23 @@ object PlanetCommand : TabExecutor {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "No stars nearby. Create one using /star create <name>")
                 return true
             }
-            val exitHeight = if (args.size == 4) args[3].toInt() else 250
-            val pLoc = sender.location.clone()
-            val orbitTime = if (args.size == 5) {
+            var exitHeight =  250
+            var orbitTime = 10
+            for (arg in args.drop(2)) {
                 try {
-                    args[4].toInt()
+                    if (arg.startsWith("exitheight:", true)) {
+                        exitHeight = arg.replace("exitheight:", "", true).toInt()
+                    }
+                    if (arg.startsWith("orbittime:", true)) {
+                        orbitTime = arg.replace("orbittime:", "", true).toInt()
+                    }
                 } catch (e : NumberFormatException) {
-                    sender.sendMessage(COMMAND_PREFIX + ERROR + "Orbit time is not a number")
-                    return true
+                    sender.sendMessage("Invalid argument: " + arg)
                 }
-
-            } else {
-                10
             }
+
+
+            val pLoc = sender.location.clone()
             val nearestPlanet = PlanetCollection.nearestPlanet(pLoc.world!!, ImmutableVector.fromLocation(pLoc), Settings.MaxMoonSpacing, true)
 
             val orbitCenter = if (nearestPlanet != null) {
@@ -130,7 +134,12 @@ object PlanetCommand : TabExecutor {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "Planet is too far away from the outer orbit of " + nearestStar.name + "'s planetary system. Move " + (spacing - Settings.MaximumDistanceBetweenOrbits ) + " blocks closer")
                 return true
             }
-            sender.sendMessage(COMMAND_PREFIX + "Successfully created planet " + args[1] + "!")
+            val intersecting = PlanetCollection.intersectingOtherPlanetaryOrbit(planet, nearestPlanet)
+            if (intersecting != null) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "Orbit of planet " + planet.name + " intersects with the orbit of " + intersecting.name)
+                return true
+            }
+            sender.sendMessage(COMMAND_PREFIX + "Successfully created planet " + planet.name + "!")
             val structureRadius = planet.radius - 30
             val sphere = LinkedList(MSUtils.createSphere(structureRadius, planet.center))
             object : BukkitRunnable() {

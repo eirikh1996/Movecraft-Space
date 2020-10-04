@@ -206,5 +206,18 @@ object MovecraftListener : Listener {
         }.runTaskLater(MovecraftSpace.instance, 3)
     }
 
+    fun onRelease(event : CraftReleaseEvent) {
+        if (event.reason == CraftReleaseEvent.Reason.FORCE) {
+            return
+        }
+        val craft = event.craft
+        for (ml in craft.hitBox) {
+            val intersecting = PlanetCollection.intersectingOtherPlanetaryOrbit(ml.toBukkit(craft.w))
+            if (intersecting == null)
+                continue
+            craft.notificationPlayer!!.sendMessage("You cannot release your craft here as the craft intersects with the planetary orbit of " + intersecting.name)
+        }
+    }
+
 
 }

@@ -8,7 +8,7 @@
     <version>parent</version>
     <packaging>jar</packaging>
 
-    <name>io.github.eirikh1996 FactionsUUIDExpansion</name>
+    <name>FactionsUUIDExpansion</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -58,6 +58,7 @@
     </dependencies>
 
     <build>
+        <finalName>FactionsUUIDExpansion</finalName>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
         <directory>../../target/expansions/factionsuuid</directory>

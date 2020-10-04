@@ -69,6 +69,7 @@
     </dependencies>
 
     <build>
+        <finalName>FactionsExpansion</finalName>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
         <directory>../../target/expansions/factions</directory>

@@ -62,17 +62,17 @@
         <outputRelativeToContentRoot value="true" />
         <module name="TownyExpansion" />
       </profile>
-      <profile name="Annotation profile for Movecraft-Space-Parent" enabled="true">
-        <sourceOutputDir name="../target/generated-sources/annotations" />
-        <sourceTestOutputDir name="../target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <module name="Movecraft-Space" />
-      </profile>
       <profile name="Annotation profile for HyperspaceExpansion" enabled="true">
         <sourceOutputDir name="../../target/expansions/hyperspace/generated-sources/annotations" />
         <sourceTestOutputDir name="../../target/expansions/hyperspace/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="HyperspaceExpansion" />
+      </profile>
+      <profile name="Annotation profile for Movecraft-Space-Parent" enabled="true">
+        <sourceOutputDir name="../target/generated-sources/annotations" />
+        <sourceTestOutputDir name="../target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="Movecraft-Space" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

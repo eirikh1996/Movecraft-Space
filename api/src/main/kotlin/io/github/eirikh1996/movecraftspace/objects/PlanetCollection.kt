@@ -111,7 +111,6 @@ object PlanetCollection : Iterable<Planet> {
                 destination,
                 entryData.get("orbitTime") as Int,
                 entryData.get("exitHeight") as Int)
-            Bukkit.getLogger().info(entry.key + ": " + planet.hashCode())
             planets.add(planet)
             moonMap.put(planet, moons)
         }
@@ -175,8 +174,22 @@ object PlanetCollection : Iterable<Planet> {
         }
         printWriter.close()
     }
+    fun intersectingOtherPlanetaryOrbit(planet: Planet, moon : Planet? = null) : Planet? {
+        for (p in this) {
+            if (moon != null && moon.equals(p)) {
+                continue
+            }
+            val orbitRadius = p.orbitRadius
+            val minOrbitRadius = p.orbitCenter.distance(planet.orbitCenter) - orbitRadius - p.radius
+            if (planet.orbitRadius <= minOrbitRadius) {
+                continue
+            }
+            return p
+        }
+        return null
+    }
 
-    fun intersectingOtherPlanetaryOrbit(loc : Location) : Boolean {
+    fun intersectingOtherPlanetaryOrbit(loc : Location) : Planet? {
         for (pl in this) {
             if (pl.space != loc.world)
                 continue
@@ -185,10 +198,10 @@ object PlanetCollection : Iterable<Planet> {
             val maxDistance = distance + pl.radius
             val planetDistance = pl.orbitCenter.distance(ImmutableVector.fromLocation(loc))
             if (planetDistance < minDistance || planetDistance > maxDistance)
-                return true
+                return pl
 
         }
-        return false
+        return null
     }
 
     override fun iterator() : Iterator<Planet> {
