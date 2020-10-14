@@ -149,7 +149,10 @@ object HyperspaceCommand : TabExecutor {
                     }
                     entry.progressBar.progress = 0.0
                     entry.progressBar.color = BarColor.BLUE
-                    craft.translate(hyperspaceWorld, x - midpoint.x, 0, z - midpoint.z)
+                    val dx = x - midpoint.x
+                    val dz = z - midpoint.z
+                    Bukkit.broadcastMessage("dx: " + dx + ", dz: " + dz)
+                    craft.translate(hyperspaceWorld, dx, 0, dz)
                     HyperspaceManager.entries.put(craft, entry)
                 }
 

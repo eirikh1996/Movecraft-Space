@@ -1,7 +1,9 @@
 package io.github.eirikh1996.movecraftspace.utils
 
+import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
 import io.github.eirikh1996.movecraftspace.objects.Planet
+import net.countercraft.movecraft.Movecraft
 import net.countercraft.movecraft.MovecraftLocation
 import net.countercraft.movecraft.WorldHandler
 import net.countercraft.movecraft.craft.Craft
@@ -9,14 +11,25 @@ import net.countercraft.movecraft.utils.MathUtils
 import org.bukkit.*
 import org.bukkit.Bukkit.getConsoleSender
 import org.bukkit.scheduler.BukkitRunnable
+import java.io.File
 import java.lang.Exception
 import java.lang.reflect.Method
 import java.util.concurrent.Future
+import javax.imageio.ImageIO
+import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.sin
 import kotlin.random.Random
 
 object MSUtils {
-
+    private var setBlockFast : Method? = null
+    init {
+        try {
+            setBlockFast = WorldHandler::class.java.getDeclaredMethod("setBlockFast", Location::class.java, Material::class.java, Any::class.java)
+        } catch (e : Exception) {
+            setBlockFast = null
+        }
+    }
     fun randomCoords(minX : Int, maxX : Int, minY : Int, maxY : Int, minZ : Int, maxZ : Int) : IntArray {
 
         return intArrayOf(Random.nextInt(minX, maxX), Random.nextInt(minY, maxY), Random.nextInt(minZ, maxZ))
@@ -60,7 +73,17 @@ object MSUtils {
 
     }
 
-    fun createSphere(radius : Int, center : ImmutableVector) : Set<ImmutableVector> {
+    fun setBlock(loc : Location, type : Material, data : Any) {
+        val wh = Movecraft.getInstance().worldHandler
+        if (setBlockFast == null) {
+            wh.setBlockFast(loc, type, data as Byte)
+        } else {
+            setBlockFast!!.invoke(wh, loc, type, data)
+        }
+
+    }
+
+    fun createSphere(radius : Int, center : ImmutableVector, imageFile : File? = null) : Set<ImmutableVector> {
         val minX = center.x - radius
         val maxX = center.x + radius
         val minZ = center.z - radius

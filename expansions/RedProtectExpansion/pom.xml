@@ -5,7 +5,7 @@
 
     <groupId>io.github.eirikh1996</groupId>
     <artifactId>RedProtectExpansion</artifactId>
-    <version>parent</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
 
     <name>RedProtectExpansion</name>
@@ -74,6 +74,12 @@
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
         <directory>../../target/expansions/redprotect</directory>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>

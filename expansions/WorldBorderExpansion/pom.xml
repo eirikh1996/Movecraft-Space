@@ -4,7 +4,7 @@
     <parent>
         <artifactId>movecraft-space-parent</artifactId>
         <groupId>io.github.eirikh1996</groupId>
-        <version>parent</version>
+        <version>1.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -67,7 +67,12 @@
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
         <directory>../../target/expansions/worldborder</directory>
-
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>

@@ -1,4 +1,5 @@
 name: DynmapExpansion
 main: io.github.eirikh1996.movecraftspace.expansion.dynmap.DynmapExpansion
+version: '${project.version}'
 depend:
   - dynmap

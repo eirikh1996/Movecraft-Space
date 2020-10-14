@@ -63,6 +63,10 @@ data class ImmutableVector constructor(val x : Int, val y : Int, val z : Int) : 
         return "( " + x + ", " + y + ", " + z + ")"
     }
 
+    fun times(other: ImmutableVector) : Int{
+        return x * other.x + y * other.y + z * other.z
+    }
+
     companion object {
         fun deserialize(map : Map<String, Any>) : ImmutableVector {
             return ImmutableVector(map["x"] as Int, map["y"] as Int, map["z"] as Int)

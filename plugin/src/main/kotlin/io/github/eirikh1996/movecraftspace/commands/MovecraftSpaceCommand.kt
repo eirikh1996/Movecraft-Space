@@ -21,7 +21,7 @@ object MovecraftSpaceCommand : TabExecutor {
 
         } else if (args[0].equals("expansions", true)) {
             val set = HashSet<String>()
-            for (ex in ExpansionManager) {
+            for (ex in ExpansionManager.filter { e -> e.state != ExpansionState.NOT_LOADED }) {
                 var entry = ""
                 entry += if (ex.state == ExpansionState.ENABLED) {
                     "§a"

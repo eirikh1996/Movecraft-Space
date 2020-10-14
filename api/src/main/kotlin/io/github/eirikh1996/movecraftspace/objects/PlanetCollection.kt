@@ -174,17 +174,18 @@ object PlanetCollection : Iterable<Planet> {
         }
         printWriter.close()
     }
-    fun intersectingOtherPlanetaryOrbit(planet: Planet, moon : Planet? = null) : Planet? {
-        for (p in this) {
-            if (moon != null && moon.equals(p)) {
+    fun intersectingOtherPlanetaryOrbit(planet: Planet, moonCenter : Planet? = null) : Planet? {
+        for (pl in this) {
+            if (pl == planet || moonCenter == pl)
                 continue
-            }
-            val orbitRadius = p.orbitRadius
-            val minOrbitRadius = p.orbitCenter.distance(planet.orbitCenter) - orbitRadius - p.radius
-            if (planet.orbitRadius <= minOrbitRadius) {
-                continue
-            }
-            return p
+            val distance = pl.orbitCenter.distance(pl.center)
+            val minDistance = distance - pl.radius
+            val maxDistance = distance + pl.radius
+            val planetDistance = pl.orbitCenter.distance(planet.orbitCenter)
+            if (planetDistance >= minDistance && planetDistance <= maxDistance)
+                return pl
+
+
         }
         return null
     }
@@ -197,7 +198,7 @@ object PlanetCollection : Iterable<Planet> {
             val minDistance = distance - pl.radius
             val maxDistance = distance + pl.radius
             val planetDistance = pl.orbitCenter.distance(ImmutableVector.fromLocation(loc))
-            if (planetDistance < minDistance || planetDistance > maxDistance)
+            if (planetDistance >= minDistance && planetDistance <= maxDistance)
                 return pl
 
         }

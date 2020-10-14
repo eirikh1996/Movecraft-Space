@@ -1,2 +1,5 @@
 name: LandsExpansion
 main: io.github.eirikh1996.movecraftspace.expansion.lands.LandsExpansion
+version: '${project.version}'
+depend:
+  - Lands

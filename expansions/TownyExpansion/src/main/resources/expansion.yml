@@ -1,2 +1,5 @@
 name: TownyExpansion
 main: io.github.eirikh1996.movecraftspace.expansion.towny.TownyExpansion
+version: '${project.version}'
+depend:
+  - Towny

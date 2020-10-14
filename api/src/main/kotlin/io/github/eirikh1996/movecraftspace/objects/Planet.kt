@@ -1,6 +1,7 @@
 package io.github.eirikh1996.movecraftspace.objects
 
 import io.github.eirikh1996.movecraftspace.Settings
+import io.github.eirikh1996.movecraftspace.utils.MSUtils.setBlock
 import net.countercraft.movecraft.Movecraft
 import net.countercraft.movecraft.MovecraftLocation
 import net.countercraft.movecraft.WorldHandler
@@ -103,6 +104,7 @@ data class Planet(var center: ImmutableVector, var orbitCenter : ImmutableVector
                 queue.add(test)
             }
         }
+
         val newLocMap = HashMap<ImmutableVector, Pair<Material, Any>>()
         for (loc in visited) {
             val b = loc.toLocation(space).block
@@ -132,15 +134,6 @@ data class Planet(var center: ImmutableVector, var orbitCenter : ImmutableVector
 
     var orbitRadius : Int get() { return center.distance(orbitCenter).toInt() } set(value) { throw UnsupportedOperationException()}
 
-    private fun setBlock(loc : Location, type : Material, data : Any) {
-        val wh = Movecraft.getInstance().worldHandler
-        if (Settings.IsLegacy) {
-            wh.setBlockFast(loc, type, data as Byte)
-        } else {
-            setBlockFast!!.invoke(wh, loc, type, data)
-        }
-
-    }
 
     private val SHIFTS = arrayOf(
         ImmutableVector(1,1,0),

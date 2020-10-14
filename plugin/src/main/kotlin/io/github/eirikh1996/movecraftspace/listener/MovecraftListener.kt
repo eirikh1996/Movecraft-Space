@@ -206,6 +206,7 @@ object MovecraftListener : Listener {
         }.runTaskLater(MovecraftSpace.instance, 3)
     }
 
+    @EventHandler
     fun onRelease(event : CraftReleaseEvent) {
         if (event.reason == CraftReleaseEvent.Reason.FORCE) {
             return
@@ -216,6 +217,8 @@ object MovecraftListener : Listener {
             if (intersecting == null)
                 continue
             craft.notificationPlayer!!.sendMessage("You cannot release your craft here as the craft intersects with the planetary orbit of " + intersecting.name)
+            event.isCancelled = true
+            break
         }
     }
 

@@ -12,9 +12,13 @@ import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_NO_PERMISSION
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.WARNING
+import io.github.eirikh1996.movecraftspace.utils.MSUtils.setBlock
 import io.github.eirikh1996.movecraftspace.utils.Paginator
 import net.md_5.bungee.api.ChatMessageType
+import net.md_5.bungee.api.chat.ClickEvent
+import net.md_5.bungee.api.chat.HoverEvent
 import net.md_5.bungee.api.chat.TextComponent
+import net.md_5.bungee.api.chat.hover.content.Text
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -28,6 +32,7 @@ import java.lang.System.currentTimeMillis
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import kotlin.math.abs
 import kotlin.math.min
 import kotlin.random.Random
 
@@ -86,22 +91,52 @@ object PlanetCommand : TabExecutor {
             }
             var exitHeight =  250
             var orbitTime = 10
+            var surface : Material? = Material.STONE
+            var data = 0.toByte()
+            var isMoon = ""
+            val planetProperties = ArrayList<String>()
             for (arg in args.drop(2)) {
                 try {
                     if (arg.startsWith("exitheight:", true)) {
+                        planetProperties.add(arg)
                         exitHeight = arg.replace("exitheight:", "", true).toInt()
                     }
                     if (arg.startsWith("orbittime:", true)) {
+                        planetProperties.add(arg)
                         orbitTime = arg.replace("orbittime:", "", true).toInt()
                     }
+                    if (arg.startsWith("surfacematerial:", true)) {
+                        planetProperties.add(arg)
+                        val str = arg.replace("surfacematerial:", "", true)
+                        if (str.contains(":")) {
+                            val pts = str.split(":")
+                            surface = Material.getMaterial(pts[0].toUpperCase())
+                            data = pts[1].toByte()
+                        } else {
+                            surface = Material.getMaterial(str.toUpperCase())
+                        }
+                    }
+                    if (arg.startsWith("isMoon:", true)) {
+                        isMoon = arg.replace("isMoon:", "", true)
+                        if (!isMoon.equals("true", true) && !isMoon.equals("false", true)) {
+                            return true
+                        }
+                    }
                 } catch (e : NumberFormatException) {
-                    sender.sendMessage("Invalid argument: " + arg)
+                    sender.sendMessage(COMMAND_PREFIX + ERROR + "Invalid argument: " + arg)
+                    return true
+                }
+                if (surface == null) {
+                    sender.sendMessage(COMMAND_PREFIX + ERROR + "Invalid material: " + arg)
+                    return true
                 }
             }
 
 
             val pLoc = sender.location.clone()
-            val nearestPlanet = PlanetCollection.nearestPlanet(pLoc.world!!, ImmutableVector.fromLocation(pLoc), Settings.MaxMoonSpacing, true)
+            var nearestPlanet : Planet? = null
+            if (isMoon.length == 0 || isMoon.toBoolean())
+                nearestPlanet = PlanetCollection.nearestPlanet(pLoc.world!!, ImmutableVector.fromLocation(pLoc), Settings.MaxMoonSpacing, true)
 
             val orbitCenter = if (nearestPlanet != null) {
                 nearestPlanet.center
@@ -116,6 +151,7 @@ object PlanetCommand : TabExecutor {
             }
             val spacing = planet.orbitRadius - nearestStar.radius()
             var moon = false
+            Bukkit.broadcastMessage(nearestPlanet.toString())
             if (nearestPlanet != null && nearestPlanet.center.distance(planet.center) < nearestStar.loc.distance(planet.center)) {
                 val moonSpacing = nearestPlanet.center.distance(planet.center)
                 if (moonSpacing < Settings.MinMoonSpacing) {
@@ -139,6 +175,19 @@ object PlanetCommand : TabExecutor {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "Orbit of planet " + planet.name + " intersects with the orbit of " + intersecting.name)
                 return true
             }
+            if (moon && isMoon == "") {
+                val text = TextComponent(COMMAND_PREFIX + "Planet " + planet.name + " is within the moon radius of " + nearestPlanet!!.name + " and will become a moon of this planet. Should planet be moon? ")
+                val yesClickText = TextComponent("§2[Yes] ")
+                yesClickText.clickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/planet create " + planet.name + " " + planet.radius + " " + planetProperties.joinToString(" ") + "isMoon:true" )
+                yesClickText.hoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, arrayOf(TextComponent("Click to set planet " + planet.name + " as moon of " + nearestPlanet!!.name)))
+                val noClickText = TextComponent("§4[No] ")
+                noClickText.clickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/planet create " + planet.name + " " + planet.radius + " " + planetProperties.joinToString(" ") + "isMoon:false" )
+                noClickText.hoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, arrayOf(TextComponent("Click to set planet " + planet.name + " as a planet orbiting the star " + nearestStar.name)))
+                text.addExtra(yesClickText)
+                text.addExtra(noClickText)
+                sender.spigot().sendMessage(text)
+                return true
+            }
             sender.sendMessage(COMMAND_PREFIX + "Successfully created planet " + planet.name + "!")
             val structureRadius = planet.radius - 30
             val sphere = LinkedList(MSUtils.createSphere(structureRadius, planet.center))
@@ -148,7 +197,9 @@ object PlanetCommand : TabExecutor {
                     if (sphere.isEmpty())
                         cancel()
                     for (i in 0..size) {
-                        sphere.pop().toLocation(planet.space).block.type = Material.STONE
+                        val loc = sphere.pop().toLocation(planet.space)
+
+                        setBlock(loc, surface!!, if (Settings.IsLegacy) data else Bukkit.createBlockData(surface!!))
                     }
                 }
             }.runTaskTimer(MovecraftSpace.instance,0,1)
@@ -172,7 +223,7 @@ object PlanetCommand : TabExecutor {
                 return true
             }
             if (planet.moons.size > 0 &&
-                !planetRemoveTimeMap.containsKey(sender.uniqueId) ||
+                planetRemoveTimeMap.containsKey(sender.uniqueId) &&
                 currentTimeMillis() - planetRemoveTimeMap.get(sender.uniqueId)!! > 10000) {
                 sender.sendMessage(COMMAND_PREFIX + WARNING + "Planet " + planet.name + " is center of a moon system. Removal will also remove its moons. Type /planet remove " + planet.name + " again within 10 seconds to remove.")
                 planetRemoveTimeMap.put(sender.uniqueId, currentTimeMillis())
@@ -281,6 +332,26 @@ object PlanetCommand : TabExecutor {
                 return true
             }
             val newSphere = LinkedList(MSUtils.createSphere(planet.radius - 30, planet.center))
+            var surface : Material? = Material.STONE
+            var data = 0.toByte()
+            if (args.size >= 3) {
+                try {
+                    if (args[2].contains(":")) {
+                        val pts = args[2].split(":")
+                        surface = Material.getMaterial(pts[0].toUpperCase())
+                        data = pts[1].toByte()
+                    } else {
+                        surface = Material.getMaterial(args[2].toUpperCase())
+                    }
+                } catch (e: NumberFormatException) {
+                    sender.sendMessage(COMMAND_PREFIX + ERROR + "Invalid argument: " + args[2])
+                    return true
+                }
+            }
+            if (surface == null) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "Invalid argument: " + args[2])
+                return true
+            }
             object : BukkitRunnable() {
                 var x = planet.minX
                 var y = planet.minY
@@ -316,9 +387,11 @@ object PlanetCommand : TabExecutor {
 
                         }
                     } else if (!newSphere.isEmpty()) {
+
                         for (i in 1..min(newSphere.size, 25000)) {
                             val pop = newSphere.pop()
-                            pop.toLocation(planet.space).block.type = Material.STONE
+                            val loc = pop.toLocation(planet.space)
+                            setBlock(loc, surface, if (Settings.IsLegacy) data else Bukkit.createBlockData(surface))
                         }
                     } else {
                         cancel()
@@ -348,7 +421,10 @@ object PlanetCommand : TabExecutor {
                 percentage = 100.0
             }
             val oldSphere = LinkedList(MSUtils.createSphere(planet.radius - 26, planet.center))
-            val sphere = LinkedList(oldSphere.filter { loc -> Random.nextDouble(0.0, 100.0) <= percentage })
+            val sphere = LinkedList(oldSphere.filter {
+                    loc ->
+                Random.nextDouble(0.0, 100.0) <= percentage
+            })
             object : BukkitRunnable() {
                 override fun run() {
                     if (!oldSphere.isEmpty()) {
