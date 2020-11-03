@@ -53,7 +53,7 @@ object PlanetCommand : TabExecutor {
         }
 
         if (args.size == 0) {
-            sender.sendMessage("Usage: /planet <create|remove|list> <radius> <destination> [exitheight:numValue orbit time:numValue] ")
+            sender.sendMessage("Usage: /planet <create|remove|list> <radius> <destination> [exitheight:numValue orbittime:numValue] ")
             return true
         }
         if (args[0].equals("create", true)) {
@@ -399,55 +399,12 @@ object PlanetCommand : TabExecutor {
                 }
 
             }.runTaskTimer(MovecraftSpace.instance, 0, 3)
-        } else if (args[0].equals("addclouds", true)) {
-            if (args.size <= 1) {
-                sender.sendMessage(COMMAND_PREFIX + ERROR + "You must specify a planet")
-                return true
-            }
-            val planet = PlanetCollection.getPlanetByName(args[1])
-            if (planet == null) {
-                sender.sendMessage(COMMAND_PREFIX + ERROR + "Planet " + args[1] + " does not exist!")
-                return true
-            }
-            val percentage : Double
-            if (args.size <= 2) {
-                try {
-                    percentage = args[1].toDouble()
-                } catch (e : NumberFormatException) {
-                    sender.sendMessage(COMMAND_PREFIX + ERROR + "Invalid argument " + args[1])
-                    return true
-                }
-            } else {
-                percentage = 100.0
-            }
-            val oldSphere = LinkedList(MSUtils.createSphere(planet.radius - 26, planet.center))
-            val sphere = LinkedList(oldSphere.filter {
-                    loc ->
-                Random.nextDouble(0.0, 100.0) <= percentage
-            })
-            object : BukkitRunnable() {
-                override fun run() {
-                    if (!oldSphere.isEmpty()) {
-                        val size = min(oldSphere.size, 20000)
-                        for (i in 1..size) {
-                            oldSphere.pop().toLocation(planet.space).block.type = Material.AIR
-                        }
-                    } else if (!sphere.isEmpty()) {
-                        val size = min(sphere.size, 20000)
-                        for (i in 1..size) {
-                            sphere.pop().toLocation(planet.space).block.type =
-                                if (Settings.IsLegacy) Material.getMaterial("STAINED_GLASS")!! else Material.WHITE_STAINED_GLASS
-                        }
-                    } else
-                        cancel()
-                }
-            }.runTaskTimer(MovecraftSpace.instance,0,1)
         }
         return true
     }
 
     override fun onTabComplete(sender: CommandSender, cmd: Command, label: String, args: Array<out String>) : List<String> {
-        var tabCompletions = listOf("create", "remove", "move", "list", "toggleplayerteleport", "regensphere", "addclouds").filter { str -> sender.hasPermission("movecraftspace.command.planet." + str) }
+        var tabCompletions = listOf("create", "remove", "move", "list", "toggleplayerteleport", "regensphere").filter { str -> sender.hasPermission("movecraftspace.command.planet." + str) }
         tabCompletions = tabCompletions.sorted()
         if (args.size == 0) {
             return tabCompletions
@@ -462,8 +419,7 @@ object PlanetCommand : TabExecutor {
             tabCompletions = worlds
         } else if (args[0].equals("remove", true) ||
             args[0].equals("move", true) ||
-            args[0].equals("regensphere", true) ||
-            args[0].equals("addclouds", true)) {
+            args[0].equals("regensphere", true)) {
             val worlds = ArrayList<String>()
             for (planet in PlanetCollection) {
                 worlds.add(planet.destination.name)

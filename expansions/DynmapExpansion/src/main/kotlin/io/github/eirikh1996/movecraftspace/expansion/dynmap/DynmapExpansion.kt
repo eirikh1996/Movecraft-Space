@@ -156,19 +156,21 @@ class DynmapExpansion : Expansion() {
                     if (PlanetCollection.getPlanetByName(marker.label) != null)
                         continue
                     planetMarkerByID.remove(planetMarker)
+                    marker.deleteMarker()
                 }
                 for (orbitMarker in orbitMarkerByID.keys) {
                     val planetName = orbitMarker.split("_")[1]
                     if (PlanetCollection.getPlanetByName(planetName) != null) {
                         continue
                     }
-                    orbitMarkerByID.remove(orbitMarker)
+                    orbitMarkerByID.remove(orbitMarker)!!.deleteMarker()
                 }
                 for (starMarker in starMarkerByID.keys) {
                     val marker = starMarkerByID[starMarker]!!
                     if (StarCollection.getStarByName(marker.label) != null)
                         continue
                     starMarkerByID.remove(starMarker)
+                    marker.deleteMarker()
 
                 }
                 if (hyperspaceExpansion == null) {
