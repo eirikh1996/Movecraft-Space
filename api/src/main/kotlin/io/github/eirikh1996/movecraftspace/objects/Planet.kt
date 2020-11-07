@@ -13,11 +13,20 @@ import org.bukkit.util.Vector
 import java.lang.Exception
 import java.lang.reflect.Method
 import java.util.*
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.logging.Logger
 import kotlin.collections.HashSet
 import kotlin.math.min
 
-data class Planet(var center: ImmutableVector, var orbitCenter : ImmutableVector, val radius : Int, val space : World, val destination : World, val orbitTime : Int, val exitHeight : Int) {
+data class Planet(
+    var center: ImmutableVector,
+    var orbitCenter : ImmutableVector,
+    val radius : Int,
+    val space : World,
+    val destination : World,
+    val orbitTime : Int,
+    val exitHeight : Int
+) {
     var setBlockFast : Method? = null
     init {
         try {
@@ -26,6 +35,7 @@ data class Planet(var center: ImmutableVector, var orbitCenter : ImmutableVector
 
         }
     }
+    var moving = false
     val name : String get() { return destination.name }
     val moons = HashSet<Planet>()
     val id = UUID.randomUUID()
@@ -82,6 +92,7 @@ data class Planet(var center: ImmutableVector, var orbitCenter : ImmutableVector
     }
 
     fun move(displacement : ImmutableVector, moon : Boolean) {
+        moving = true
         var type = center.toLocation(space).block.type
         var y = center.y
         while (type == Material.AIR && y <= 255) {
@@ -130,6 +141,7 @@ data class Planet(var center: ImmutableVector, var orbitCenter : ImmutableVector
         minZ = center.z - radius
         maxz = center.z + radius
         PlanetCollection.saveFile()
+        moving = false;
     }
 
     var orbitRadius : Int get() { return center.distance(orbitCenter).toInt() } set(value) { throw UnsupportedOperationException()}

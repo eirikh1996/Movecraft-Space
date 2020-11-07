@@ -26,24 +26,28 @@ import kotlin.math.sin
 import kotlin.random.Random
 
 object PlanetaryMotionManager : BukkitRunnable() {
-    val updates = LinkedList<PlanetMoveUpdateCommand>()
-    val moonUpdates = HashMap<Planet, MutableSet<UpdateCommand>>()
-    var lastMotionCheck = System.currentTimeMillis()
-    var lastMoonMotionCheck = System.currentTimeMillis()
-    var processedPlanets = false;
+    private val updates = LinkedList<PlanetMoveUpdateCommand>()
+    private val moonUpdates = HashMap<Planet, MutableSet<UpdateCommand>>()
+    private var lastMotionCheck = System.currentTimeMillis()
+    private var lastMoonMotionCheck = System.currentTimeMillis()
+    private var processedPlanets = false;
     override fun run() {
         processPlanetaryMotion()
         processQueue()
     }
 
     fun processPlanetaryMotion() {
-        if (System.currentTimeMillis() - lastMotionCheck < 300000)
+        if (System.currentTimeMillis() - lastMotionCheck < Settings.PlanetaryRotationCheckCooldown * 60000 )
             return
 
         for (pl in PlanetCollection) {
-            if (pl.isMoon())
+            if (pl.isMoon() || pl.moving)
                 continue
-            val angle = (2 * PI) / pl.orbitTime
+            val perimeter = 2 * PI * pl.orbitRadius
+            val meterPerDay = perimeter / pl.orbitTime
+            val meterPerMinute = meterPerDay / 1440
+            val arcLength = meterPerMinute * Settings.PlanetaryRotationCheckCooldown
+            val angle = arcLength / pl.orbitRadius
             val newCenter = pl.center.rotate(angle, pl.orbitCenter)
             val translationVector = newCenter.subtract(pl.center)
             updates.add(PlanetMoveUpdateCommand(pl, translationVector))
@@ -54,6 +58,7 @@ object PlanetaryMotionManager : BukkitRunnable() {
                 }
                 this.moonUpdates.put(pl, moonUpdates)
             }
+
         }
         lastMotionCheck = System.currentTimeMillis()
         processedPlanets = true
@@ -61,7 +66,7 @@ object PlanetaryMotionManager : BukkitRunnable() {
 
     private fun processMoonRotation() {
         for (pl in PlanetCollection) {
-            if (!pl.isMoon())
+            if (!pl.isMoon() || pl.moving)
                 continue
             val angle = (2 * PI) / pl.orbitTime
             val newCenter = pl.center.rotate(angle, pl.orbitCenter)

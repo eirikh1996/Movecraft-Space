@@ -18,7 +18,7 @@ object MovecraftSpaceCommand : TabExecutor {
         if (!cmd.name.equals("movecraftspace", true))
             return false
         if (args.size == 0) {
-
+            sender.sendMessage(COMMAND_PREFIX + "Version : " + MovecraftSpace.instance.description.version)
         } else if (args[0].equals("expansions", true)) {
             val set = HashSet<String>()
             for (ex in ExpansionManager.filter { e -> e.state != ExpansionState.NOT_LOADED }) {
@@ -33,11 +33,6 @@ object MovecraftSpaceCommand : TabExecutor {
                 set.add(entry)
             }
             sender.sendMessage(COMMAND_PREFIX + "Expansions loaded: " + set.sortedBy { s: String -> ChatColor.stripColor(s) }.joinToString())
-        } else if (args[0].equals("reload", true)) {
-            getPluginManager().disablePlugin(MovecraftSpace.instance)
-            getScheduler().cancelTasks(MovecraftSpace.instance)
-            ExpansionManager.loadExpansions()
-            getPluginManager().enablePlugin(MovecraftSpace.instance)
         }
         return true
     }

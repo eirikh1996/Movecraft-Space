@@ -42,8 +42,6 @@ import kotlin.math.min
 import kotlin.random.Random
 
 object MovecraftListener : Listener {
-    val teleportTimeMap = HashMap<UUID, Long>()
-    val chunkMap = HashMap<Craft, List<Chunk>>()
     var SET_CANCELLED : Method?
     init {
         try {
@@ -58,9 +56,6 @@ object MovecraftListener : Listener {
     fun onCraftPreTranslate (event : CraftPreTranslateEvent) {
         val craft = event.craft
         if (!craft.type.canSwitchWorld) {
-            return
-        }
-        if ((System.currentTimeMillis() - teleportTimeMap.getOrDefault(craft.notificationPlayer!!.uniqueId, 0)) / 1000 < Settings.WorldSwitchCooldownTime) {
             return
         }
         val hitBox = craft.hitBox
@@ -165,7 +160,6 @@ object MovecraftListener : Listener {
         event.dx = displacement.x
         event.dy = displacement.y
         event.dz = displacement.z
-        teleportTimeMap.put(craft.notificationPlayer!!.uniqueId, System.currentTimeMillis())
 
     }
 
