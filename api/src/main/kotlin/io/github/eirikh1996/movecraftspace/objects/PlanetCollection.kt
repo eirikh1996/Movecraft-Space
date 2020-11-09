@@ -1,6 +1,8 @@
 package io.github.eirikh1996.movecraftspace.objects
 
+import net.countercraft.movecraft.MovecraftChunk
 import org.bukkit.Bukkit
+import org.bukkit.Bukkit.broadcastMessage
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.plugin.Plugin
@@ -13,6 +15,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
+import kotlin.math.abs
 
 object PlanetCollection : Iterable<Planet> {
     private val planets = HashSet<Planet>()
@@ -188,6 +191,22 @@ object PlanetCollection : Iterable<Planet> {
 
         }
         return null
+    }
+    fun intersectingOtherPlanetaryOrbit(chunk : MovecraftChunk) : Planet? {
+        var foundPlanet : Planet? = null
+        val maxX = chunk.x * 16
+        val maxZ = chunk.z * 16
+        val minX = maxX - 15
+        val minZ = maxZ - 15
+        for (x in minX..maxX)
+            for (z in minZ..maxZ) {
+                val p = intersectingOtherPlanetaryOrbit(Location(chunk.world, x.toDouble(), 127.5, z.toDouble()))
+                if (p != null) {
+                    foundPlanet = p
+                    break
+                }
+            }
+        return foundPlanet
     }
 
     fun intersectingOtherPlanetaryOrbit(loc : Location) : Planet? {

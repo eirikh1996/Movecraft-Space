@@ -2,6 +2,8 @@ package io.github.eirikh1996.movecraftspace.commands
 
 import io.github.eirikh1996.movecraftspace.MovecraftSpace
 import io.github.eirikh1996.movecraftspace.Settings
+import io.github.eirikh1996.movecraftspace.event.planet.PlanetCreateEvent
+import io.github.eirikh1996.movecraftspace.event.planet.PlanetRemoveEvent
 import io.github.eirikh1996.movecraftspace.listener.PlayerListener
 import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
 import io.github.eirikh1996.movecraftspace.objects.Planet
@@ -20,6 +22,7 @@ import net.md_5.bungee.api.chat.HoverEvent
 import net.md_5.bungee.api.chat.TextComponent
 import net.md_5.bungee.api.chat.hover.content.Text
 import org.bukkit.Bukkit
+import org.bukkit.Bukkit.getPluginManager
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.command.Command
@@ -188,6 +191,10 @@ object PlanetCommand : TabExecutor {
                 sender.spigot().sendMessage(text)
                 return true
             }
+            val event = PlanetCreateEvent(planet)
+            getPluginManager().callEvent(event)
+            if (event.isCancelled)
+                return true
             sender.sendMessage(COMMAND_PREFIX + "Successfully created planet " + planet.name + "!")
             val structureRadius = planet.radius - 30
             val sphere = LinkedList(MSUtils.createSphere(structureRadius, planet.center))
@@ -233,8 +240,10 @@ object PlanetCommand : TabExecutor {
             PlanetCollection.remove(planet)
             val structureRadius = planet.radius - 30
             val sphere = LinkedList(MSUtils.createSphere(structureRadius, planet.center))
+            getPluginManager().callEvent(PlanetRemoveEvent(planet))
             if (!planet.moons.isEmpty()) {
                 for (moon in planet.moons) {
+                    getPluginManager().callEvent(PlanetRemoveEvent(moon))
                     sphere.addAll(MSUtils.createSphere(moon.radius - 30, moon.center))
                     PlanetCollection.remove(moon)
                 }
@@ -283,11 +292,11 @@ object PlanetCommand : TabExecutor {
             val dz = tz - planet.center.z
             sender.sendMessage(COMMAND_PREFIX + "Moved planet to x: " + sender.location.blockX + ", z: " + sender.location.blockZ)
             val displacement = ImmutableVector(dx, 0, dz)
-            planet.move(displacement)
+            planet.move(displacement, false, sender.world)
             if (planet.moons.isEmpty())
                 return true
             for (moon in planet.moons) {
-                moon.move(displacement, true)
+                moon.move(displacement, true, sender.world)
             }
         } else if (args[0].equals("list", true)) {
             val paginator = Paginator("Planets")

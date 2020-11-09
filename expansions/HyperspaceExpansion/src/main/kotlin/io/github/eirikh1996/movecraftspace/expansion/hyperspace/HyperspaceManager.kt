@@ -125,12 +125,12 @@ object HyperspaceManager : BukkitRunnable(), Listener {
         var foundLoc : Location? = null
         var str = ""
         for (beacon in beaconLocations) {
-            if (beacon.origin.distance(event.newHitBox.midPoint.toBukkit(event.world)) <= HyperspaceExpansion.instance.config.getInt("Beacon range")) {
+            if (beacon.origin.world!!.equals(event.world) && beacon.origin.distance(event.newHitBox.midPoint.toBukkit(event.world)) <= HyperspaceExpansion.instance.config.getInt("Beacon range")) {
                 foundLoc = beacon.origin
                 str = beacon.originName + "-" + beacon.destinationName
                 break
             }
-            if (beacon.destination.distance(event.newHitBox.midPoint.toBukkit(event.world)) <= HyperspaceExpansion.instance.config.getInt("Beacon range")) {
+            if (beacon.destination.world!!.equals(event.world) && beacon.destination.distance(event.newHitBox.midPoint.toBukkit(event.world)) <= HyperspaceExpansion.instance.config.getInt("Beacon range")) {
                 foundLoc = beacon.destination
                 str = beacon.destinationName + "-" + beacon.originName
                 break

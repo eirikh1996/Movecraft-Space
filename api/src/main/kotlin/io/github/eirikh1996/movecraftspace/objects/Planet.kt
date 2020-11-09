@@ -1,6 +1,7 @@
 package io.github.eirikh1996.movecraftspace.objects
 
 import io.github.eirikh1996.movecraftspace.Settings
+import io.github.eirikh1996.movecraftspace.event.planet.PlanetMoveEvent
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.setBlock
 import net.countercraft.movecraft.Movecraft
 import net.countercraft.movecraft.MovecraftLocation
@@ -87,11 +88,11 @@ data class Planet(
         return destination.equals(other.destination) && space.equals(other.space) && id.equals(other.id)
     }
 
-    fun move(displacement : ImmutableVector) {
-        move(displacement, false)
-    }
-
-    fun move(displacement : ImmutableVector, moon : Boolean) {
+    fun move(displacement : ImmutableVector, moon : Boolean = false, newSpace : World = space) {
+        val newCenter = center.add(displacement)
+        //call event
+        val event = PlanetMoveEvent(this, newCenter, newSpace)
+        Bukkit.getPluginManager().callEvent(event)
         moving = true
         var type = center.toLocation(space).block.type
         var y = center.y
@@ -131,7 +132,7 @@ data class Planet(
             setBlock(loc.toLocation(space), Material.AIR, if (Settings.IsLegacy) 0.toByte() else Bukkit.createBlockData(
                 Material.AIR))
         }
-        center = center.add(displacement)
+        center = newCenter
         if (moon)
             orbitCenter = orbitCenter.add(displacement)
         minX = center.x - radius

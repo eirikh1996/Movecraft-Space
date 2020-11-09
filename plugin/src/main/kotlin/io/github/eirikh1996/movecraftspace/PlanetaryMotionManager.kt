@@ -16,6 +16,7 @@ import net.countercraft.movecraft.utils.MathUtils
 import org.bukkit.Bukkit
 import org.bukkit.World
 import org.bukkit.scheduler.BukkitRunnable
+import org.bukkit.util.Vector
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
@@ -68,7 +69,11 @@ object PlanetaryMotionManager : BukkitRunnable() {
         for (pl in PlanetCollection) {
             if (!pl.isMoon() || pl.moving)
                 continue
-            val angle = (2 * PI) / pl.orbitTime
+            val perimeter = 2 * PI * pl.orbitRadius
+            val meterPerDay = perimeter / pl.orbitTime
+            val meterPerMinute = meterPerDay / 1440
+            val arcLength = meterPerMinute * Settings.PlanetaryRotationCheckCooldown
+            val angle = arcLength / pl.orbitRadius
             val newCenter = pl.center.rotate(angle, pl.orbitCenter)
             val translationVector = newCenter.subtract(pl.center)
             updates.add(PlanetMoveUpdateCommand(pl, translationVector))
@@ -107,11 +112,18 @@ object PlanetaryMotionManager : BukkitRunnable() {
     private fun translateCraftsToPlanet(planet : Planet, displacement : ImmutableVector) {
         val newCenter = planet.center.add(displacement)
         val craftsToTeleport = HashSet<Craft>()
-        val center = MovecraftLocation(newCenter.x, newCenter.y, newCenter.z)
         for (craft in CraftManager.getInstance().getCraftsInWorld(planet.space)) {
             for (ml in craft.hitBox) {
-                if (ml.distance(center) > planet.radius)
+                val dx = newCenter.x - ml.x
+                val dy = newCenter.y - ml.y
+                val dz = newCenter.z - ml.z
+                val dxSquared = dx * dx
+                val dySquared = dy * dy
+                val dzSquared = dz * dz
+                val distSquared = ((dxSquared) + (dySquared) + (dzSquared))
+                if (distSquared > (planet.radius * planet.radius))
                     continue
+                Bukkit.broadcastMessage("distance squared: " + distSquared + ", dx: " + dx + ", dy: " + dy + ", dz:" + dz + ", dxSquared: " + dxSquared + ", dySquared: " + dySquared + ", dzSquared: " + dzSquared)
                 craftsToTeleport.add(craft)
                 break
             }

@@ -52,6 +52,7 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/../../libs/Movecraft.jar</systemPath>
         </dependency>
+
         <dependency>
             <groupId>com.massivecraft</groupId>
             <artifactId>MassiveCore</artifactId>

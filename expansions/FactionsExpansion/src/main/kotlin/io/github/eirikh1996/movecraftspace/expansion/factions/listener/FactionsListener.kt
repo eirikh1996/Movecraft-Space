@@ -1,17 +1,24 @@
 package io.github.eirikh1996.movecraftspace.expansion.factions.listener
 
+import com.massivecraft.factions.entity.Faction
 import com.massivecraft.factions.entity.FactionColl
 import com.massivecraft.factions.entity.MFlag
 import com.massivecraft.factions.event.EventFactionsChunksChange
 import com.massivecraft.massivecore.ps.PS
+import io.github.eirikh1996.movecraftspace.objects.Planet
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
+import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
+import net.countercraft.movecraft.MovecraftChunk
+import org.bukkit.Bukkit
+import org.bukkit.Bukkit.broadcastMessage
 import org.bukkit.Location
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 
 object FactionsListener : Listener {
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     fun onClaim (event : EventFactionsChunksChange) {
         val newFaction = event.newFaction
         if (newFaction == FactionColl.get().none ||
@@ -19,24 +26,21 @@ object FactionsListener : Listener {
             newFaction == FactionColl.get().safezone ||
             event.mPlayer.isOverriding)
             return
-
+        val intersectingClaimMap = HashMap<Planet, MutableSet<PS>>()
         for (ps in event.chunks) {
-            val maxX = ps.chunkX * 16
-            val minX = maxX - 15
-            val maxZ = ps.chunkZ * 16
-            val minZ = maxZ - 15
-            for (x in minX..maxX) {
-                for (y in 0..255) {
-                    for (z in minZ..maxX) {
-                        if (!PlanetCollection.withinPlanetOrbit(Location(ps.asBukkitWorld(),
-                                x.toDouble(), y.toDouble(), z.toDouble())))
-                            continue
-                        event.mPlayer.message("Cannot claim in planetary orbits")
-                        event.isCancelled = true
-                        return
-                    }
-                }
-            }
+            val chunk = MovecraftChunk(ps.chunkX, ps.chunkZ, ps.asBukkitWorld())
+            val intersectingPlanet = PlanetCollection.intersectingOtherPlanetaryOrbit(chunk)
+            if (intersectingPlanet == null)
+                continue
+            val psSet = intersectingClaimMap.getOrDefault(intersectingPlanet, HashSet())
+            psSet.add(ps)
+            intersectingClaimMap.put(intersectingPlanet, psSet)
+
         }
+        if (intersectingClaimMap.isEmpty()) {
+            return
+        }
+        event.mPlayer.message(COMMAND_PREFIX + "Cannot claim as claims intersect the orbit" + if (intersectingClaimMap.size == 1) "" else "s" + " of " + intersectingClaimMap.keys.joinToString { p -> p.name })
+        event.isCancelled = true
     }
 }
