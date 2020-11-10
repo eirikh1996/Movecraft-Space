@@ -161,6 +161,10 @@ object HyperspaceCommand : TabExecutor {
             runnable.runTaskTimerAsynchronously(HyperspaceExpansion.instance.plugin, 0, 20)
 
         } else if (p3[0].equals("createbeacon", true)) {
+            if (!p0.hasPermission("movecraftspace.command.hyperspace.createbeacon")) {
+                p0.sendMessage(COMMAND_PREFIX + ERROR + COMMAND_NO_PERMISSION)
+                return true
+            }
             if (locationMap.containsKey(p0.uniqueId)) {
                 val origin = locationMap.remove(p0.uniqueId)!!
                 val second = p0.location.clone()

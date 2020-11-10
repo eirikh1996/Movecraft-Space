@@ -6,6 +6,7 @@ import br.net.fabiozumbi12.RedProtect.Bukkit.RedProtect
 import io.github.eirikh1996.movecraftspace.expansion.Expansion
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionState
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
+import io.github.eirikh1996.movecraftspace.utils.MSUtils
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -39,7 +40,7 @@ class RedProtectExpansion : Expansion(), Listener {
             val planet = PlanetCollection.intersectingOtherPlanetaryOrbit(loc)
             if (planet == null)
                 continue
-            event.player.sendMessage(COMMAND_PREFIX + "Cannot create a region here as it intersect with the planetary orbit of " + planet.name)
+            event.player.sendMessage(COMMAND_PREFIX + MSUtils.ERROR + "Cannot create a region here as it intersect with the planetary orbit of " + planet.name)
             event.isCancelled = true
             break
         }
@@ -47,14 +48,14 @@ class RedProtectExpansion : Expansion(), Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    fun onCreate(event : RedefineRegionEvent) {
+    fun onRedefine(event : RedefineRegionEvent) {
         val region = event.newRegion
         if (region == null) return
         for (loc in region.getLimitLocs(region.minY, region.maxY, true)) {
             val planet = PlanetCollection.intersectingOtherPlanetaryOrbit(loc)
             if (planet == null)
                 continue
-            event.player.sendMessage(COMMAND_PREFIX + "Cannot redefine region here as it intersect with the planetary orbit of " + planet.name)
+            event.player.sendMessage(COMMAND_PREFIX + MSUtils.ERROR + "Cannot redefine region here as it intersect with the planetary orbit of " + planet.name)
             event.isCancelled = true
             break
         }

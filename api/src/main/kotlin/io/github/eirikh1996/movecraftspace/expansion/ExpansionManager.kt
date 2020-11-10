@@ -87,7 +87,14 @@ object ExpansionManager : Iterable<Expansion> {
                 pl.logger.severe("main is required, but not found in expansion.yml of " + jar.name)
                 continue
             }
-            val classLoader = ExpansionClassLoader(javaClass.classLoader, desc, jar.parentFile, jar, pl)
+            val classLoader : ExpansionClassLoader
+            try {
+                classLoader = ExpansionClassLoader(javaClass.classLoader, desc, jar.parentFile, jar, pl)
+            } catch (t : Throwable) {
+                getConsoleSender().sendMessage(COMMAND_PREFIX + ERROR + "Cannot load expansion " + name)
+                t.printStackTrace()
+                continue
+            }
             val ex = classLoader.expansion
 
             val missingDependencies = HashSet<String>()

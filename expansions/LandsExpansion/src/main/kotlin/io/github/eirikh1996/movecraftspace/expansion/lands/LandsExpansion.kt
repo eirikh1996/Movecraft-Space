@@ -38,7 +38,7 @@ class LandsExpansion : Expansion(), Listener {
         val planet = PlanetCollection.intersectingOtherPlanetaryOrbit(MovecraftChunk(event.x, event.z, getWorld(event.worldName)))
         if (planet == null)
             return
-        event.landPlayer.player!!.sendMessage(MSUtils.COMMAND_PREFIX + "Cannot claim land here as it intersect with the planetary orbit of " + planet.name)
+        event.landPlayer.player!!.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Cannot claim land here as it intersect with the planetary orbit of " + planet.name)
         event.isCancelled = true
     }
 }

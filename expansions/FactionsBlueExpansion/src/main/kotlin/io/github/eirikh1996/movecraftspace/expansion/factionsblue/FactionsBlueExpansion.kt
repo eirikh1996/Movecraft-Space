@@ -1,9 +1,11 @@
-package io.github.eirikh1996.expansion.factionsblue
+package io.github.eirikh1996.movecraftspace.expansion.factionsblue
 
 import io.github.eirikh1996.movecraftspace.expansion.Expansion
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionState
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
+import io.github.eirikh1996.movecraftspace.utils.MSUtils
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
+import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import me.zysea.factions.FPlugin
 import me.zysea.factions.events.FPlayerClaimEvent
 import me.zysea.factions.objects.Claim
@@ -44,7 +46,7 @@ class FactionsBlueExpansion : Expansion() {
         val claim = event.claim
         val planet = PlanetCollection.intersectingOtherPlanetaryOrbit(MovecraftChunk(claim.x, claim.z, claim.world))
         if (planet == null) return
-        event.player.sendMessage(COMMAND_PREFIX + "Cannot claim faction land here as it intersects with planetary orbit of " + planet.name)
+        event.player.sendMessage(COMMAND_PREFIX + ERROR + "Cannot claim faction land here as it intersects with planetary orbit of " + planet.name)
         event.isCancelled = true
     }
 }

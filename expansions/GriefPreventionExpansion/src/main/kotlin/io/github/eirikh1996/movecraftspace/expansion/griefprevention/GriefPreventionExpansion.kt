@@ -3,7 +3,9 @@ package io.github.eirikh1996.movecraftspace.expansion.griefprevention
 import io.github.eirikh1996.movecraftspace.expansion.Expansion
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionState
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
+import io.github.eirikh1996.movecraftspace.utils.MSUtils
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
+import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import me.ryanhamshire.GriefPrevention.Claim
 import me.ryanhamshire.GriefPrevention.GriefPrevention
 import me.ryanhamshire.GriefPrevention.events.ClaimCreatedEvent
@@ -50,7 +52,7 @@ class GriefPreventionExpansion : Expansion(), Listener{
                 val planet = PlanetCollection.intersectingOtherPlanetaryOrbit(test)
                 if (planet == null)
                     continue
-                event.creator.sendMessage(COMMAND_PREFIX + "Cannot create claim here as claim intersect with the orbit of " + planet.name)
+                event.creator.sendMessage(COMMAND_PREFIX + ERROR + "Cannot create claim here as claim intersect with the orbit of " + planet.name)
                 event.isCancelled = true
                 return
             }
@@ -71,7 +73,7 @@ class GriefPreventionExpansion : Expansion(), Listener{
                 val planet = PlanetCollection.intersectingOtherPlanetaryOrbit(test)
                 if (planet == null)
                     continue
-                getPlayer(claim.ownerID)!!.sendMessage(COMMAND_PREFIX + "Cannot create claim here as claim intersect with the orbit of " + planet.name)
+                getPlayer(claim.ownerID)!!.sendMessage(COMMAND_PREFIX + ERROR + "Cannot create claim here as claim intersect with the orbit of " + planet.name)
                 event.isCancelled = true
                 return
             }

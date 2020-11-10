@@ -7,7 +7,9 @@ import com.massivecraft.factions.event.EventFactionsChunksChange
 import com.massivecraft.massivecore.ps.PS
 import io.github.eirikh1996.movecraftspace.objects.Planet
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
+import io.github.eirikh1996.movecraftspace.utils.MSUtils
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
+import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import net.countercraft.movecraft.MovecraftChunk
 import org.bukkit.Bukkit
 import org.bukkit.Bukkit.broadcastMessage
@@ -40,7 +42,7 @@ object FactionsListener : Listener {
         if (intersectingClaimMap.isEmpty()) {
             return
         }
-        event.mPlayer.message(COMMAND_PREFIX + "Cannot claim as claims intersect the orbit" + if (intersectingClaimMap.size == 1) "" else "s" + " of " + intersectingClaimMap.keys.joinToString { p -> p.name })
+        event.mPlayer.message(COMMAND_PREFIX + ERROR + "Cannot claim as claims intersect the orbit" + if (intersectingClaimMap.size == 1) "" else "s" + " of " + intersectingClaimMap.keys.joinToString { p -> p.name })
         event.isCancelled = true
     }
 }

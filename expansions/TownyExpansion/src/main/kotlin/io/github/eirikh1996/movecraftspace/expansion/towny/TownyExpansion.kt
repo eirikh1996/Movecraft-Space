@@ -43,7 +43,7 @@ class TownyExpansion : Expansion(), Listener {
         val planet = PlanetCollection.intersectingOtherPlanetaryOrbit(MovecraftChunk(tb.x, tb.z, getWorld(tb.world.name)))
         if (planet == null)
             return
-        event.player.sendMessage(MSUtils.COMMAND_PREFIX + "Cannot claim town blocks here as it intersect with the planetary orbit of " + planet.name)
+        event.player.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Cannot claim town blocks here as it intersect with the planetary orbit of " + planet.name)
         event.isCancelled = true
     }
 }

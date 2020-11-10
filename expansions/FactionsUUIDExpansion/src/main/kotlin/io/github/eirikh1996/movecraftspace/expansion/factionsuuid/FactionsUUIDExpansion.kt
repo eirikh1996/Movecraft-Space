@@ -7,6 +7,8 @@ import io.github.eirikh1996.movecraftspace.expansion.Expansion
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionState
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
 import io.github.eirikh1996.movecraftspace.utils.MSUtils
+import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
+import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import net.countercraft.movecraft.MovecraftChunk
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -48,7 +50,7 @@ class FactionsUUIDExpansion : Expansion(){
         val planet = PlanetCollection.intersectingOtherPlanetaryOrbit(MovecraftChunk(fLoc.x.toInt(), fLoc.z.toInt(), fLoc.world))
         if (planet == null)
             return
-        event.getfPlayer().player.sendMessage(MSUtils.COMMAND_PREFIX + "Cannot claim land here as it intersect with the planetary orbit of " + planet.name)
+        event.getfPlayer().player.sendMessage(COMMAND_PREFIX + ERROR + "Cannot claim land here as it intersect with the planetary orbit of " + planet.name)
         event.isCancelled = true
     }
 }
