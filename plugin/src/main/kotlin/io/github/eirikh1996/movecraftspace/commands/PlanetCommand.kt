@@ -277,6 +277,10 @@ object PlanetCommand : TabExecutor {
             sender.sendMessage(COMMAND_PREFIX + "Player teleportation to planets disabled")
             PlayerListener.disabledPlayers.add(sender.uniqueId)
         } else if (args[0].equals("move", true)) {
+            if (!sender.hasPermission("movecraftspace.command.planet.move")) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + COMMAND_NO_PERMISSION)
+                return true
+            }
             if (args.size == 1) {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "You must specify a planet")
                 return true
@@ -288,6 +292,27 @@ object PlanetCommand : TabExecutor {
             }
             val tx = sender.location.blockX
             val tz = sender.location.blockZ
+            val closestStar = StarCollection.closestStarSystem(
+                Location(sender.world, tx.toDouble(), 127.0,
+                    tz.toDouble()
+                ), Settings.MaximumDistanceBetweenOrbits
+            )
+            if (closestStar == null) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "Cannot move planet to this location as it it too far away from a star or planetary system")
+                return true
+            }
+            val closestPlanet = PlanetCollection.nearestPlanet(sender.world, ImmutableVector.fromLocation(sender.location), Settings.MaxMoonSpacing, true)
+            val distance = closestStar.loc.distance(ImmutableVector(tx, 127, tz)) - closestStar.radius()
+            if (distance < Settings.MinimumDistanceBetweenStars && closestPlanet == null) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "Cannot move planet to this location as it it too close to star system " + closestStar.name)
+                return true
+            } else if (closestPlanet!!.center.distance(ImmutableVector.fromLocation(sender.location)) < Settings.MinMoonSpacing) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "Cannot move planet to this location as it it too close to moon system " + closestPlanet.name)
+                return true
+            } else if (!closestPlanet.moons.isEmpty()) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "Planets with moons cannot join other moon systems")
+                return true
+            }
             val dx = tx - planet.center.x
             val dz = tz - planet.center.z
             sender.sendMessage(COMMAND_PREFIX + "Moved planet to x: " + sender.location.blockX + ", z: " + sender.location.blockZ)
@@ -299,6 +324,10 @@ object PlanetCommand : TabExecutor {
                 moon.move(displacement, true, sender.world)
             }
         } else if (args[0].equals("list", true)) {
+            if (!sender.hasPermission("movecraftspace.command.planet.list")) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + COMMAND_NO_PERMISSION)
+                return true
+            }
             val paginator = Paginator("Planets")
             for (pl in PlanetCollection) {
                 val orbitCenterPlanet = PlanetCollection.getPlanetAt(pl.orbitCenter.toLocation(pl.space))
@@ -310,7 +339,7 @@ object PlanetCommand : TabExecutor {
                 } else {
                     ""
                 }
-                val component = TextComponent(pl.name + ", §cSystem:§r " + systemName + ", §cOrbit time:§r " + pl.orbitTime)
+                val component = TextComponent(pl.name + "§cLocation: " + pl.center + ", §cSystem:§r " + systemName + ", §cOrbit time:§r " + pl.orbitTime + "§cSpace world: " + pl.space.name)
                 paginator.addLine(component)
             }
             val pageNo = if (args.size > 1) {
@@ -331,6 +360,10 @@ object PlanetCommand : TabExecutor {
                 sender.spigot().sendMessage(ChatMessageType.CHAT, l)
             }
         } else if (args[0].equals("regensphere", true)) {
+            if (!sender.hasPermission("movecraftspace.command.planet.regensphere")) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + COMMAND_NO_PERMISSION)
+                return true
+            }
             if (args.size <= 1) {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "You must specify a planet")
                 return true

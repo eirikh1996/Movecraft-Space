@@ -7,6 +7,7 @@ import io.github.eirikh1996.movecraftspace.objects.Star
 import io.github.eirikh1996.movecraftspace.objects.StarCollection
 import io.github.eirikh1996.movecraftspace.objects.StarCollection.getStarByName
 import io.github.eirikh1996.movecraftspace.utils.MSUtils
+import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_NO_PERMISSION
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import org.bukkit.Material
@@ -26,11 +27,17 @@ object StarCommand : TabExecutor{
             sender.sendMessage(COMMAND_PREFIX + ERROR + "You must be player to use this command")
             return true
         }
+        if (!sender.hasPermission("movecraftspace.command.star")) {
+            sender.sendMessage(COMMAND_PREFIX + ERROR + COMMAND_NO_PERMISSION)
+        }
         if (args.size == 0) {
             sender.sendMessage(COMMAND_PREFIX + ERROR + "Usage /star <create|remove> <name>")
             return true
         }
         if (args[0].equals("create", true)) {
+            if (!sender.hasPermission("movecraftspace.command.star.create")) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + COMMAND_NO_PERMISSION)
+            }
             if (args.size == 1) {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "You need to supply a name")
                 return true
@@ -64,6 +71,9 @@ object StarCommand : TabExecutor{
             }.runTaskTimer(MovecraftSpace.instance,0,1)
 
         } else if (args[0].equals("remove", true)) {
+            if (!sender.hasPermission("movecraftspace.command.star.remove")) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + COMMAND_NO_PERMISSION)
+            }
             if (args.size == 1) {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "Usage /star remove <name>")
                 return true
@@ -86,6 +96,9 @@ object StarCommand : TabExecutor{
                 }
             }.runTaskTimer(MovecraftSpace.instance,0,1)
         } else if (args[0].equals("tp", true)) {
+            if (!sender.hasPermission("movecraftspace.command.star.tp")) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + COMMAND_NO_PERMISSION)
+            }
             if (args.size == 1) {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "Usage /star tp <name>")
                 return true
@@ -104,7 +117,10 @@ object StarCommand : TabExecutor{
 
     override fun onTabComplete(sender: CommandSender, cmd: Command, label: String, args: Array<out String>): List<String> {
         var tabCompletions = Arrays.asList("create", "remove", "info", "tp")
-        if (args[0].equals("create",true) || args[0].equals("info",true)) {
+        if (!sender.hasPermission("movecraftspace.command.star")) {
+            return emptyList()
+        }
+        if (args[0].equals("create",true) || args[0].equals("info",true) || args[0].equals("tp",true) ) {
             tabCompletions = StarCollection.asStringList
         } else if (args.size > 1) {
             return emptyList()

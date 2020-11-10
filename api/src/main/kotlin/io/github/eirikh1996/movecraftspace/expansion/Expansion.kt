@@ -34,6 +34,7 @@ abstract class Expansion {
     val config = YamlConfiguration()
     val classLoader = javaClass.classLoader as ExpansionClassLoader
     val name = classLoader.desc.getString("name")!!
+    val description = classLoader.desc.getString("description", "")!!
     val dataFolder = File(classLoader.datafolder, name)
     val depend = HashSet<String>()
     val softdepend = HashSet<String>()

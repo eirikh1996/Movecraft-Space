@@ -31,14 +31,13 @@ object PlanetCollection : Iterable<Planet> {
         return returnSet
     }
 
-    fun nearestPlanet(space : World, loc : ImmutableVector, maxDistance : Int, excludeMoons : Boolean) : Planet? {
+    fun nearestPlanet(space : World, loc : ImmutableVector, maxDistance : Int = -1, excludeMoons : Boolean = false) : Planet? {
         var foundPlanet : Planet? = null
         var lastDistance = Int.MAX_VALUE
         for (p in this) {
             if (!p.space.equals(space))
                 continue
-            Bukkit.broadcastMessage(p.destination.name + " " + (loc.distance(p.center).toInt() - p.moonOrbitRadius()))
-            if (p.center.distance(loc).toInt() > lastDistance || p.center.distance(loc).toInt() - p.moonOrbitRadius() > maxDistance)
+            if (p.center.distance(loc).toInt() > lastDistance || maxDistance > -1 && p.center.distance(loc).toInt() - p.moonOrbitRadius() > maxDistance)
                 continue
             if (p.isMoon() && excludeMoons)
                 continue

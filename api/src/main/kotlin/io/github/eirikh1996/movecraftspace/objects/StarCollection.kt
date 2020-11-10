@@ -35,6 +35,20 @@ object StarCollection : Iterable<Star> {
         return star
     }
 
+    fun closestStarSystem(loc : Location, maxDistance : Int = -1) : Star? {
+        var star : Star? = null
+        var lastDistance = if (maxDistance <= -1) Double.MAX_VALUE else maxDistance.toDouble()
+        for (s in StarCollection) {
+            val distance = s.loc.distance(ImmutableVector.fromLocation(loc)) - s.radius()
+            if (s.space.equals(loc.world) && distance <= lastDistance) {
+                star = s
+                lastDistance = distance
+            }
+
+        }
+        return star
+    }
+
     fun add(s : Star) {
         stars.add(s)
         saveFile()

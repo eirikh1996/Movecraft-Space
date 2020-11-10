@@ -4,6 +4,11 @@ import io.github.eirikh1996.movecraftspace.MovecraftSpace
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionManager
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionState
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
+import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
+import net.md_5.bungee.api.chat.ClickEvent
+import net.md_5.bungee.api.chat.HoverEvent
+import net.md_5.bungee.api.chat.TextComponent
+import net.md_5.bungee.api.chat.hover.content.Text
 import org.bukkit.Bukkit.*
 import org.bukkit.ChatColor
 import org.bukkit.command.Command
@@ -20,19 +25,42 @@ object MovecraftSpaceCommand : TabExecutor {
         if (args.size == 0) {
             sender.sendMessage(COMMAND_PREFIX + "Version : " + MovecraftSpace.instance.description.version)
         } else if (args[0].equals("expansions", true)) {
-            val set = HashSet<String>()
-            for (ex in ExpansionManager.filter { e -> e.state != ExpansionState.NOT_LOADED }) {
-                var entry = ""
-                entry += if (ex.state == ExpansionState.ENABLED) {
-                    "§a"
-                } else {
-                    "§c"
+            if (args.size <= 1) {
+                val expansionList = TextComponent(COMMAND_PREFIX + "Expansions loaded: ")
+                var index = 0
+                val loadedExpansions = ExpansionManager.filter { e -> e.state != ExpansionState.NOT_LOADED }
+                for (ex in loadedExpansions) {
+                    index++
+                    var entry = ""
+                    entry += if (ex.state == ExpansionState.ENABLED) {
+                        "§a"
+                    } else {
+                        "§c"
+                    }
+                    entry += ex.name
+                    entry += "§r"
+                    val tp = TextComponent(entry)
+                    tp.hoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, Text("Click for expansion information"))
+                    tp.clickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/movecraftspace expansion " + ex.name)
+                    expansionList.addExtra(tp)
+                    if (index >= loadedExpansions.size)
+                        expansionList.addExtra(", ")
                 }
-                entry += ex.name
-                entry += "§r"
-                set.add(entry)
+                sender.spigot().sendMessage(expansionList)
+                return true
             }
-            sender.sendMessage(COMMAND_PREFIX + "Expansions loaded: " + set.sortedBy { s: String -> ChatColor.stripColor(s) }.joinToString())
+            val expansion = ExpansionManager.getExpansion(args[1])
+            if (expansion == null) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "No such expansion is loaded: " + args[1])
+                return true
+            }
+            sender.sendMessage("===========[" + expansion.name + "]===========")
+            sender.sendMessage("Description: " + expansion.description)
+            sender.sendMessage("Version: " + expansion.version)
+            sender.sendMessage("Depend: " + expansion.depend.joinToString())
+            sender.sendMessage("Soft depend: " + expansion.softdepend.joinToString())
+            sender.sendMessage("Expansion depend: " + expansion.expansionDepend.joinToString())
+            sender.sendMessage("Expansion soft depend: " + expansion.expansionSoftDepend.joinToString())
         }
         return true
     }
