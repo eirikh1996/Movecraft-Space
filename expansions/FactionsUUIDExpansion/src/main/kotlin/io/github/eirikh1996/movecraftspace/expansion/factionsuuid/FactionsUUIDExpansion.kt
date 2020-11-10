@@ -1,12 +1,17 @@
 package io.github.eirikh1996.movecraftspace.expansion.factionsuuid
 
 import com.massivecraft.factions.*
+import com.massivecraft.factions.event.LandClaimEvent
 import com.massivecraft.factions.perms.PermissibleAction
 import io.github.eirikh1996.movecraftspace.expansion.Expansion
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionState
+import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
+import io.github.eirikh1996.movecraftspace.utils.MSUtils
+import net.countercraft.movecraft.MovecraftChunk
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
+import org.bukkit.event.EventHandler
 
 class FactionsUUIDExpansion : Expansion(){
     override fun allowedArea(p: Player, loc: Location): Boolean {
@@ -28,5 +33,15 @@ class FactionsUUIDExpansion : Expansion(){
             return
         }
         saveDefaultConfig()
+    }
+
+    @EventHandler
+    fun onClaim(event : LandClaimEvent) {
+        val fLoc = event.location
+        val planet = PlanetCollection.intersectingOtherPlanetaryOrbit(MovecraftChunk(fLoc.x.toInt(), fLoc.z.toInt(), fLoc.world))
+        if (planet == null)
+            return
+        event.getfPlayer().player.sendMessage(MSUtils.COMMAND_PREFIX + "Cannot claim land here as it intersect with the planetary orbit of " + planet.name)
+        event.isCancelled = true
     }
 }
