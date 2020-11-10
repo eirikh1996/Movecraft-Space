@@ -19,6 +19,7 @@
         <module>expansions/HyperspaceExpansion</module>
         <module>expansions/TownyExpansion</module>
         <module>expansions/LandsExpansion</module>
+        <module>expansions/FactionsBlueExpansion</module>
     </modules>
     <packaging>pom</packaging>
 

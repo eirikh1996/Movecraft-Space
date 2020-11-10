@@ -74,6 +74,12 @@
         <outputRelativeToContentRoot value="true" />
         <module name="Movecraft-Space" />
       </profile>
+      <profile name="Annotation profile for FactionsBlueExpansion" enabled="true">
+        <sourceOutputDir name="../../target/expansions/factionsblue/generated-sources/annotations" />
+        <sourceTestOutputDir name="../../target/expansions/factionsblue/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="FactionsBlueExpansion" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="Movecraft-Space-Parent" target="1.5" />

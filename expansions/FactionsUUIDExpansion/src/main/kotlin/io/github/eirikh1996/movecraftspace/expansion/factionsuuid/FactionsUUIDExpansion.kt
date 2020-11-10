@@ -14,8 +14,11 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 
 class FactionsUUIDExpansion : Expansion(){
+    var allowEntryInSafezone = false
+    var allowEntryInWarzone = false
     override fun allowedArea(p: Player, loc: Location): Boolean {
         val faction = Board.getInstance().getFactionAt(FLocation(loc))
+        if (faction.isWilderness || faction.isSafeZone && allowEntryInSafezone || faction.isWarZone && allowEntryInWarzone) return true
         for (s in config.getStringList("Allow entry to factions")) {
             val allowedFaction = Factions.getInstance().getByTag(s)
             if (allowedFaction == null || !faction.equals(allowedFaction))
@@ -33,10 +36,14 @@ class FactionsUUIDExpansion : Expansion(){
             return
         }
         saveDefaultConfig()
+        allowEntryInSafezone = config.getBoolean("Allow entry to safezone")
+        allowEntryInWarzone = config.getBoolean("Allow entry to warzone")
     }
 
     @EventHandler
     fun onClaim(event : LandClaimEvent) {
+        val faction = event.faction
+        if (faction.isWilderness || faction.isSafeZone || faction.isWarZone) return
         val fLoc = event.location
         val planet = PlanetCollection.intersectingOtherPlanetaryOrbit(MovecraftChunk(fLoc.x.toInt(), fLoc.z.toInt(), fLoc.world))
         if (planet == null)

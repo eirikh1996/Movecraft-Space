@@ -1,3 +1,5 @@
+Allow entry to safezone: false
+Allow entry to warzone: false
 Allow entry to factions:
   - Safezone
   - Warzone

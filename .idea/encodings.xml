@@ -4,6 +4,8 @@
     <file url="file://$PROJECT_DIR$/api/src/main/kotlin" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/expansions/DynmapExpansion/src/main/kotlin" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/expansions/DynmapExpansion/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/expansions/FactionsBlueExpansion/src/main/kotlin" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/expansions/FactionsBlueExpansion/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/expansions/FactionsExpansion/src/main/kotlin" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/expansions/FactionsExpansion/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/expansions/FactionsUUIDExpansion/src/main/kotlin" charset="UTF-8" />
