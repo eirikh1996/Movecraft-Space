@@ -47,13 +47,13 @@ abstract class Expansion {
     set(state) {
         field = state
         if (state == ExpansionState.ENABLED) {
-            Bukkit.getConsoleSender().sendMessage(COMMAND_PREFIX + "Enabling expansion " + name)
+            logMessage(LogMessageType.INFO, "Enabling expansion " + name)
             enable()
         } else if (state == ExpansionState.DISABLED) {
-            Bukkit.getConsoleSender().sendMessage(COMMAND_PREFIX + "Disabling expansion " + name)
+            logMessage(LogMessageType.INFO, "Disabling expansion " + name)
             disable()
         } else if (state == ExpansionState.LOADED) {
-            Bukkit.getConsoleSender().sendMessage(COMMAND_PREFIX + "Loading expansion " + name)
+            logMessage(LogMessageType.INFO, "Loading expansion " + name)
             load()
         }
     }
@@ -106,7 +106,7 @@ abstract class Expansion {
         return true
     }
     fun logMessage(type : LogMessageType, message: String) {
-        Bukkit.getConsoleSender().sendMessage(COMMAND_PREFIX + "[" + name + "]" + type + ": " + message)
+        Bukkit.getConsoleSender().sendMessage(COMMAND_PREFIX + "§5[§3" + name + "§5]§r" + type.message + ": " + message)
     }
 
     fun saveDefaultConfig() {
@@ -119,14 +119,14 @@ abstract class Expansion {
         }
         val input = getResource(path)
         if (input == null) {
-            Bukkit.getLogger().severe("[Movecraft-Space/Expansion] Resource " + path + "does not exist")
+            logMessage(LogMessageType.CRITICAL,"Resource " + path + "does not exist")
             return
         }
         if (!dataFolder.exists())
             dataFolder.mkdirs()
         val file = File(dataFolder, path)
         if (file.exists() && !replace) {
-            Bukkit.getLogger().severe("[Movecraft-Space/Expansion] Resource " + path + "already exists at target location")
+            logMessage(LogMessageType.CRITICAL,"Resource " + path + "already exists at target location")
             return
         }
         val buffer = ByteArray(input.available())
@@ -163,6 +163,10 @@ abstract class Expansion {
     }
 
     enum class LogMessageType(val message : String) {
-        INFO("INFO"), WARNING("§eWARNING"), ERROR("§cERROR"), CRITICAL("§4CRITICAL")
+        INFO("INFO"), WARNING("§eWARNING"), ERROR("§cERROR"), CRITICAL("§4CRITICAL");
+
+        override fun toString(): String {
+            return message
+        }
     }
 }

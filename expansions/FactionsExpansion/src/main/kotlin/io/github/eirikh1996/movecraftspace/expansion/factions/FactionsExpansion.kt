@@ -28,7 +28,7 @@ class FactionsExpansion : Expansion(){
     override fun enable() {
         val f = Bukkit.getPluginManager().getPlugin("Factions")
         if (f !is Factions || !f.isEnabled) {
-            logger.severe("Factions is required, but not found or disabled")
+            logMessage(LogMessageType.CRITICAL,"Factions is required, but not found or disabled")
             state = ExpansionState.DISABLED
             return
         }

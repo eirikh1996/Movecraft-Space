@@ -26,6 +26,7 @@ class TownyExpansion : Expansion(), Listener {
     override fun enable() {
         val t = plugin.server.pluginManager.getPlugin("Towny")
         if (t !is Towny || !t.isEnabled) {
+            logMessage(LogMessageType.CRITICAL, "Towny is required, but was not found or is disabled")
             state = ExpansionState.DISABLED
             return
         }

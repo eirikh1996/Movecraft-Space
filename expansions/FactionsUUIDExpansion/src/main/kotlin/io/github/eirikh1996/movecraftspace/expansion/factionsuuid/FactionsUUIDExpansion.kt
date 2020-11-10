@@ -33,7 +33,7 @@ class FactionsUUIDExpansion : Expansion(){
     override fun enable() {
         val f = Bukkit.getPluginManager().getPlugin("Factions")
         if (f !is FactionsPlugin || !f.isEnabled) {
-            logger.severe("FactionsUUID is required, but not found or disabled")
+            logMessage(LogMessageType.CRITICAL,"FactionsUUID is required, but not found or disabled")
             state = ExpansionState.DISABLED
             return
         }

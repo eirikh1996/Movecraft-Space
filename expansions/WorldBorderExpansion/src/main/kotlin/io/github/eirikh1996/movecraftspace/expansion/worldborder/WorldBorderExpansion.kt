@@ -14,7 +14,7 @@ class WorldBorderExpansion : Expansion() {
     override fun enable() {
         val wb = Bukkit.getPluginManager().getPlugin("WorldBorder")
         if (wb !is WorldBorder || !wb.isEnabled) {
-            logger.severe("WorldBorder is required, but was not found or disabled")
+            logMessage(LogMessageType.CRITICAL, "WorldBorder is required, but was not found or disabled")
             state = ExpansionState.DISABLED
             return
         }

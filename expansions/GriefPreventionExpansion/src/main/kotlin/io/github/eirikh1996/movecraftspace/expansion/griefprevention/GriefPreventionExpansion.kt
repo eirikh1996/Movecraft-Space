@@ -30,7 +30,7 @@ class GriefPreventionExpansion : Expansion(), Listener{
     override fun enable() {
         val gp = Bukkit.getPluginManager().getPlugin("GriefPrevention")
         if (gp !is GriefPrevention || !gp.isEnabled) {
-            logger.severe("GriefPrevention is required, but not found or disabled")
+            logMessage(LogMessageType.CRITICAL,"GriefPrevention is required, but not found or disabled")
             state = ExpansionState.DISABLED
             return
         }

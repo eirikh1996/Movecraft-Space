@@ -303,21 +303,32 @@ object PlanetCommand : TabExecutor {
             }
             val closestPlanet = PlanetCollection.nearestPlanet(sender.world, ImmutableVector.fromLocation(sender.location), Settings.MaxMoonSpacing, true)
             val distance = closestStar.loc.distance(ImmutableVector(tx, 127, tz)) - closestStar.radius()
-            if (distance < Settings.MinimumDistanceBetweenStars && closestPlanet == null) {
+            if (distance < Settings.MinimumDistanceBetweenOrbits && closestPlanet == null) {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "Cannot move planet to this location as it it too close to star system " + closestStar.name)
                 return true
-            } else if (closestPlanet!!.center.distance(ImmutableVector.fromLocation(sender.location)) < Settings.MinMoonSpacing) {
-                sender.sendMessage(COMMAND_PREFIX + ERROR + "Cannot move planet to this location as it it too close to moon system " + closestPlanet.name)
-                return true
-            } else if (!closestPlanet.moons.isEmpty()) {
-                sender.sendMessage(COMMAND_PREFIX + ERROR + "Planets with moons cannot join other moon systems")
-                return true
+            } else if (closestPlanet != null) {
+                if (closestPlanet.center.distance(ImmutableVector.fromLocation(sender.location)) < Settings.MinMoonSpacing) {
+                    sender.sendMessage(COMMAND_PREFIX + ERROR + "Cannot move planet to this location as it it too close to moon system " + closestPlanet.name)
+                    return true
+                }
+                if (!closestPlanet.moons.isEmpty()) {
+                    sender.sendMessage(COMMAND_PREFIX + ERROR + "Planets with moons cannot join other moon systems")
+                    return true
+                }
+
             }
             val dx = tx - planet.center.x
             val dz = tz - planet.center.z
             sender.sendMessage(COMMAND_PREFIX + "Moved planet to x: " + sender.location.blockX + ", z: " + sender.location.blockZ)
             val displacement = ImmutableVector(dx, 0, dz)
             planet.move(displacement, false, sender.world)
+            planet.orbitCenter = if (closestPlanet == null) closestStar.loc else closestPlanet.center
+            for (pl in PlanetCollection) {
+                pl.moons.remove(planet)
+            }
+            if (closestPlanet != null)
+                closestPlanet.moons.add(planet)
+
             if (planet.moons.isEmpty())
                 return true
             for (moon in planet.moons) {
@@ -339,7 +350,7 @@ object PlanetCommand : TabExecutor {
                 } else {
                     ""
                 }
-                val component = TextComponent(pl.name + "§cLocation: " + pl.center + ", §cSystem:§r " + systemName + ", §cOrbit time:§r " + pl.orbitTime + "§cSpace world: " + pl.space.name)
+                val component = TextComponent(pl.name + "§cLocation:§r " + pl.center + ", §cSystem:§r " + systemName + ", §cOrbit time:§r " + pl.orbitTime + "§cSpace world:§r " + pl.space.name)
                 paginator.addLine(component)
             }
             val pageNo = if (args.size > 1) {
@@ -441,12 +452,32 @@ object PlanetCommand : TabExecutor {
                 }
 
             }.runTaskTimer(MovecraftSpace.instance, 0, 3)
+        } else if (args[0].equals("tp", true)) {
+            if (!sender.hasPermission("movecraftspace.command.planet.tp")) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + COMMAND_NO_PERMISSION)
+                return true
+            }
+            if (args.size <= 1) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "You must specify a planet")
+                return true
+            }
+            val planet = PlanetCollection.getPlanetByName(args[1])
+            if (planet == null) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "Planet " + args[1] + " does not exist!")
+                return true
+            }
+            sender.teleport(Location(planet.space,
+                planet.center.x.toDouble(),
+                (planet.center.y + planet.radius + 10).toDouble(),
+                planet.center.z.toDouble(),
+                sender.location.yaw,
+                sender.location.pitch))
         }
         return true
     }
 
     override fun onTabComplete(sender: CommandSender, cmd: Command, label: String, args: Array<out String>) : List<String> {
-        var tabCompletions = listOf("create", "remove", "move", "list", "toggleplayerteleport", "regensphere").filter { str -> sender.hasPermission("movecraftspace.command.planet." + str) }
+        var tabCompletions = listOf("create", "remove", "move", "list", "toggleplayerteleport", "regensphere", "tp").filter { str -> sender.hasPermission("movecraftspace.command.planet." + str) }
         tabCompletions = tabCompletions.sorted()
         if (args.size == 0) {
             return tabCompletions
@@ -459,9 +490,13 @@ object PlanetCommand : TabExecutor {
                 worlds.add(world.name)
             }
             tabCompletions = worlds
+            if (args.size >= 3) {
+                tabCompletions = listOf("exitheight:", "surfacematerial:", "isMoon:", "orbitTime:")
+            }
         } else if (args[0].equals("remove", true) ||
             args[0].equals("move", true) ||
-            args[0].equals("regensphere", true)) {
+            args[0].equals("regensphere", true)||
+            args[0].equals("tp", true)) {
             val worlds = ArrayList<String>()
             for (planet in PlanetCollection) {
                 worlds.add(planet.destination.name)

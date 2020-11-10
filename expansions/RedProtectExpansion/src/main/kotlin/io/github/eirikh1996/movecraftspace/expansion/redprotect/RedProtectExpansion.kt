@@ -21,6 +21,7 @@ class RedProtectExpansion : Expansion(), Listener {
     override fun enable() {
         val rp = Bukkit.getPluginManager().getPlugin("RedProtect")
         if (rp !is RedProtect || !rp.isEnabled) {
+            logMessage(LogMessageType.CRITICAL, "RedProtect is required, but was not found or is disabled")
             state = ExpansionState.DISABLED
             return
         }

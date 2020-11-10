@@ -41,9 +41,9 @@ object MovecraftSpaceCommand : TabExecutor {
                     entry += "§r"
                     val tp = TextComponent(entry)
                     tp.hoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, Text("Click for expansion information"))
-                    tp.clickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/movecraftspace expansion " + ex.name)
+                    tp.clickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/movecraftspace expansions " + ex.name)
                     expansionList.addExtra(tp)
-                    if (index >= loadedExpansions.size)
+                    if (index < loadedExpansions.size)
                         expansionList.addExtra(", ")
                 }
                 sender.spigot().sendMessage(expansionList)
@@ -66,9 +66,14 @@ object MovecraftSpaceCommand : TabExecutor {
     }
 
     override fun onTabComplete(sender : CommandSender, cmd : Command, label : String, args : Array<out String>) : List<String> {
-        val tabCompletions = listOf("expansions").sorted()
+        var tabCompletions = listOf("expansions").sorted()
         if (args.size == 0)
             return tabCompletions
+        else if (args[0].equals("expansions", true)) {
+            val list = ArrayList<String>()
+            ExpansionManager.filter { ex -> ex.state == ExpansionState.ENABLED || ex.state == ExpansionState.DISABLED }.forEach{e -> list.add(e.name)}
+            tabCompletions = list
+        }
         val completions = ArrayList<String>()
         for (c in tabCompletions) {
             if (!c.startsWith(args[args.size - 1]))

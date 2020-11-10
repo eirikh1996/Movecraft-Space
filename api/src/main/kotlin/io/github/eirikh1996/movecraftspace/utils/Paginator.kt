@@ -25,7 +25,7 @@ class Paginator constructor(val name : String = "") {
         page[0] = TextComponent("§5==========§9 " + name + " §5==========")
         for (i in 1 until lineCount) {
             val index = (CLOSED_CHAT_PAGE_HEIGHT - 1) * (pageNo - 1) + i
-            page[i] = content[index]
+            page[i] = content[index - 1]
         }
         val clickArrows = TextComponent( if (pageNo == 1) "---" else { "<<<" } )
         clickArrows.color = if (pageNo == 1) ChatColor.RED else ChatColor.GREEN

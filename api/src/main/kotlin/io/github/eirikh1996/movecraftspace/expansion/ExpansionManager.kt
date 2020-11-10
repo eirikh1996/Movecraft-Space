@@ -70,7 +70,7 @@ object ExpansionManager : Iterable<Expansion> {
             val jarFile = JarFile(jar)
             val yamlEntry = jarFile.getJarEntry("expansion.yml")
             if (yamlEntry == null) {
-                pl.logger.severe("No expansion.yml found in " + jar.name)
+                getConsoleSender().sendMessage(COMMAND_PREFIX + ERROR + "No expansion.yml found in " + jar.name)
                 continue
             }
             val input = jarFile.getInputStream(yamlEntry)
@@ -79,12 +79,12 @@ object ExpansionManager : Iterable<Expansion> {
             desc.load(reader)
             val name = desc.getString("name")
             if (name == null) {
-                pl.logger.severe("name is required, but not found in expansion.yml of " + jar.name)
+                getConsoleSender().sendMessage(COMMAND_PREFIX + ERROR + "name is required, but not found in expansion.yml of " + jar.name)
                 continue
             }
             val main = desc.getString("main")
             if (main == null) {
-                pl.logger.severe("main is required, but not found in expansion.yml of " + jar.name)
+                getConsoleSender().sendMessage(COMMAND_PREFIX + ERROR + "main is required, but not found in expansion.yml of " + jar.name)
                 continue
             }
             val classLoader : ExpansionClassLoader
@@ -100,11 +100,11 @@ object ExpansionManager : Iterable<Expansion> {
             val missingDependencies = HashSet<String>()
             val disabledDependencies = HashSet<String>()
             if (!missingDependencies.isEmpty()) {
-                pl.logger.severe("Dependenc" + if (missingDependencies.size > 1 ) "ies " else "y " + missingDependencies.joinToString(", ") + if (missingDependencies.size > 1 ) " are " else " is " + "required, but missing")
+                ex.logMessage(Expansion.LogMessageType.ERROR, "Dependenc" + if (missingDependencies.size > 1 ) "ies " else "y " + missingDependencies.joinToString(", ") + if (missingDependencies.size > 1 ) " are " else " is " + "required, but missing")
                 continue
             }
             if (!disabledDependencies.isEmpty()) {
-                pl.logger.severe("Dependenc" + if (disabledDependencies.size > 1 ) "ies " else "y " + disabledDependencies.joinToString(", ") + if (disabledDependencies.size > 1 ) " are " else " is " + "required, but disabled")
+                ex.logMessage(Expansion.LogMessageType.ERROR, "Dependenc" + if (disabledDependencies.size > 1 ) "ies " else "y " + disabledDependencies.joinToString(", ") + if (disabledDependencies.size > 1 ) " are " else " is " + "required, but disabled")
                 continue
             }
             val commandsField = PluginDescriptionFile::class.java.getDeclaredField("commands")
@@ -116,10 +116,10 @@ object ExpansionManager : Iterable<Expansion> {
             expansions.add(ex)
             try {
                 ex.state = ExpansionState.LOADED
-                pl.logger.info("Expansion " + name + " loaded")
+                ex.logMessage(Expansion.LogMessageType.INFO , "Expansion " + name + " loaded")
 
             } catch (t : Throwable) {
-                pl.logger.severe("Failure to load expansion " + ex.name)
+                ex.logMessage(Expansion.LogMessageType.ERROR, "Failure to load expansion " + ex.name)
                 t.printStackTrace()
                 continue
             }
@@ -138,7 +138,7 @@ object ExpansionManager : Iterable<Expansion> {
             try {
                 ex.state = ExpansionState.ENABLED
             } catch (t : Throwable) {
-                getConsoleSender().sendMessage(COMMAND_PREFIX + ERROR + "Failure to enable expansion " + ex.name)
+                ex.logMessage(Expansion.LogMessageType.ERROR, "Failure to enable expansion " + ex.name)
                 t.printStackTrace()
                 ex.state = ExpansionState.DISABLED
             }
@@ -148,7 +148,7 @@ object ExpansionManager : Iterable<Expansion> {
             try {
                 ex.state = ExpansionState.ENABLED
             } catch (t : Throwable) {
-                getConsoleSender().sendMessage(COMMAND_PREFIX + ERROR + "Failure to enable expansion " + ex.name)
+                ex.logMessage(Expansion.LogMessageType.ERROR, "Failure to enable expansion " + ex.name)
                 t.printStackTrace()
                 ex.state = ExpansionState.DISABLED
             }

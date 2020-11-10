@@ -2,11 +2,11 @@ WorldSwitchCooldownTime: 10
 IgnoreProtectedRegions: false
 MaxRadiusFromPlanetWorldSpawn: -1
 MinDistanceToOtherCrafts: -1
-MinimumDistanceBetweenOrbits: 7000
-MaximumDistanceBetweenOrbits: 15000
+MinimumDistanceBetweenOrbits: 1000
+MaximumDistanceBetweenOrbits: 3000
 PlanetaryRotationCheckCooldown: 25
 MinMoonSpacing: 500
-MaxMoonSpacing: 3500
+MaxMoonSpacing: 1000
 AllowPlayersTeleportationToPlanets: true
 ExplodeSinkingCraftsInWorlds:
   - Space

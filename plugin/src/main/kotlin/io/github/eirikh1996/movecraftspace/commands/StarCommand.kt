@@ -2,7 +2,9 @@ package io.github.eirikh1996.movecraftspace.commands
 
 import io.github.eirikh1996.movecraftspace.MovecraftSpace
 import io.github.eirikh1996.movecraftspace.Settings
+import io.github.eirikh1996.movecraftspace.event.planet.PlanetRemoveEvent
 import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
+import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
 import io.github.eirikh1996.movecraftspace.objects.Star
 import io.github.eirikh1996.movecraftspace.objects.StarCollection
 import io.github.eirikh1996.movecraftspace.objects.StarCollection.getStarByName
@@ -10,13 +12,21 @@ import io.github.eirikh1996.movecraftspace.utils.MSUtils
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_NO_PERMISSION
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
+import io.github.eirikh1996.movecraftspace.utils.MSUtils.WARNING
+import io.github.eirikh1996.movecraftspace.utils.Paginator
+import net.md_5.bungee.api.ChatMessageType
+import net.md_5.bungee.api.chat.ClickEvent
+import net.md_5.bungee.api.chat.TextComponent
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabExecutor
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
+import java.lang.NumberFormatException
 import java.util.*
+import kotlin.collections.HashSet
 import kotlin.math.min
 
 object StarCommand : TabExecutor{
@@ -83,8 +93,33 @@ object StarCommand : TabExecutor{
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "Star " + args[1] + "does not exist!")
                 return true
             }
+            val planetsOrbitingStar = PlanetCollection.getPlanetsWithOrbitPoint(star.loc)
+            val sphere = LinkedList<ImmutableVector>()
+            if (!planetsOrbitingStar.isEmpty()) {
+                if (args.size < 3 || !args[2].equals("confirm", true)) {
+                    val component = TextComponent(COMMAND_PREFIX + WARNING + "Star " + args[1] + " is part of a planetary system. Do you still want to remove? ")
+                    val confirm = TextComponent("§2[Confirm]")
+                    confirm.clickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/star remove " + star.name + " confirm")
+                    component.addExtra(confirm)
+                    sender.spigot().sendMessage(ChatMessageType.CHAT, component)
+                    return true
+                }
+                for (planet in planetsOrbitingStar) {
+                    val structureRadius = planet.radius - 30
+                    sphere.addAll(MSUtils.createSphere(structureRadius, planet.center))
+                    if (!planet.moons.isEmpty()) {
+                        for (moon in planet.moons) {
+                            Bukkit.getPluginManager().callEvent(PlanetRemoveEvent(moon))
+                            sphere.addAll(MSUtils.createSphere(moon.radius - 30, moon.center))
+                            PlanetCollection.remove(moon)
+                        }
+                        sender.sendMessage(COMMAND_PREFIX + "Removed " + planet.moons.size + " moons attached to " + planet.name)
+                        planet.moons.clear()
+                    }
+                }
+            }
             sender.sendMessage(COMMAND_PREFIX + "Successfully removed star named " + star.name)
-            val sphere = LinkedList(MSUtils.createSphere(126, star.loc))
+            sphere.addAll(MSUtils.createSphere(126, star.loc))
             object : BukkitRunnable() {
                 override fun run() {
                     val size = min(sphere.size, 10000)
@@ -111,6 +146,25 @@ object StarCommand : TabExecutor{
             val tpLoc = star.loc.toLocation(star.space)
             tpLoc.y = 260.0
             sender.teleport(tpLoc)
+        } else if (args[0].equals("list", true)) {
+            val paginator = Paginator("Stars")
+            for (star in StarCollection) {
+                val planets = PlanetCollection.getPlanetsWithOrbitPoint(star.loc)
+                var moons = 0
+                for (pl in planets) {
+                    moons += pl.moons.size
+                }
+                paginator.addLine(TextComponent(star.name + " Location: " + star.loc + " Space: " + star.space))
+            }
+            var pageNo = 1
+            if (args.size > 1) {
+                try {
+                    pageNo = args[1].toInt()
+                } catch (e : NumberFormatException) {
+                    sender.sendMessage(COMMAND_PREFIX + ERROR + args[1] + " is not a number")
+                }
+            }
+            paginator.getPage(pageNo, "/star list ").forEach { t -> sender.spigot().sendMessage(ChatMessageType.CHAT, t) }
         }
         return true
     }

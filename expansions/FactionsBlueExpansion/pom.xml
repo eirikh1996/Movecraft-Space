@@ -8,7 +8,7 @@
     <version>1.0</version>
     <packaging>jar</packaging>
 
-    <name>io.github.eirikh1996 FactionsBlueExpansion</name>
+    <name>FactionsBlueExpansion</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

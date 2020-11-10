@@ -38,6 +38,7 @@ class WorldGuardExpansion : Expansion() {
     override fun enable() {
         val wg = plugin.server.pluginManager.getPlugin("WorldGuard")
         if (wg !is WorldGuardPlugin || !wg.isEnabled) {
+            logMessage(LogMessageType.CRITICAL, "WorldGuard is required, but was not found or disabled")
             state = ExpansionState.DISABLED
             return
         }
