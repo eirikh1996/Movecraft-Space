@@ -13,3 +13,22 @@ commands:
     aliases:
       - ms
       - mspace
+permissions:
+  movecraftspace.command.star:
+    children:
+      movecraftspace.command.star.create: true
+      movecraftspace.command.star.remove: true
+      movecraftspace.command.star.tp: true
+  movecraftspace.command.planet:
+    children:
+      movecraftspace.command.planet.create: true
+      movecraftspace.command.planet.remove: true
+      movecraftspace.command.planet.regensphere: true
+      movecraftspace.command.planet.toggleplayerteleport: true
+      movecraftspace.command.planet.tp: true
+      movecraftspace.command.planet.move: true
+
+  movecraftspace.command.planet.list:
+    default: true
+  movecraftspace.command.star.list:
+    default: true

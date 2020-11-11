@@ -41,7 +41,7 @@ object StarCommand : TabExecutor{
             sender.sendMessage(COMMAND_PREFIX + ERROR + COMMAND_NO_PERMISSION)
         }
         if (args.size == 0) {
-            sender.sendMessage(COMMAND_PREFIX + ERROR + "Usage /star <create|remove> <name>")
+            sender.sendMessage(COMMAND_PREFIX + ERROR + "Usage /star <create|remove> <name> [radius]")
             return true
         }
         if (args[0].equals("create", true)) {
@@ -67,7 +67,7 @@ object StarCommand : TabExecutor{
             var radius = 126
             if (args.size >= 3) {
                 try {
-                    radius = args[2].toInt()
+                    radius = min(args[2].toInt(), 126)
                 } catch (e : NumberFormatException) {
                     sender.sendMessage(COMMAND_PREFIX + ERROR + args[2] + " is not a number")
                     return true
@@ -77,7 +77,7 @@ object StarCommand : TabExecutor{
             StarCollection.add(newStar)
             sender.sendMessage(COMMAND_PREFIX + "Successfully created new star named " + newStar.name)
 
-            val sphere = LinkedList(MSUtils.createSphere(126, newStar.loc))
+            val sphere = LinkedList(MSUtils.createSphere(radius, newStar.loc))
             object : BukkitRunnable() {
                 override fun run() {
                     val size = min(sphere.size, 10000)
@@ -106,7 +106,7 @@ object StarCommand : TabExecutor{
             val sphere = LinkedList<ImmutableVector>()
 
             if (!planetsOrbitingStar.isEmpty()) {
-                if (args.size < 4 || !args[2].equals("confirm", true)) {
+                if (args.size < 3 || !args[2].equals("confirm", true)) {
                     val component = TextComponent(COMMAND_PREFIX + WARNING + "Star " + args[1] + " is part of a planetary system. Do you still want to remove? ")
                     val confirm = TextComponent("§2[Confirm]")
                     confirm.clickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/star remove " + star.name + " confirm")
@@ -117,6 +117,7 @@ object StarCommand : TabExecutor{
                 for (planet in planetsOrbitingStar) {
                     val structureRadius = planet.radius - 30
                     sphere.addAll(MSUtils.createSphere(structureRadius, planet.center))
+                    PlanetCollection.remove(planet)
                     if (!planet.moons.isEmpty()) {
                         for (moon in planet.moons) {
                             Bukkit.getPluginManager().callEvent(PlanetRemoveEvent(moon))
@@ -128,6 +129,7 @@ object StarCommand : TabExecutor{
                     }
                 }
             }
+            StarCollection.remove(star)
             sender.sendMessage(COMMAND_PREFIX + "Successfully removed star named " + star.name)
             sphere.addAll(MSUtils.createSphere(star.radius, star.loc))
             object : BukkitRunnable() {
@@ -184,7 +186,7 @@ object StarCommand : TabExecutor{
         if (!sender.hasPermission("movecraftspace.command.star")) {
             return emptyList()
         }
-        if (args[0].equals("create",true) || args[0].equals("info",true) || args[0].equals("tp",true) ) {
+        if (args[0].equals("info",true) || args[0].equals("tp",true) ) {
             tabCompletions = StarCollection.asStringList
         } else if (args.size > 1) {
             return emptyList()

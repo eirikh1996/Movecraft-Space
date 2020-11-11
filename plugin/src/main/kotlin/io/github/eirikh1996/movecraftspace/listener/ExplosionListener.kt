@@ -1,6 +1,7 @@
 package io.github.eirikh1996.movecraftspace.listener
 
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
+import io.github.eirikh1996.movecraftspace.objects.StarCollection
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockExplodeEvent
@@ -26,9 +27,10 @@ object ExplosionListener : Listener {
         while (iter.hasNext()) {
             val next = iter.next()
             val planet = PlanetCollection.getPlanetAt(next.location)
-            if (planet == null || planet.destination.equals(next.world))
-                continue
-            iter.remove()
+            val star = StarCollection.getStarAt(next.location)
+            if (planet != null && planet.space.equals(next.world) || star != null)
+                iter.remove()
+
         }
     }
 }

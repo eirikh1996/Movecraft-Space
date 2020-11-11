@@ -65,14 +65,14 @@ object PlanetCommand : TabExecutor {
                 return true
             }
             if (sender !is Player) {
-                sender.sendMessage("You must be a player to use this command")
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "You must be a player to use this command")
                 return true
             }
             if (args.size == 1) {
-                sender.sendMessage("You must specify destination world")
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "You must specify destination world")
                 return true
             } else if (args.size == 2) {
-                sender.sendMessage("You must specify radius")
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "You must specify radius")
                 return true
             }
             val radius : Int
@@ -84,10 +84,10 @@ object PlanetCommand : TabExecutor {
             }
             val destination = Bukkit.getWorld(args[1])
             if (destination == null) {
-                sender.sendMessage("World " + args[1] + " does not exist!")
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "World " + args[1] + " does not exist!")
                 return true
             } else if (sender.world.equals(destination)) {
-                sender.sendMessage("Space world and planet world cannot be the same!")
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "Space world and planet world cannot be the same!")
                 return true
             } else if (PlanetCollection.worldIsPlanet(sender.world)) {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "Planet worlds cannot serve as space worlds")
@@ -160,7 +160,6 @@ object PlanetCommand : TabExecutor {
             }
             val spacing = planet.orbitRadius - nearestStar.radius()
             var moon = false
-            Bukkit.broadcastMessage(nearestPlanet.toString())
             if (nearestPlanet != null && nearestPlanet.center.distance(planet.center) < nearestStar.loc.distance(planet.center)) {
                 val moonSpacing = nearestPlanet.center.distance(planet.center)
                 if (moonSpacing < Settings.MinMoonSpacing) {

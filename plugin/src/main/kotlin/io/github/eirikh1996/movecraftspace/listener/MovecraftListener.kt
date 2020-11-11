@@ -5,6 +5,7 @@ import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionManager
 import io.github.eirikh1996.movecraftspace.objects.Planet
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
+import io.github.eirikh1996.movecraftspace.objects.StarCollection
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.hitboxObstructed
 import net.countercraft.movecraft.Movecraft
 import net.countercraft.movecraft.MovecraftChunk
@@ -145,6 +146,8 @@ object MovecraftListener : Listener {
                 if (craft.notificationPlayer != null && !ExpansionManager.allowedArea(craft.notificationPlayer!!, test.toBukkit(destWorld))) {
                     continue
                 }
+                if (StarCollection.getStarAt(test.toBukkit(destWorld)) != null)
+                    continue
                 val diff = test.subtract(midpoint)
                 val chunks = ChunkManager.getChunks(craft.hitBox, destWorld, diff.x, diff.y, diff.z)
                 MovecraftChunk.addSurroundingChunks(chunks, 3)

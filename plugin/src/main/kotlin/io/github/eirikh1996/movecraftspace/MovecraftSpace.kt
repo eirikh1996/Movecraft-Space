@@ -4,6 +4,7 @@ import io.github.eirikh1996.movecraftspace.commands.MovecraftSpaceCommand
 import io.github.eirikh1996.movecraftspace.commands.PlanetCommand
 import io.github.eirikh1996.movecraftspace.commands.StarCommand
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionManager
+import io.github.eirikh1996.movecraftspace.listener.BlockListener
 import io.github.eirikh1996.movecraftspace.listener.ExplosionListener
 import io.github.eirikh1996.movecraftspace.listener.MovecraftListener
 import io.github.eirikh1996.movecraftspace.listener.PlayerListener
@@ -44,6 +45,7 @@ class MovecraftSpace : JavaPlugin() {
         server.pluginManager.registerEvents(MovecraftListener, this)
         server.pluginManager.registerEvents(PlayerListener, this)
         server.pluginManager.registerEvents(ExplosionListener, this)
+        server.pluginManager.registerEvents(BlockListener, this)
         getCommand("planet")!!.setExecutor(PlanetCommand)
         getCommand("movecraftspace")!!.setExecutor(MovecraftSpaceCommand)
         getCommand("star")!!.setExecutor(StarCommand)
