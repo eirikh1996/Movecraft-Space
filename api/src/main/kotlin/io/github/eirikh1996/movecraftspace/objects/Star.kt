@@ -5,7 +5,7 @@ import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World
 
-data class Star constructor(val name : String, val space : World,val loc : ImmutableVector) {
+data class Star constructor(val name : String, val space : World,val loc : ImmutableVector, val radius : Int) {
 
     fun radius() : Int {
         var y = loc.y

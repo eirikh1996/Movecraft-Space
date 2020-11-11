@@ -75,7 +75,13 @@ object PlanetCommand : TabExecutor {
                 sender.sendMessage("You must specify radius")
                 return true
             }
-            val radius = args[2].toInt()
+            val radius : Int
+            try {
+                radius = args[2].toInt()
+            } catch (e : NumberFormatException) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + args[2] + " is not a number!")
+                return true
+            }
             val destination = Bukkit.getWorld(args[1])
             if (destination == null) {
                 sender.sendMessage("World " + args[1] + " does not exist!")

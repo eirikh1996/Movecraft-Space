@@ -64,7 +64,16 @@ object StarCommand : TabExecutor{
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "Star is too close to " + closest.name + ". Move " + (Settings.MinimumDistanceBetweenStars - closest.loc.distance(ImmutableVector.fromLocation(sender.location))).toInt() + " blocks away")
                 return true
             }
-            val newStar = Star(args[1], sender.world, ImmutableVector.fromLocation(pLoc))
+            var radius = 126
+            if (args.size >= 3) {
+                try {
+                    radius = args[2].toInt()
+                } catch (e : NumberFormatException) {
+                    sender.sendMessage(COMMAND_PREFIX + ERROR + args[2] + " is not a number")
+                    return true
+                }
+            }
+            val newStar = Star(args[1], sender.world, ImmutableVector.fromLocation(pLoc), radius)
             StarCollection.add(newStar)
             sender.sendMessage(COMMAND_PREFIX + "Successfully created new star named " + newStar.name)
 
@@ -95,8 +104,9 @@ object StarCommand : TabExecutor{
             }
             val planetsOrbitingStar = PlanetCollection.getPlanetsWithOrbitPoint(star.loc)
             val sphere = LinkedList<ImmutableVector>()
+
             if (!planetsOrbitingStar.isEmpty()) {
-                if (args.size < 3 || !args[2].equals("confirm", true)) {
+                if (args.size < 4 || !args[2].equals("confirm", true)) {
                     val component = TextComponent(COMMAND_PREFIX + WARNING + "Star " + args[1] + " is part of a planetary system. Do you still want to remove? ")
                     val confirm = TextComponent("§2[Confirm]")
                     confirm.clickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/star remove " + star.name + " confirm")
@@ -119,7 +129,7 @@ object StarCommand : TabExecutor{
                 }
             }
             sender.sendMessage(COMMAND_PREFIX + "Successfully removed star named " + star.name)
-            sphere.addAll(MSUtils.createSphere(126, star.loc))
+            sphere.addAll(MSUtils.createSphere(star.radius, star.loc))
             object : BukkitRunnable() {
                 override fun run() {
                     val size = min(sphere.size, 10000)

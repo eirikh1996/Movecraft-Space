@@ -69,9 +69,20 @@ object StarCollection : Iterable<Star> {
         for (entry in planetData.entries) {
             val entryData = entry.value as ArrayList<Any>
             val space = Bukkit.getWorld(entryData[0] as String)
+            var radius = 126
+            if (entryData.size > 4) {
+                radius = entryData[4] as Int
+            }
             if (space == null)
                 continue
-            stars.add(Star(entry.key, space, ImmutableVector(entryData[1] as Int , entryData[2] as Int, entryData[3] as Int)))
+            stars.add(
+                Star(
+                    entry.key,
+                    space,
+                    ImmutableVector(entryData[1] as Int , entryData[2] as Int, entryData[3] as Int),
+                    radius
+                )
+            )
         }
         pl.logger.info("Loaded " + stars.size + " stars")
     }
@@ -85,7 +96,7 @@ object StarCollection : Iterable<Star> {
         val writer = PrintWriter(file)
         writer.println("stars:")
         for (star in stars) {
-            writer.println("   " + star.name + ": [" + star.space.name + ", " + star.loc.x + ", " + star.loc.y + ", " + star.loc.z + "]")
+            writer.println("   " + star.name + ": [" + star.space.name + ", " + star.loc.x + ", " + star.loc.y + ", " + star.loc.z + ", " + star.radius + "]")
         }
         writer.close()
     }
@@ -108,7 +119,7 @@ object StarCollection : Iterable<Star> {
 
     fun getStarAt(testLoc: Location) : Star? {
         for (star in this) {
-            if (star.space != testLoc.world || star.loc.distance(ImmutableVector.fromLocation(testLoc)) > 130)
+            if (star.space != testLoc.world || star.loc.distance(ImmutableVector.fromLocation(testLoc)) > star.radius + 2)
                 continue
             return star
         }
