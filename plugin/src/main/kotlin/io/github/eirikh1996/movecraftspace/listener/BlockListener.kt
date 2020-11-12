@@ -14,7 +14,7 @@ object BlockListener : Listener {
     fun onBreak(event : BlockBreakEvent) {
         val planet = PlanetCollection.getPlanetAt(event.block.location)
         val star = StarCollection.getStarAt(event.block.location)
-        if (planet == null && star == null)
+        if (planet == null || planet.destination.equals(event.block.world) && star == null)
             return
         event.isCancelled = true
     }
@@ -23,7 +23,7 @@ object BlockListener : Listener {
     fun onPlace(event : BlockPlaceEvent) {
         val planet = PlanetCollection.getPlanetAt(event.block.location)
         val star = StarCollection.getStarAt(event.block.location)
-        if (planet == null && star == null)
+        if ((planet == null || planet.destination.equals(event.block.world)) && star == null)
             return
         event.isCancelled = true
     }
@@ -32,7 +32,7 @@ object BlockListener : Listener {
     fun onFromTo(event: BlockFromToEvent) {
         val planet = PlanetCollection.getPlanetAt(event.toBlock.location)
         val star = StarCollection.getStarAt(event.toBlock.location)
-        if (planet == null && star == null)
+        if (planet == null || planet.destination.equals(event.block.world) && star == null)
             return
         event.isCancelled = true
     }
