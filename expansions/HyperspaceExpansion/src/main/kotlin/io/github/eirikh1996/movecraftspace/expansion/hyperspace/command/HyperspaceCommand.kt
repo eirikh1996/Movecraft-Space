@@ -29,8 +29,10 @@ import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
 import java.lang.Math.pow
+import java.lang.System.currentTimeMillis
 import java.math.RoundingMode
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.math.abs
 import kotlin.math.hypot
@@ -41,9 +43,14 @@ object HyperspaceCommand : TabExecutor {
     val runnableMap = HashMap<UUID, BukkitRunnable>()
     val locationMap = HashMap<UUID, Location>()
     override fun onTabComplete(p0: CommandSender, p1: Command, p2: String, p3: Array<out String>): List<String> {
-        val tabCompletions = listOf("travel", "createbeacon")
+        var tabCompletions = listOf("travel", "createbeacon", "removebeacon")
         if (p3.size == 0)
             return tabCompletions
+        if (p3[0].equals("removebeacon", true)) {
+            val links = ArrayList<String>()
+            HyperspaceManager.beaconLocations.forEach { b -> links.add(b.originName + "-" + b.destinationName) }
+            tabCompletions = links
+        }
         return tabCompletions.filter { s -> s.startsWith(p3[p3.size - 1]) }
     }
 
@@ -69,13 +76,13 @@ object HyperspaceCommand : TabExecutor {
             var destination : Location? = null
             var str = ""
             for (beacon in HyperspaceManager.beaconLocations) {
-                if (beacon.origin.distance(hitBox.midPoint.toBukkit(craft.w)) <= HyperspaceExpansion.instance.config.getInt("Beacon range")) {
+                if (beacon.origin.world!!.equals(craft.w) && beacon.origin.distance(hitBox.midPoint.toBukkit(craft.w)) <= HyperspaceExpansion.instance.config.getInt("Beacon range")) {
                     foundLoc = beacon.origin
                     destination = beacon.destination
                     str = beacon.originName + "-" + beacon.destinationName
                     break
                 }
-                if (beacon.destination.distance(hitBox.midPoint.toBukkit(craft.w)) <= HyperspaceExpansion.instance.config.getInt("Beacon range")) {
+                if (beacon.destination.world!!.equals(craft.w) && beacon.destination.distance(hitBox.midPoint.toBukkit(craft.w)) <= HyperspaceExpansion.instance.config.getInt("Beacon range")) {
                     foundLoc = beacon.destination
                     destination = beacon.origin
                     str = beacon.destinationName + "-" + beacon.originName
@@ -117,17 +124,18 @@ object HyperspaceCommand : TabExecutor {
             val notifyP = craft.notificationPlayer!!
             val runnable = object : BukkitRunnable() {
                 val warmupTime = HyperspaceExpansion.instance.config.getInt("Hyperspace travel warmup", 60)
-                var timePassed = 0
+                val timeStarted = currentTimeMillis()
                 override fun run() {
+                    notifyP.playSound(notifyP.location, HyperspaceExpansion.instance.hyperspaceChargeSound, 0.1f, 0f)
+                    val timePassed = (currentTimeMillis() - timeStarted) / 1000
                     val progress = min(timePassed.toDouble() / warmupTime.toDouble(), 1.0)
                     val percent = progress * 100
                     entry.progressBar.setTitle(str + " Warmup " + percent.toBigDecimal().setScale(2, RoundingMode.UP) + "%")
                     entry.progressBar.progress = progress
-                    timePassed++
                     if (timePassed <= warmupTime)
                         return
                     notifyP.sendMessage("Initiating hyperspace jump")
-                    notifyP.playSound(notifyP.location, if (Settings.IsLegacy) Sound.valueOf("ENTITY_ENDERMEN_TELEPORT") else Sound.ENTITY_ENDERMAN_TELEPORT, 3f, 0f)
+                    notifyP.playSound(notifyP.location, HyperspaceExpansion.instance.hyperspaceEnterSound, 15f, 0f)
                     cancel()
                     val hyperspaceWorld = HyperspaceExpansion.instance.hyperspaceWorld
                     val bounds = ExpansionManager.worldBoundrary(hyperspaceWorld)
@@ -135,7 +143,6 @@ object HyperspaceCommand : TabExecutor {
                     val maxX = (bounds[1] - (hitBox.xLength / 2)) - 10
                     val minZ = (bounds[2] + (hitBox.zLength / 2)) + 10
                     val maxZ = (bounds[3] - (hitBox.zLength / 2)) - 10
-                    Bukkit.broadcastMessage(String.format("%d, %d, %d, %d", minX, maxX, minZ, maxZ))
                     var x = Random.nextInt(minX, maxX)
                     var z = Random.nextInt(minZ, maxZ)
                     var hitboxObstructed = true
@@ -151,14 +158,18 @@ object HyperspaceCommand : TabExecutor {
                     entry.progressBar.color = BarColor.BLUE
                     val dx = x - midpoint.x
                     val dz = z - midpoint.z
-                    Bukkit.broadcastMessage("dx: " + dx + ", dz: " + dz)
+                    val runnable = runnableMap.remove(craft.notificationPlayer!!.uniqueId)
+                    if (runnable != null) {
+                        runnable.cancel()
+                    }
+                    HyperspaceManager.craftsWithinBeaconRange.remove(craft)
                     craft.translate(hyperspaceWorld, dx, 0, dz)
-                    HyperspaceManager.entries.put(craft, entry)
+                    HyperspaceManager.addEntry(craft, entry)
                 }
 
             }
             runnableMap.put(p0.uniqueId, runnable)
-            runnable.runTaskTimerAsynchronously(HyperspaceExpansion.instance.plugin, 0, 20)
+            runnable.runTaskTimerAsynchronously(HyperspaceExpansion.instance.plugin, 0, 1)
 
         } else if (p3[0].equals("createbeacon", true)) {
             if (!p0.hasPermission("movecraftspace.command.hyperspace.createbeacon")) {
@@ -201,6 +212,60 @@ object HyperspaceCommand : TabExecutor {
             }
             p0.sendMessage(COMMAND_PREFIX + "Set the first location for the hyperspace beacon. Select a second location in a different start system")
             locationMap.put(p0.uniqueId, origin)
+        } else if (p3[0].equals("removebeacon", true)) {
+            if (!p0.hasPermission("movecraftspace.command.hyperspace.removebeacon")) {
+                p0.sendMessage(COMMAND_PREFIX + ERROR + COMMAND_NO_PERMISSION)
+                return true
+            }
+            if (p3.size < 2) {
+                p0.sendMessage(COMMAND_PREFIX + ERROR + "You must specify a beacon link")
+                return true
+            }
+            val split = p3[1].split("-")
+            var foundBeacon : HyperspaceBeacon? = null
+            for (b in HyperspaceManager.beaconLocations) {
+                if (!split[0].equals(b.originName, true) || !split[1].equals(b.destinationName, true))
+                    continue
+                foundBeacon = b
+                break
+            }
+            if (foundBeacon == null) {
+                p0.sendMessage(COMMAND_PREFIX + ERROR + "No such beacon link exists: " + p3[1])
+                return true
+            }
+            val queue = LinkedList<ImmutableVector>()
+            val visited = HashSet<ImmutableVector>()
+            queue.add(ImmutableVector.fromLocation(foundBeacon.origin))
+            while (!queue.isEmpty()) {
+                val node = queue.poll()
+                if (visited.contains(node))
+                    continue
+                visited.add(node)
+                for (shift in SHIFTS) {
+                    val test = node.add(shift)
+                    if (test.toLocation(foundBeacon.origin.world!!).block.type.name.endsWith("AIR"))
+                        continue
+                    queue.add(test)
+                }
+            }
+            visited.forEach { l -> l.toLocation(foundBeacon.origin.world!!).block.type = Material.AIR }
+            queue.add(ImmutableVector.fromLocation(foundBeacon.destination))
+            while (!queue.isEmpty()) {
+                val node = queue.poll()
+                if (visited.contains(node))
+                    continue
+                visited.add(node)
+                for (shift in SHIFTS) {
+                    val test = node.add(shift)
+                    if (test.toLocation(foundBeacon.destination.world!!).block.type.name.endsWith("AIR"))
+                        continue
+                    queue.add(test)
+                }
+            }
+            visited.forEach { l -> l.toLocation(foundBeacon.destination.world!!).block.type = Material.AIR }
+            p0.sendMessage(COMMAND_PREFIX + "Sucessfully removed beacon link " + foundBeacon.originName + "-" + foundBeacon.destinationName)
+            HyperspaceManager.beaconLocations.remove(foundBeacon)
+            HyperspaceManager.saveFile()
         }
         return true
     }
@@ -249,7 +314,7 @@ object HyperspaceCommand : TabExecutor {
                 for (z in loc.blockZ - 2 .. loc.blockZ + 2) {
 
                     val dSquared = (loc.blockX - x) * (loc.blockX - x) + (loc.blockZ - z) * (loc.blockZ - z)
-                    if (abs(dSquared - radius * radius) > radius) {
+                    if (abs(dSquared - (radius * radius)) > radius) {
                         continue
                     }
                     val block = loc.world!!.getBlockAt(x, y, z)
@@ -279,4 +344,25 @@ object HyperspaceCommand : TabExecutor {
                 }
         }
     }
+
+    private val SHIFTS = arrayOf(
+        ImmutableVector(1,1,0),
+        ImmutableVector(1,0,0),
+        ImmutableVector(1,-1,0),
+        ImmutableVector(-1,1,0),
+        ImmutableVector(-1,0,0),
+        ImmutableVector(-1,-1,0),
+        ImmutableVector(0,1,1),
+        ImmutableVector(0,0,1),
+        ImmutableVector(0,-1,1),
+        ImmutableVector(0,1,-1),
+        ImmutableVector(0,0,-1),
+        ImmutableVector(0,-1,-1),
+        ImmutableVector(0,1,0),
+        ImmutableVector(0,-1,0),
+        ImmutableVector(1, 0, 1),
+        ImmutableVector(-1, 0, 1),
+        ImmutableVector(1, 0, -1),
+        ImmutableVector(-1, 0, -1)
+    )
 }

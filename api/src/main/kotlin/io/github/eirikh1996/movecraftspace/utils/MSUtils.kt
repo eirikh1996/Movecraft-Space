@@ -58,7 +58,7 @@ object MSUtils {
     }
 
     fun displayTitle() {
-        getConsoleSender().sendMessage(" __      --                                                ___    _            ____")
+        getConsoleSender().sendMessage(" __      __                                                ___    _            ____")
         getConsoleSender().sendMessage("|  \\    / |                                               / __\\  | |          / __ \\ ")
         getConsoleSender().sendMessage("|   \\  /  |                                               | |    | |         / /  \\_\\ ")
         getConsoleSender().sendMessage("|    \\/   |   __  _  _     ___    __   __  ___    ____   _| |_  _| |_   ___  | |__    _  ___   ____      __    ___")

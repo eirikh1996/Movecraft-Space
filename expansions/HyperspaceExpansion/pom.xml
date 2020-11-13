@@ -12,6 +12,7 @@
 
     <artifactId>HyperspaceExpansion</artifactId>
     <packaging>jar</packaging>
+    <version>1.2</version>
 
     <name>HyperspaceExpansion</name>
 

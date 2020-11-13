@@ -10,3 +10,4 @@ MaxMoonSpacing: 1000
 AllowPlayersTeleportationToPlanets: true
 ExplodeSinkingCraftsInWorlds:
   - Space
+SinkExplosionSize: 3.0

@@ -63,6 +63,7 @@ class MovecraftSpace : JavaPlugin() {
             }
 
         }.runTaskTimer(this, 0, 1)
+        server.pluginManager.registerEvents(UpdateManager, this)
     }
 
     fun averageTicks() : Double {

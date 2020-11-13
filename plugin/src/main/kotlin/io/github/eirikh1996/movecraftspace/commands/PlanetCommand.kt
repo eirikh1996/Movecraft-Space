@@ -355,7 +355,7 @@ object PlanetCommand : TabExecutor {
                 } else {
                     ""
                 }
-                val component = TextComponent(pl.name + "§cLocation:§r " + pl.center + ", §cSystem:§r " + systemName + ", §cOrbit time:§r " + pl.orbitTime + "§cSpace world:§r " + pl.space.name)
+                val component = TextComponent(pl.name + ": §cLocation:§r " + pl.center + ", §cSystem:§r " + systemName + ", §cOrbit time:§r " + pl.orbitTime + "§cSpace world:§r " + pl.space.name)
                 paginator.addLine(component)
             }
             val pageNo = if (args.size > 1) {

@@ -1,5 +1,6 @@
 package io.github.eirikh1996.movecraftspace.expansion.hyperspace
 
+import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.expansion.Expansion
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionState
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.command.HyperspaceCommand
@@ -9,11 +10,15 @@ import org.bukkit.Bukkit
 import org.bukkit.Bukkit.getConsoleSender
 import org.bukkit.Bukkit.getPluginManager
 import org.bukkit.Location
+import org.bukkit.Sound
 import org.bukkit.World
 import org.bukkit.entity.Player
 
 class HyperspaceExpansion : Expansion() {
     lateinit var hyperspaceWorld : World
+    lateinit var hyperspaceChargeSound : Sound
+    lateinit var hyperspaceEnterSound : Sound
+    lateinit var hyperspaceExitSound : Sound
 
     override fun enable() {
         saveDefaultConfig()
@@ -33,6 +38,9 @@ class HyperspaceExpansion : Expansion() {
         }
         HyperspaceManager.loadFile()
         hyperspaceWorld = hsWorld
+        hyperspaceEnterSound = Sound.valueOf(config.getString("Hyperspace enter sound", "ENTITY_ENDERMAN_TELEPORT")!!)
+        hyperspaceChargeSound = Sound.valueOf(config.getString("Hyperspace charge sound", "BLOCK_STONE_BREAK")!!)
+        hyperspaceExitSound = Sound.valueOf(config.getString("Hyperspace exit sound", "ENTITY_ENDERMAN_TELEPORT")!!)
         plugin.getCommand("hyperspace")!!.setExecutor(HyperspaceCommand)
         HyperspaceManager.runTaskTimerAsynchronously(plugin, 0, 1)
         getPluginManager().registerEvents(HyperspaceManager, plugin)

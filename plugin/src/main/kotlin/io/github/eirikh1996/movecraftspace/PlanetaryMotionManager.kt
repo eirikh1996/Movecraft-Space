@@ -20,10 +20,7 @@ import org.bukkit.util.Vector
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.round
-import kotlin.math.sin
+import kotlin.math.*
 import kotlin.random.Random
 
 object PlanetaryMotionManager : BukkitRunnable() {
@@ -114,16 +111,13 @@ object PlanetaryMotionManager : BukkitRunnable() {
         val craftsToTeleport = HashSet<Craft>()
         for (craft in CraftManager.getInstance().getCraftsInWorld(planet.space)) {
             for (ml in craft.hitBox) {
-                val dx = newCenter.x - ml.x
-                val dy = newCenter.y - ml.y
-                val dz = newCenter.z - ml.z
-                val dxSquared = dx * dx
-                val dySquared = dy * dy
-                val dzSquared = dz * dz
-                val distSquared = ((dxSquared) + (dySquared) + (dzSquared))
-                if (distSquared > (planet.radius * planet.radius))
+                val dx = abs(newCenter.x - ml.x)
+                val dy = abs(newCenter.y - ml.y)
+                val dz = abs(newCenter.z - ml.z)
+                val distSquared = abs((dx * dx) + (dy * dy) + (dz * dz))
+                val radiusSquared = (planet.radius * planet.radius)
+                if (distSquared > radiusSquared)
                     continue
-                Bukkit.broadcastMessage("distance squared: " + distSquared + ", dx: " + dx + ", dy: " + dy + ", dz:" + dz + ", dxSquared: " + dxSquared + ", dySquared: " + dySquared + ", dzSquared: " + dzSquared)
                 craftsToTeleport.add(craft)
                 break
             }

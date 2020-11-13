@@ -166,7 +166,7 @@ object StarCommand : TabExecutor{
                 for (pl in planets) {
                     moons += pl.moons.size
                 }
-                paginator.addLine(TextComponent(star.name + " Location: " + star.loc + " Space: " + star.space))
+                paginator.addLine(TextComponent(star.name + " Location: " + star.loc + " Space: " + star.space.name))
             }
             var pageNo = 1
             if (args.size > 1) {

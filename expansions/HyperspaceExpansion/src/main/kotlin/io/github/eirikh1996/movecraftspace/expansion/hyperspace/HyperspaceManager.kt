@@ -4,15 +4,22 @@ import io.github.eirikh1996.movecraftspace.expansion.hyperspace.command.Hyperspa
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
 import io.github.eirikh1996.movecraftspace.objects.StarCollection
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
+import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import net.countercraft.movecraft.craft.Craft
+import net.countercraft.movecraft.craft.CraftManager
 import net.countercraft.movecraft.events.CraftReleaseEvent
+import net.countercraft.movecraft.events.CraftRotateEvent
 import net.countercraft.movecraft.events.CraftTranslateEvent
+import net.countercraft.movecraft.utils.HitBox
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.Location
+import org.bukkit.World
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.scheduler.BukkitRunnable
 import java.io.File
 import java.math.RoundingMode
@@ -24,8 +31,8 @@ import kotlin.math.min
 import kotlin.random.Random
 
 object HyperspaceManager : BukkitRunnable(), Listener {
-    val entries = HashMap<Craft, HyperspaceTravelEntry>()
-    val craftsWarmingUp = HashSet<Craft>()
+    private val pendingEntries = HashMap<Craft, HyperspaceTravelEntry>()
+    private val processingEntries = HashMap<Craft, HyperspaceTravelEntry>()
     val beaconLocations = HashSet<HyperspaceBeacon>()
     val craftsWithinBeaconRange = HashSet<Craft>()
     private val file = File(HyperspaceExpansion.instance.dataFolder, "beacons.yml")
@@ -44,12 +51,15 @@ object HyperspaceManager : BukkitRunnable(), Listener {
     override fun run() {
         processHyperspaceTravel()
     }
+    fun addEntry(craft: Craft, entry: HyperspaceTravelEntry) {
+        pendingEntries.put(craft, entry)
+    }
 
     private fun processHyperspaceTravel() {
-        val iterator = entries.values.iterator()
+        val iterator = processingEntries.values.iterator()
         while (iterator.hasNext()) {
             val entry = iterator.next()
-            val distance = entry.destination.clone().subtract(entry.origin.clone()).toVector()
+            val distance = entry.destination.toVector().clone().subtract(entry.origin.toVector().clone())
             val totalDistance = distance.length()
             val unit = distance.clone().normalize()
             val speed = HyperspaceExpansion.instance.config.getDouble("Hyperspace travel speed", 1.0)
@@ -72,6 +82,8 @@ object HyperspaceManager : BukkitRunnable(), Listener {
                 entry.progressBar.isVisible = false
                 entry.craft.translate(entry.destination.world, coords[0] - midPoint.x, coords[1] - midPoint.y, coords[2] - midPoint.z)
                 iterator.remove()
+
+                entry.craft.notificationPlayer!!.playSound(entry.craft.notificationPlayer!!.location, HyperspaceExpansion.instance.hyperspaceExitSound, 3f, 0f)
             }
             if (entry.origin.world != entry.destination.world)
                 continue
@@ -83,7 +95,7 @@ object HyperspaceManager : BukkitRunnable(), Listener {
                 val midPoint = entry.craft.hitBox.midPoint
                 entry.craft.translate(entry.destination.world, coords[0] - midPoint.x, coords[1] - midPoint.y, coords[2] - midPoint.z)
                 entry.progressBar.isVisible = false
-                entries.remove(entry.craft)
+                processingEntries.remove(entry.craft)
             }
 
         }
@@ -121,40 +133,67 @@ object HyperspaceManager : BukkitRunnable(), Listener {
     }
 
     @EventHandler
+    fun onRotate(event : CraftRotateEvent) {
+        if (processingEntries.containsKey(event.craft)) {
+            event.failMessage = COMMAND_PREFIX + ERROR + "Cannot move ship while travelling in hyperspace"
+            event.isCancelled = true
+            return
+        }
+        processHyperspaceBeaconDetection(event.craft, event.newHitBox)
+    }
+
+    @EventHandler
     fun onTranslate(event : CraftTranslateEvent) {
+        if (processingEntries.containsKey(event.craft)) {
+            event.failMessage = COMMAND_PREFIX + ERROR + "Cannot move ship while travelling in hyperspace"
+            event.isCancelled = true
+            return
+        }
+        val entry = pendingEntries[event.craft]
+        if (entry != null) {
+            processingEntries.put(event.craft, entry)
+        }
+        processHyperspaceBeaconDetection(event.craft, event.newHitBox, event.world)
+    }
+
+
+    fun processHyperspaceBeaconDetection(craft : Craft, hitBox: HitBox = craft.hitBox, world: World = craft.w) {
         var foundLoc : Location? = null
         var str = ""
+        if (hitBox.isEmpty)
+            return
         for (beacon in beaconLocations) {
-            if (beacon.origin.world!!.equals(event.world) && beacon.origin.distance(event.newHitBox.midPoint.toBukkit(event.world)) <= HyperspaceExpansion.instance.config.getInt("Beacon range")) {
+            if (beacon.origin.world!!.equals(world) && beacon.origin.distance(hitBox.midPoint.toBukkit(world)) <= HyperspaceExpansion.instance.config.getInt("Beacon range")) {
                 foundLoc = beacon.origin
                 str = beacon.originName + "-" + beacon.destinationName
                 break
             }
-            if (beacon.destination.world!!.equals(event.world) && beacon.destination.distance(event.newHitBox.midPoint.toBukkit(event.world)) <= HyperspaceExpansion.instance.config.getInt("Beacon range")) {
+            if (beacon.destination.world!!.equals(world) && beacon.destination.distance(hitBox.midPoint.toBukkit(world)) <= HyperspaceExpansion.instance.config.getInt("Beacon range")) {
                 foundLoc = beacon.destination
                 str = beacon.destinationName + "-" + beacon.originName
                 break
             }
         }
-        if (foundLoc == null && craftsWithinBeaconRange.contains(event.craft)) {
-            event.craft.notificationPlayer!!.sendMessage("Exiting hyperspace beacon range")
-            craftsWithinBeaconRange.remove(event.craft)
+        if (foundLoc == null && craftsWithinBeaconRange.contains(craft)) {
+            craft.notificationPlayer!!.sendMessage("Exiting hyperspace beacon range")
+            craftsWithinBeaconRange.remove(craft)
             return
         }
-        if (HyperspaceCommand.runnableMap.containsKey(event.craft.notificationPlayer!!.uniqueId)) {
-            HyperspaceCommand.runnableMap.remove(event.craft.notificationPlayer!!.uniqueId)!!.cancel()
-            event.craft.notificationPlayer!!.sendMessage(COMMAND_PREFIX + "Space craft was moved during warmup. Cancelling hyperspace warmup")
-            val entry = entries.remove(event.craft)!!
-            entry.progressBar.isVisible = false
+        if (HyperspaceCommand.runnableMap.containsKey(craft.notificationPlayer!!.uniqueId)) {
+            HyperspaceCommand.runnableMap.remove(craft.notificationPlayer!!.uniqueId)!!.cancel()
+            craft.notificationPlayer!!.sendMessage(COMMAND_PREFIX + "Space craft was moved during warmup. Cancelling hyperspace warmup")
+            val entry = processingEntries.remove(craft)
+            if (entry != null)
+                entry.progressBar.isVisible = false
         }
-        if (foundLoc != null && !craftsWithinBeaconRange.contains(event.craft)) {
-            val clickText = TextComponent("[Accept]")
+        if (foundLoc != null && !craftsWithinBeaconRange.contains(craft)) {
+            val clickText = TextComponent("§2[Accept]")
             clickText.clickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/hyperspace travel")
-            event.craft.notificationPlayer!!.spigot().sendMessage(
+            craft.notificationPlayer!!.spigot().sendMessage(
                 TextComponent("Entered the range of " + str + " hyperspace beacon "),
                 clickText
             )
-            craftsWithinBeaconRange.add(event.craft)
+            craftsWithinBeaconRange.add(craft)
         }
     }
     fun loadFile() {
