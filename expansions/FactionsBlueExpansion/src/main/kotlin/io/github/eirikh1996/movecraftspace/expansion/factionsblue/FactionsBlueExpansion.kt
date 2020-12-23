@@ -45,7 +45,7 @@ class FactionsBlueExpansion : Expansion() {
     fun onClaim(event : FPlayerClaimEvent) {
         val claim = event.claim
         val planet = PlanetCollection.intersectingOtherPlanetaryOrbit(MovecraftChunk(claim.x, claim.z, claim.world))
-        if (planet == null) return
+        if (planet == null || config.getBoolean("Allow claiming in orbits", false)) return
         event.player.sendMessage(COMMAND_PREFIX + ERROR + "Cannot claim faction land here as it intersects with planetary orbit of " + planet.name)
         event.isCancelled = true
     }

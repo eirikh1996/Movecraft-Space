@@ -11,3 +11,4 @@ AllowPlayersTeleportationToPlanets: true
 ExplodeSinkingCraftsInWorlds:
   - Space
 SinkExplosionSize: 3.0
+DisableReleaseInPlanetaryOrbits: false

@@ -5,6 +5,7 @@ import com.massivecraft.factions.entity.FactionColl
 import com.massivecraft.factions.entity.MFlag
 import com.massivecraft.factions.event.EventFactionsChunksChange
 import com.massivecraft.massivecore.ps.PS
+import io.github.eirikh1996.movecraftspace.expansion.factions.FactionsExpansion
 import io.github.eirikh1996.movecraftspace.objects.Planet
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
 import io.github.eirikh1996.movecraftspace.utils.MSUtils
@@ -26,7 +27,7 @@ object FactionsListener : Listener {
         if (newFaction == FactionColl.get().none ||
             newFaction == FactionColl.get().warzone ||
             newFaction == FactionColl.get().safezone ||
-            event.mPlayer.isOverriding)
+            event.mPlayer.isOverriding || FactionsExpansion.AllowClaimingInOrbits)
             return
         val intersectingClaimMap = HashMap<Planet, MutableSet<PS>>()
         for (ps in event.chunks) {

@@ -45,7 +45,7 @@ class FactionsUUIDExpansion : Expansion(){
     @EventHandler
     fun onClaim(event : LandClaimEvent) {
         val faction = event.faction
-        if (faction.isWilderness || faction.isSafeZone || faction.isWarZone) return
+        if (faction.isWilderness || faction.isSafeZone || faction.isWarZone || config.getBoolean("Allow claiming in orbits", false)) return
         val fLoc = event.location
         val planet = PlanetCollection.intersectingOtherPlanetaryOrbit(MovecraftChunk(fLoc.x.toInt(), fLoc.z.toInt(), fLoc.world))
         if (planet == null)

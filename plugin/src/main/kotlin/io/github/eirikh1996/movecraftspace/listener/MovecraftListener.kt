@@ -205,7 +205,10 @@ object MovecraftListener : Listener {
 
     @EventHandler
     fun onRelease(event : CraftReleaseEvent) {
-        if (event.reason == CraftReleaseEvent.Reason.FORCE) {
+        if (event.reason == CraftReleaseEvent.Reason.FORCE ||
+            event.reason == CraftReleaseEvent.Reason.DISCONNECT ||
+            event.reason == CraftReleaseEvent.Reason.SUNK ||
+            !Settings.DisableReleaseInPlanetaryOrbits) {
             return
         }
         val craft = event.craft

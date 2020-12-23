@@ -40,6 +40,8 @@ class TownyExpansion : Expansion(), Listener {
 
     @EventHandler
     fun onClaim(event : TownPreClaimEvent) {
+        if (config.getBoolean("Allow claiming in orbits", false))
+            return
         val tb = event.townBlock
         val planet = PlanetCollection.intersectingOtherPlanetaryOrbit(MovecraftChunk(tb.x, tb.z, getWorld(tb.world.name)))
         if (planet == null)

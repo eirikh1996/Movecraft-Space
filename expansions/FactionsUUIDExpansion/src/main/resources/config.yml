@@ -1,5 +1,6 @@
 Allow entry to safezone: false
 Allow entry to warzone: false
+Allow claiming in orbits: false
 Allow entry to factions:
   - Safezone
   - Warzone

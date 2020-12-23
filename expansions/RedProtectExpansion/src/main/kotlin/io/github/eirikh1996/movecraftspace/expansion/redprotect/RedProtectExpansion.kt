@@ -39,7 +39,7 @@ class RedProtectExpansion : Expansion(), Listener {
         if (region == null) return
         for (loc in region.getLimitLocs(region.minY, region.maxY, true)) {
             val planet = PlanetCollection.intersectingOtherPlanetaryOrbit(loc)
-            if (planet == null)
+            if (planet == null || config.getBoolean("Allow claiming in orbits", false))
                 continue
             event.player.sendMessage(COMMAND_PREFIX + MSUtils.ERROR + "Cannot create a region here as it intersect with the planetary orbit of " + planet.name)
             event.isCancelled = true

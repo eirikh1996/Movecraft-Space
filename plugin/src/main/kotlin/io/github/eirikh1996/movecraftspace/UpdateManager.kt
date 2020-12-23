@@ -69,9 +69,16 @@ object UpdateManager : BukkitRunnable(), Listener {
                 MovecraftSpace.instance.getLogger().warning("No files found, or Feed URL is bad.")
                 return null
             }
-            val data =
-                objList[objList.size - 1] as Map<String, Any>
-            val versionName = data["name"] as String?
+            val iter = objList.iterator()
+            val foundVersions = ArrayList<String>()
+            while (iter.hasNext()) {
+                val data = iter.next() as Map<String, Any>
+                val versionName = data["name"] as String
+                if (!versionName.startsWith("Movecraft-Space", true))
+                    continue
+                foundVersions.add(versionName)
+            }
+            val versionName = foundVersions[foundVersions.size - 1]!!
             val currVersion = MovecraftSpace.instance.getDescription().getVersion().replace("v", "")
             val newVersion = versionName!!.substring(versionName.lastIndexOf("v") + 1)
             val cv = (currVersion.split(".")[0].toInt() * 1000) + currVersion.split(".")[1].toInt()

@@ -40,6 +40,8 @@ class GriefPreventionExpansion : Expansion(), Listener{
 
     @EventHandler
     fun onClaimCreate(event : ClaimCreatedEvent) {
+        if (config.getBoolean("Allow claiming in orbits", false))
+            return
         val claim = event.claim
         if (claim.isAdminClaim)
             return

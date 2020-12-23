@@ -11,6 +11,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import java.lang.reflect.Method
+import kotlin.properties.Delegates
 
 class FactionsExpansion : Expansion(){
     var IsMPlayerPermitted : Method? = null
@@ -38,10 +39,12 @@ class FactionsExpansion : Expansion(){
             IsMPlayerPermitted = Faction::class.java.getDeclaredMethod("isPlayerPermitted", MPlayer::class.java, MPerm::class.java)
         }
         plugin.server.pluginManager.registerEvents(FactionsListener, plugin)
+        AllowClaimingInOrbits =  config.getBoolean("Allow claiming in orbits", false)
     }
 
     companion object {
         var factions3 = false
+        var AllowClaimingInOrbits = false
     }
 
 }

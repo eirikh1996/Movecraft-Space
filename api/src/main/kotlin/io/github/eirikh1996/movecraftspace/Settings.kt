@@ -12,4 +12,5 @@ object Settings {
     val PlanetaryRotationCheckCooldown : Int get() { return ConfigHolder.config.getInt("PlanetaryRotationCheckCooldown", 10) }
     val ExplodeSinkingCraftsInWorlds : Set<String> get() { return ConfigHolder.config.getStringList("ExplodeSinkingCraftsInWorlds").toHashSet() }
     val RotatePlanets : Boolean get() { return ConfigHolder.config.getBoolean("RotatePlanets", true) }
+    val DisableReleaseInPlanetaryOrbits : Boolean get() = ConfigHolder.config.getBoolean("DisableReleaseInPlanetaryOrbits", true)
 }
