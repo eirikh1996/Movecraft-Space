@@ -1,24 +1,28 @@
 package io.github.eirikh1996.movecraftspace.expansion.hyperspace
 
-import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.expansion.Expansion
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionState
+import io.github.eirikh1996.movecraftspace.expansion.hyperspace.command.HyperdriveCommand
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.command.HyperspaceCommand
+import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.HyperdriveManager
+import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.HyperspaceManager
+import io.github.eirikh1996.movecraftspace.expansion.hyperspace.sign.HyperspaceSign
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
-import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
-import org.bukkit.Bukkit
-import org.bukkit.Bukkit.getConsoleSender
+import net.countercraft.movecraft.craft.CraftManager
+import net.countercraft.movecraft.craft.CraftType
+import org.bukkit.*
 import org.bukkit.Bukkit.getPluginManager
-import org.bukkit.Location
-import org.bukkit.Sound
-import org.bukkit.World
-import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 
 class HyperspaceExpansion : Expansion() {
     lateinit var hyperspaceWorld : World
     lateinit var hyperspaceChargeSound : Sound
     lateinit var hyperspaceEnterSound : Sound
     lateinit var hyperspaceExitSound : Sound
+    lateinit var hyperdriveSelectionWand : Material
+    lateinit var hypermatter : ItemStack
+    val allowedCraftTypes = HashSet<CraftType>()
+    val maxHyperdrivesOnCraft = HashMap<CraftType, Int>()
 
     override fun enable() {
         saveDefaultConfig()
@@ -41,9 +45,17 @@ class HyperspaceExpansion : Expansion() {
         hyperspaceEnterSound = Sound.valueOf(config.getString("Hyperspace enter sound", "ENTITY_ENDERMAN_TELEPORT")!!)
         hyperspaceChargeSound = Sound.valueOf(config.getString("Hyperspace charge sound", "BLOCK_STONE_BREAK")!!)
         hyperspaceExitSound = Sound.valueOf(config.getString("Hyperspace exit sound", "ENTITY_ENDERMAN_TELEPORT")!!)
+        hyperdriveSelectionWand = Material.getMaterial(config.getString("Hyperdrive selection wand", "STONE_HOE")!!)!!
+        hypermatter = config.getSerializable("Hypermatter", ItemStack::class.java) ?: ItemStack(Material.EMERALD)
+        config.getConfigurationSection("Max hyperdrives on craft")!!.getValues(false).forEach { t, u -> maxHyperdrivesOnCraft.put(CraftManager.getInstance().getCraftTypeFromString(t), u as Int) }
+        config.getStringList("Allowed craft types").forEach { s -> allowedCraftTypes.add(CraftManager.getInstance().getCraftTypeFromString(s)) }
         plugin.getCommand("hyperspace")!!.setExecutor(HyperspaceCommand)
+        plugin.getCommand("hyperdrive")!!.setExecutor(HyperdriveCommand)
         HyperspaceManager.runTaskTimerAsynchronously(plugin, 0, 1)
         getPluginManager().registerEvents(HyperspaceManager, plugin)
+        HyperdriveManager.loadHyperdrives()
+        getPluginManager().registerEvents(HyperdriveManager, plugin)
+        getPluginManager().registerEvents(HyperspaceSign, plugin)
     }
 
     override fun load() {

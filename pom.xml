@@ -20,6 +20,7 @@
         <module>expansions/TownyExpansion</module>
         <module>expansions/LandsExpansion</module>
         <module>expansions/FactionsBlueExpansion</module>
+        <module>Movecraft-8</module>
     </modules>
     <packaging>pom</packaging>
 

@@ -66,7 +66,7 @@ abstract class Expansion {
         depend.addAll(classLoader.desc.getStringList("depend"))
         softdepend.addAll(classLoader.desc.getStringList("softdepend"))
         expansionDepend.addAll(classLoader.desc.getStringList("expansiondepend"))
-        expansionSoftDepend.addAll(classLoader.desc.getStringList("softdepend"))
+        expansionSoftDepend.addAll(classLoader.desc.getStringList("expansionsoftdepend"))
         val cmds = classLoader.desc.getConfigurationSection("commands")
         if (cmds != null) {
             val cmdMap = cmds.getValues(false)

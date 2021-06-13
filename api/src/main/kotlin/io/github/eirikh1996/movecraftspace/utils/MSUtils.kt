@@ -10,6 +10,7 @@ import net.countercraft.movecraft.craft.Craft
 import net.countercraft.movecraft.utils.MathUtils
 import org.bukkit.*
 import org.bukkit.Bukkit.getConsoleSender
+import org.bukkit.block.BlockFace
 import org.bukkit.scheduler.BukkitRunnable
 import java.io.File
 import java.lang.Exception
@@ -104,8 +105,31 @@ object MSUtils {
 
     }
 
+    fun angleBetweenBlockFaces(first : BlockFace, second : BlockFace) : Double {
+        val faces = arrayOf(BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST)
+        if (!faces.contains(first) || !faces.contains(second)) {
+            throw IllegalArgumentException("Blockfaces can only be NORTH, EAST, SOUTH and WEST")
+        }
+        if (first == second)
+            return 0.0
+        var index = faces.indexOf(first)
+        var multiplier = 0
+        while (true) {
+            val face = faces[index]
+            if (face == second) {
+                break
+            }
+            index++
+            if (index > 3)
+                index = 0
+            multiplier++
+        }
+        return (PI / 2) * multiplier
+    }
+
     val COMMAND_PREFIX = "§5[§9Movecraft-Space§5]§r "
     val ERROR = "§4Error: "
     val WARNING = "§6Warning: "
     val COMMAND_NO_PERMISSION = "You have no permission to execute this command!"
+    val MUST_BE_PLAYER = "You must be a player to use this command"
 }

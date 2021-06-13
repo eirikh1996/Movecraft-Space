@@ -6,3 +6,7 @@ commands:
     aliases:
       - hs
     usage: /hyperspace
+  hyperdrive:
+    aliases:
+      - hd
+    usage: /hyperdrive

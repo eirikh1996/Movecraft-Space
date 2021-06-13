@@ -28,8 +28,9 @@ object UpdateManager : BukkitRunnable(), Listener {
                 if (newVersion != null) {
                     for (p in Bukkit.getOnlinePlayers()) {
                         if (!p.hasPermission("movecraftspace.update")) {
-                            p.sendMessage(COMMAND_PREFIX + "An update of MovecraftSpace is now available. Download from https://dev.bukkit.org/projects/Movecraft-Space")
+                            continue
                         }
+                        p.sendMessage(COMMAND_PREFIX + "An update of MovecraftSpace is now available. Download from https://dev.bukkit.org/projects/Movecraft-Space")
                     }
                     getConsoleSender().sendMessage(COMMAND_PREFIX + WARNING + "Update " + update + " of MovecraftSpace is available. You're still on " + MovecraftSpace.instance.description.version)
                     update = newVersion

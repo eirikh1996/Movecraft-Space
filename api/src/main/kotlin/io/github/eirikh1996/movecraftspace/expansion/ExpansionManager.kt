@@ -1,5 +1,6 @@
 package io.github.eirikh1996.movecraftspace.expansion
 
+import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
@@ -17,6 +18,7 @@ import java.io.InputStreamReader
 import java.util.*
 import java.util.Collections.unmodifiableSet
 import java.util.jar.JarFile
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 
@@ -42,6 +44,9 @@ object ExpansionManager : Iterable<Expansion> {
     }
 
     fun allowedArea(p : Player, loc : Location) : Boolean {
+        val coords = worldBoundrary(loc.world!!)
+        if (coords[0] > loc.blockX || coords[1] < loc.blockX || coords[2] > loc.blockZ || coords[3] < loc.blockZ)
+            return false
         for (ex in getExpansions(ExpansionState.ENABLED)) {
             val allowed = ex.allowedArea(p, loc)
             if (!allowed)
@@ -96,7 +101,17 @@ object ExpansionManager : Iterable<Expansion> {
                 continue
             }
             val ex = classLoader.expansion
-
+            val dependField = PluginDescriptionFile::class.java.getDeclaredField("depend")
+            dependField.isAccessible = true
+            val dependList = dependField.get(pl.description) as List<String>
+            val newDependList = ArrayList(dependList)
+            newDependList.addAll(ex.depend)
+            dependField.set(pl.description, ImmutableList.copyOf(newDependList))
+            val softDependField = PluginDescriptionFile::class.java.getDeclaredField("softDepend")
+            softDependField.isAccessible = true
+            val newSoftDependList = ArrayList(dependList)
+            newSoftDependList.addAll(ex.softdepend)
+            softDependField.set(pl.description, ImmutableList.copyOf(newDependList))
             val missingDependencies = HashSet<String>()
             val disabledDependencies = HashSet<String>()
             if (!missingDependencies.isEmpty()) {
@@ -131,6 +146,9 @@ object ExpansionManager : Iterable<Expansion> {
         getConsoleSender().sendMessage(COMMAND_PREFIX + "Enabling " + expansions.size + " loaded expansions")
         val softDependExpansions = HashSet<Expansion>()
         for (ex in expansions) {
+            ex.expansionSoftDepend.forEach { s -> getConsoleSender().sendMessage(s) }
+            getConsoleSender().sendMessage(ex.expansionSoftDepend.any { s -> getExpansion(s) != null }.toString())
+
             if (ex.expansionSoftDepend.any { s -> getExpansion(s) != null }) {
                 softDependExpansions.add(ex)
                 continue

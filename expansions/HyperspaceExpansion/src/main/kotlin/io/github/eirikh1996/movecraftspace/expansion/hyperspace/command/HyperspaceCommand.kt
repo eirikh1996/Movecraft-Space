@@ -2,10 +2,10 @@ package io.github.eirikh1996.movecraftspace.expansion.hyperspace.command
 
 import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionManager
-import io.github.eirikh1996.movecraftspace.expansion.hyperspace.HyperspaceBeacon
+import io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects.HyperspaceBeacon
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.HyperspaceExpansion
-import io.github.eirikh1996.movecraftspace.expansion.hyperspace.HyperspaceManager
-import io.github.eirikh1996.movecraftspace.expansion.hyperspace.HyperspaceTravelEntry
+import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.HyperspaceManager
+import io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects.HyperspaceTravelEntry
 import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
 import io.github.eirikh1996.movecraftspace.objects.StarCollection
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_NO_PERMISSION
@@ -14,36 +14,30 @@ import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.hitboxObstructed
 import net.countercraft.movecraft.MovecraftLocation
 import net.countercraft.movecraft.craft.CraftManager
-import org.bukkit.Bukkit
 import org.bukkit.Bukkit.getScheduler
 import org.bukkit.Location
 import org.bukkit.Material
-import org.bukkit.Sound
-import org.bukkit.block.Block
 import org.bukkit.boss.BarColor
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabExecutor
 import org.bukkit.entity.Player
 import org.bukkit.inventory.InventoryHolder
-import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
-import java.lang.Math.pow
+import java.io.File
 import java.lang.System.currentTimeMillis
 import java.math.RoundingMode
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.math.abs
-import kotlin.math.hypot
 import kotlin.math.min
 import kotlin.random.Random
 
 object HyperspaceCommand : TabExecutor {
-    val runnableMap = HashMap<UUID, BukkitRunnable>()
     val locationMap = HashMap<UUID, Location>()
     override fun onTabComplete(p0: CommandSender, p1: Command, p2: String, p3: Array<out String>): List<String> {
-        var tabCompletions = listOf("travel", "createbeacon", "removebeacon")
+        var tabCompletions = listOf("travel", "createbeacon", "removebeacon", "sethypermatter")
         if (p3.size == 0)
             return tabCompletions
         if (p3[0].equals("removebeacon", true)) {
@@ -93,83 +87,7 @@ object HyperspaceCommand : TabExecutor {
                 p0.sendMessage(COMMAND_PREFIX + ERROR + "You are not within the range of a hyperspace beacon")
                 return true
             }
-            var foundFuelContainer : InventoryHolder? = null
-            val hypermatter = Material.getMaterial(HyperspaceExpansion.instance.config.getString("Hypermatter", "EMERALD")!!.toUpperCase())!!
-            for (l in hitBox) {
-                val b = l.toBukkit(craft.w).block
-                if (b.type != Material.FURNACE)
-                    continue
-                val testHolder = b.state as InventoryHolder
-                if (!testHolder.inventory.contains(hypermatter))
-                    continue
-                foundFuelContainer = testHolder
-                break
-            }
-            if (foundFuelContainer == null) {
-                p0.sendMessage(COMMAND_PREFIX + ERROR + "No hypermatter found in the furnaces")
-                return true
-            }
-            val stack = foundFuelContainer.inventory.getItem(foundFuelContainer.inventory.first(hypermatter))!!
-            if (stack.amount == 1) {
-                foundFuelContainer.inventory.remove(stack)
-            } else {
-                stack.amount--
-            }
-            destination = destination!!
-            if (craft.cruising)
-                craft.cruising = false
-            val entry = HyperspaceTravelEntry(craft, foundLoc, destination)
-            entry.progressBar.addPlayer(p0)
-            entry.progressBar.setTitle(str + " Warmup 0.0%")
-            val notifyP = craft.notificationPlayer!!
-            val runnable = object : BukkitRunnable() {
-                val warmupTime = HyperspaceExpansion.instance.config.getInt("Hyperspace travel warmup", 60)
-                val timeStarted = currentTimeMillis()
-                override fun run() {
-                    notifyP.playSound(notifyP.location, HyperspaceExpansion.instance.hyperspaceChargeSound, 0.1f, 0f)
-                    val timePassed = (currentTimeMillis() - timeStarted) / 1000
-                    val progress = min(timePassed.toDouble() / warmupTime.toDouble(), 1.0)
-                    val percent = progress * 100
-                    entry.progressBar.setTitle(str + " Warmup " + percent.toBigDecimal().setScale(2, RoundingMode.UP) + "%")
-                    entry.progressBar.progress = progress
-                    if (timePassed <= warmupTime)
-                        return
-                    notifyP.sendMessage("Initiating hyperspace jump")
-                    notifyP.playSound(notifyP.location, HyperspaceExpansion.instance.hyperspaceEnterSound, 15f, 0f)
-                    cancel()
-                    val hyperspaceWorld = HyperspaceExpansion.instance.hyperspaceWorld
-                    val bounds = ExpansionManager.worldBoundrary(hyperspaceWorld)
-                    val minX = (bounds[0] + (hitBox.xLength / 2)) + 10
-                    val maxX = (bounds[1] - (hitBox.xLength / 2)) - 10
-                    val minZ = (bounds[2] + (hitBox.zLength / 2)) + 10
-                    val maxZ = (bounds[3] - (hitBox.zLength / 2)) - 10
-                    var x = Random.nextInt(minX, maxX)
-                    var z = Random.nextInt(minZ, maxZ)
-                    var hitboxObstructed = true
-                    val midpoint = hitBox.midPoint
-                    while (hitboxObstructed) {
-                        hitboxObstructed = getScheduler().callSyncMethod(HyperspaceExpansion.instance.plugin, { hitboxObstructed(craft, null, hyperspaceWorld, MovecraftLocation(x - midpoint.x , 0, z - midpoint.z)) }).get()
-                        if (!hitboxObstructed)
-                            break
-                        x = Random.nextInt(minX, maxX)
-                        z = Random.nextInt(minZ, maxZ)
-                    }
-                    entry.progressBar.progress = 0.0
-                    entry.progressBar.color = BarColor.BLUE
-                    val dx = x - midpoint.x
-                    val dz = z - midpoint.z
-                    val runnable = runnableMap.remove(craft.notificationPlayer!!.uniqueId)
-                    if (runnable != null) {
-                        runnable.cancel()
-                    }
-                    HyperspaceManager.craftsWithinBeaconRange.remove(craft)
-                    craft.translate(hyperspaceWorld, dx, 0, dz)
-                    HyperspaceManager.addEntry(craft, entry)
-                }
-
-            }
-            runnableMap.put(p0.uniqueId, runnable)
-            runnable.runTaskTimerAsynchronously(HyperspaceExpansion.instance.plugin, 0, 1)
+            HyperspaceManager.scheduleHyperspaceTravel(craft, foundLoc, destination!!, str)
 
         } else if (p3[0].equals("createbeacon", true)) {
             if (!p0.hasPermission("movecraftspace.command.hyperspace.createbeacon")) {
@@ -266,6 +184,14 @@ object HyperspaceCommand : TabExecutor {
             p0.sendMessage(COMMAND_PREFIX + "Sucessfully removed beacon link " + foundBeacon.originName + "-" + foundBeacon.destinationName)
             HyperspaceManager.beaconLocations.remove(foundBeacon)
             HyperspaceManager.saveFile()
+        } else if (p3[0].equals("sethypermatter", true)) {
+            val itemInHand = p0.itemInHand
+            if (itemInHand.type.name.endsWith("AIR")) {
+                p0.sendMessage(COMMAND_PREFIX + ERROR + "Air is not a valid as hypermatter")
+                return true
+            }
+            HyperspaceExpansion.instance.config.set("Hypermatter", itemInHand)
+            HyperspaceExpansion.instance.config.save(File(HyperspaceExpansion.instance.dataFolder, "Config.yml"))
         }
         return true
     }

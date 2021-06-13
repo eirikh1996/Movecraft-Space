@@ -1,4 +1,4 @@
-package io.github.eirikh1996.movecraftspace.expansion.hyperspace
+package io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects
 
 import org.bukkit.Location
 
