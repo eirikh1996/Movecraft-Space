@@ -72,8 +72,27 @@ object HyperspaceManager : BukkitRunnable(), Listener {
             val unit = distance.clone().normalize()
             val speed = HyperspaceExpansion.instance.config.getDouble("Hyperspace travel speed", 1.0)
             unit.x *= speed
-            unit.y *= speed
             unit.z *= speed
+            for (i in 1..speed.toInt()) {
+                val testLoc = entry.origin.clone().add(entry.progress)
+                val testUnit = unit.clone()
+                testUnit.x *= i
+                testUnit.z *= i
+                testLoc.add(testUnit)
+                if (PlanetCollection.getPlanetAt(testLoc) != null || StarCollection.getStarAt(testLoc) != null) {
+                    entry.craft.notificationPlayer!!.sendMessage("Space craft caught in a mass shadow. Exiting hyperspace")
+                    entry.craft.setProcessing(false)
+                    val coords = randomCoords(entry.craft.notificationPlayer!!, testLoc,500,entry.craft.hitBox.yLength)
+                    val midPoint = entry.craft.hitBox.midPoint
+                    for (hdentry in HyperdriveManager.getHyperdrivesOnCraft(entry.craft)) {
+                        hdentry.key.setLine(3, ChatColor.GOLD.toString() + "Standby")
+                        hdentry.key.update()
+                    }
+                    entry.craft.translate(entry.destination.world, coords[0] - midPoint.x, coords[1] - midPoint.y, coords[2] - midPoint.z)
+                    entry.progressBar.isVisible = false
+                    processingEntries.remove(entry.craft)
+                }
+            }
             entry.progress.add(unit)
             val progress = min(entry.progress.length() / totalDistance, 1.0)
             val percent = progress * 100
@@ -132,7 +151,10 @@ object HyperspaceManager : BukkitRunnable(), Listener {
         while (center.distance(Location(center.world, coords[0].toDouble(),
                 coords[1].toDouble(), coords[2].toDouble()
             )) < 200) {
-            if (ExpansionManager.allowedArea(p, Location(center.world, coords[0].toDouble(), coords[1].toDouble(), coords[2].toDouble())))
+                val test = Location(center.world, coords[0].toDouble(), coords[1].toDouble(), coords[2].toDouble())
+            if (ExpansionManager.allowedArea(p, test))
+                continue
+            if (StarCollection.getStarAt(test) != null || PlanetCollection.getPlanetAt(test) != null)
                 continue
             coords = intArrayOf(
             Random.nextInt(center.blockX - radius, center.blockX + radius),
@@ -228,7 +250,12 @@ object HyperspaceManager : BukkitRunnable(), Listener {
             return
         }
         val hypermatter = HyperspaceExpansion.instance.hypermatter
-        if (!hyperdrivesOnCraft.any { entry -> entry.value.getInventoryBlocks(entry.key).any { holder -> holder.inventory.contains(hypermatter, 1) } }) {
+        if (!hyperdrivesOnCraft.any {
+                    entry -> entry.value.getInventoryBlocks(entry.key).any {
+                    holder -> holder.inventory.any { stack -> stack.isSimilar(hypermatter) }
+                    }
+        }
+        ) {
             craft.notificationPlayer!!.sendMessage(COMMAND_PREFIX + ERROR + "There is no hypermatter in any of the hyperdrives on the craft")
             return
         }
@@ -241,10 +268,10 @@ object HyperspaceManager : BukkitRunnable(), Listener {
         for (entry in hyperdrivesOnCraft) {
             val sign = entry.key
             val invBlocks = entry.value.getInventoryBlocks(sign)
-            if (!invBlocks.any { holder -> holder.inventory.contains(hypermatter, 1) }) {
+            if (!invBlocks.any { holder -> holder.inventory.any { stack -> stack.isSimilar(hypermatter) } }) {
                 continue
             }
-            val foundFuelContainer = invBlocks.first { holder -> holder.inventory.contains(hypermatter, 1)}
+            val foundFuelContainer = invBlocks.first { holder -> holder.inventory.any { stack -> stack.isSimilar(hypermatter) } }
             val stack = foundFuelContainer.inventory.getItem(foundFuelContainer.inventory.first(hypermatter.type))!!
             if (!stack.isSimilar(hypermatter))
                 return

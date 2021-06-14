@@ -8,6 +8,7 @@ import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import net.countercraft.movecraft.craft.CraftManager
+import net.countercraft.movecraft.events.CraftDetectEvent
 import net.countercraft.movecraft.utils.MathUtils
 import org.bukkit.ChatColor
 import org.bukkit.block.Sign
@@ -19,11 +20,28 @@ import org.bukkit.event.block.SignChangeEvent
 import org.bukkit.event.player.PlayerInteractEvent
 
 object HyperspaceSign : Listener {
+    val HEADER = "§bHyperspace"
     @EventHandler
     fun onChange(e : SignChangeEvent) {
         if (!ChatColor.stripColor(e.getLine(0))!!.equals("[hyperspace]"))
             return
-        e.setLine(0, "§bHyperspace")
+        e.setLine(0, HEADER)
+    }
+
+    fun onDetect(e : CraftDetectEvent) {
+        val craft = e.craft
+        var range = 0
+        HyperdriveManager.getHyperdrivesOnCraft(craft).forEach { t, u -> range += u.maxRange }
+        for (ml in craft.hitBox) {
+            val b = ml.toBukkit(craft.w).block
+            if (!b.type.name.endsWith("WALL_SIGN"))
+                continue
+            val sign = b.state as Sign
+            if (!sign.getLine(0).equals(HEADER)) {
+                continue
+            }
+            sign.setLine(1, "§9Range: §6" + range)
+        }
     }
     @EventHandler
     fun onInteract(e : PlayerInteractEvent) {
@@ -34,6 +52,10 @@ object HyperspaceSign : Listener {
         }
         val sign = e.clickedBlock!!.state as Sign
         if (!sign.getLine(0).equals("§bHyperspace")) {
+            return
+        }
+        if (!e.player.hasPermission("movecraftspace.hyperspace.sign")) {
+            e.player.sendMessage(COMMAND_PREFIX + ERROR + "You don't have permission to use the Hyperspace sign")
             return
         }
         val craft = CraftManager.getInstance().getCraftByPlayer(e.player)
@@ -52,8 +74,8 @@ object HyperspaceSign : Listener {
             e.player.sendMessage(COMMAND_PREFIX + ERROR + "You can only use hyperspace travel in space worlds")
             return
         }
-        if (!HyperspaceExpansion.instance.allowedCraftTypes.contains(craft.type)) {
-            e.player.sendMessage(COMMAND_PREFIX + ERROR + "Craft type " + craft.type.craftName + " is not allowed for hyperspace travel")
+        if (!HyperspaceExpansion.instance.allowedCraftTypesForHyperspaceSign.contains(craft.type)) {
+            e.player.sendMessage(COMMAND_PREFIX + ERROR + "Craft type " + craft.type.craftName + " is not allowed for hyperspace travel using sign")
             return
         }
         val hyperdrivesOnCraft = HyperdriveManager.getHyperdrivesOnCraft(craft)

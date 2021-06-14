@@ -166,6 +166,14 @@ object HyperdriveManager : Listener, Iterable<Hyperdrive> {
 
     }
 
+    fun getMaxRange(craft: Craft) : Int {
+        var range = 0
+        for (e in getHyperdrivesOnCraft(craft)) {
+            range += e.value.maxRange
+        }
+        return range
+    }
+
     fun getHyperdrivesOnCraft(craft: Craft) : Map<Sign, Hyperdrive> {
         val returnMap = HashMap<Sign, Hyperdrive>()
         for (ml in craft.hitBox) {
@@ -218,7 +226,7 @@ object HyperdriveManager : Listener, Iterable<Hyperdrive> {
 
     fun getHyperdrive(name : String): Hyperdrive? {
         for (hd in this) {
-            if (hd.name.equals(name,true))
+            if (!hd.name.equals(name,true))
                 continue
             return hd
         }

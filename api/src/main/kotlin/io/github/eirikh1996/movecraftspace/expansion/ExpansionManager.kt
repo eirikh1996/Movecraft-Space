@@ -2,6 +2,8 @@ package io.github.eirikh1996.movecraftspace.expansion
 
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
+import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
+import io.github.eirikh1996.movecraftspace.objects.StarCollection
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import org.bukkit.Bukkit

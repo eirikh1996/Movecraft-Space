@@ -4,6 +4,7 @@ import io.github.eirikh1996.movecraftspace.expansion.Expansion
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionState
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.command.HyperdriveCommand
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.command.HyperspaceCommand
+import io.github.eirikh1996.movecraftspace.expansion.hyperspace.command.JumpCommand
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.HyperdriveManager
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.HyperspaceManager
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.sign.HyperspaceSign
@@ -21,7 +22,8 @@ class HyperspaceExpansion : Expansion() {
     lateinit var hyperspaceExitSound : Sound
     lateinit var hyperdriveSelectionWand : Material
     lateinit var hypermatter : ItemStack
-    val allowedCraftTypes = HashSet<CraftType>()
+    val allowedCraftTypesForHyperspaceSign = HashSet<CraftType>()
+    val allowedCraftTypesForJumpCommand = HashSet<CraftType>()
     val maxHyperdrivesOnCraft = HashMap<CraftType, Int>()
 
     override fun enable() {
@@ -48,9 +50,11 @@ class HyperspaceExpansion : Expansion() {
         hyperdriveSelectionWand = Material.getMaterial(config.getString("Hyperdrive selection wand", "STONE_HOE")!!)!!
         hypermatter = config.getSerializable("Hypermatter", ItemStack::class.java) ?: ItemStack(Material.EMERALD)
         config.getConfigurationSection("Max hyperdrives on craft")!!.getValues(false).forEach { t, u -> maxHyperdrivesOnCraft.put(CraftManager.getInstance().getCraftTypeFromString(t), u as Int) }
-        config.getStringList("Allowed craft types").forEach { s -> allowedCraftTypes.add(CraftManager.getInstance().getCraftTypeFromString(s)) }
+        config.getStringList("Allowed craft types for hyperspace sign").forEach { s -> allowedCraftTypesForHyperspaceSign.add(CraftManager.getInstance().getCraftTypeFromString(s)) }
+        config.getStringList("Allowed craft types for jump command").forEach { s -> allowedCraftTypesForJumpCommand.add(CraftManager.getInstance().getCraftTypeFromString(s)) }
         plugin.getCommand("hyperspace")!!.setExecutor(HyperspaceCommand)
         plugin.getCommand("hyperdrive")!!.setExecutor(HyperdriveCommand)
+        plugin.getCommand("jump")!!.setExecutor(JumpCommand)
         HyperspaceManager.runTaskTimerAsynchronously(plugin, 0, 1)
         getPluginManager().registerEvents(HyperspaceManager, plugin)
         HyperdriveManager.loadHyperdrives()
