@@ -1,5 +1,8 @@
 package io.github.eirikh1996.movecraftspace
 
+import org.bukkit.Material
+import org.bukkit.inventory.ItemStack
+
 object Settings {
     val MinimumTickRate : Double get() { return ConfigHolder.config.getDouble("MinimumTickRate", 13.0) }
     val MinimumDistanceBetweenOrbits : Int get() { return ConfigHolder.config.getInt("MinimumDistanceBetweenOrbits", 3000) }
@@ -13,4 +16,5 @@ object Settings {
     val ExplodeSinkingCraftsInWorlds : Set<String> get() { return ConfigHolder.config.getStringList("ExplodeSinkingCraftsInWorlds").toHashSet() }
     val RotatePlanets : Boolean get() { return ConfigHolder.config.getBoolean("RotatePlanets", true) }
     val DisableReleaseInPlanetaryOrbits : Boolean get() = ConfigHolder.config.getBoolean("DisableReleaseInPlanetaryOrbits", true)
+    val SelectionWand : Material get() { return Material.getMaterial(ConfigHolder.config.getString("SelectionTool","STONE_HOE")!!)!!}
 }

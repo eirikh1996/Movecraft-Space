@@ -2,12 +2,15 @@ package io.github.eirikh1996.movecraftspace.expansion.hyperspace
 
 import io.github.eirikh1996.movecraftspace.expansion.Expansion
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionState
+import io.github.eirikh1996.movecraftspace.expansion.hyperspace.command.GravityWellCommand
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.command.HyperdriveCommand
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.command.HyperspaceCommand
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.command.JumpCommand
+import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.GravityWellManager
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.HyperdriveManager
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.HyperspaceManager
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.sign.HyperspaceSign
+import io.github.eirikh1996.movecraftspace.expansion.selection.SelectionSupported
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
 import net.countercraft.movecraft.craft.CraftManager
 import net.countercraft.movecraft.craft.CraftType
@@ -15,16 +18,17 @@ import org.bukkit.*
 import org.bukkit.Bukkit.getPluginManager
 import org.bukkit.inventory.ItemStack
 
-class HyperspaceExpansion : Expansion() {
+class HyperspaceExpansion : Expansion(), SelectionSupported {
     lateinit var hyperspaceWorld : World
     lateinit var hyperspaceChargeSound : Sound
     lateinit var hyperspaceEnterSound : Sound
     lateinit var hyperspaceExitSound : Sound
     lateinit var hyperdriveSelectionWand : Material
-    lateinit var hypermatter : ItemStack
+    lateinit var hypermatter : Material
+    lateinit var hypermatterName : String
     val allowedCraftTypesForHyperspaceSign = HashSet<CraftType>()
     val allowedCraftTypesForJumpCommand = HashSet<CraftType>()
-    val maxHyperdrivesOnCraft = HashMap<CraftType, Int>()
+    val maxHyperdrivesOnCraft = HashMap<String, Int>()
 
     override fun enable() {
         saveDefaultConfig()
@@ -48,17 +52,22 @@ class HyperspaceExpansion : Expansion() {
         hyperspaceChargeSound = Sound.valueOf(config.getString("Hyperspace charge sound", "BLOCK_STONE_BREAK")!!)
         hyperspaceExitSound = Sound.valueOf(config.getString("Hyperspace exit sound", "ENTITY_ENDERMAN_TELEPORT")!!)
         hyperdriveSelectionWand = Material.getMaterial(config.getString("Hyperdrive selection wand", "STONE_HOE")!!)!!
-        hypermatter = config.getSerializable("Hypermatter", ItemStack::class.java) ?: ItemStack(Material.EMERALD)
-        config.getConfigurationSection("Max hyperdrives on craft")!!.getValues(false).forEach { t, u -> maxHyperdrivesOnCraft.put(CraftManager.getInstance().getCraftTypeFromString(t), u as Int) }
+        hypermatter = Material.getMaterial(config.getString("Hypermatter.type", "EMERALD")!!) ?: Material.EMERALD
+        hypermatterName = config.getString("Hypermatter.name", "")!!
+        if (config.contains("Max hyperdrives on craft"))
+            config.getConfigurationSection("Max hyperdrives on craft")!!.getValues(false).forEach { t, u -> maxHyperdrivesOnCraft.put(t, u as Int) }
         config.getStringList("Allowed craft types for hyperspace sign").forEach { s -> allowedCraftTypesForHyperspaceSign.add(CraftManager.getInstance().getCraftTypeFromString(s)) }
         config.getStringList("Allowed craft types for jump command").forEach { s -> allowedCraftTypesForJumpCommand.add(CraftManager.getInstance().getCraftTypeFromString(s)) }
         plugin.getCommand("hyperspace")!!.setExecutor(HyperspaceCommand)
         plugin.getCommand("hyperdrive")!!.setExecutor(HyperdriveCommand)
         plugin.getCommand("jump")!!.setExecutor(JumpCommand)
+        plugin.getCommand("gravitywell")!!.setExecutor(GravityWellCommand)
         HyperspaceManager.runTaskTimerAsynchronously(plugin, 0, 1)
         getPluginManager().registerEvents(HyperspaceManager, plugin)
         HyperdriveManager.loadHyperdrives()
         getPluginManager().registerEvents(HyperdriveManager, plugin)
+        GravityWellManager.loadGravityWells()
+        getPluginManager().registerEvents(GravityWellManager, plugin)
         getPluginManager().registerEvents(HyperspaceSign, plugin)
     }
 

@@ -184,14 +184,6 @@ object HyperspaceCommand : TabExecutor {
             p0.sendMessage(COMMAND_PREFIX + "Sucessfully removed beacon link " + foundBeacon.originName + "-" + foundBeacon.destinationName)
             HyperspaceManager.beaconLocations.remove(foundBeacon)
             HyperspaceManager.saveFile()
-        } else if (p3[0].equals("sethypermatter", true)) {
-            val itemInHand = p0.itemInHand
-            if (itemInHand.type.name.endsWith("AIR")) {
-                p0.sendMessage(COMMAND_PREFIX + ERROR + "Air is not a valid as hypermatter")
-                return true
-            }
-            HyperspaceExpansion.instance.config.set("Hypermatter", itemInHand)
-            HyperspaceExpansion.instance.config.save(File(HyperspaceExpansion.instance.dataFolder, "Config.yml"))
         }
         return true
     }

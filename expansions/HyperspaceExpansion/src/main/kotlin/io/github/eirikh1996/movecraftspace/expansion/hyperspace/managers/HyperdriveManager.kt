@@ -5,8 +5,8 @@ import io.github.eirikh1996.movecraftspace.expansion.Expansion
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.HyperspaceExpansion
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects.Hyperdrive
 import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
+import io.github.eirikh1996.movecraftspace.expansion.selection.Selection
 import io.github.eirikh1996.movecraftspace.utils.BlockUtils
-import io.github.eirikh1996.movecraftspace.utils.MSUtils
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.angleBetweenBlockFaces
@@ -14,13 +14,9 @@ import net.countercraft.movecraft.craft.Craft
 import net.countercraft.movecraft.events.CraftDetectEvent
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
-import org.bukkit.Location
-import org.bukkit.World
-import org.bukkit.block.Block
-import org.bukkit.block.BlockFace
 import org.bukkit.block.Sign
+import org.bukkit.block.data.Directional
 import org.bukkit.block.data.type.WallSign
-import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
@@ -33,73 +29,10 @@ import kotlin.collections.HashSet
 
 object HyperdriveManager : Listener, Iterable<Hyperdrive> {
 
-    val selections = HashMap<UUID, Selection>()
+
     val hyperdrives = HashSet<Hyperdrive>()
 
-    @EventHandler
-    fun onWandUse(event : PlayerInteractEvent) {
-        val player = event.player
-        if (!player.hasPermission("movecraftspace.hyperspace.wand") || event.item == null || event.item!!.type != HyperspaceExpansion.instance.hyperdriveSelectionWand)
-            return
-        event.isCancelled = true
-        val action = event.action
-        if (action != Action.LEFT_CLICK_BLOCK && action != Action.RIGHT_CLICK_BLOCK) {
-            return
-        }
 
-        val clicked = event.clickedBlock?.location!!
-        if (action == Action.LEFT_CLICK_BLOCK) {
-            player.sendMessage(COMMAND_PREFIX + "Started selection at (" + clicked.blockX + ", " + clicked.blockY + ", " + clicked.blockZ + "). Right click with your selection wand to encompass selection")
-            if (selections.containsKey(player.uniqueId)) {
-                val selection = selections[player.uniqueId]!!
-                selection.minX = clicked.blockX
-                selection.maxX = clicked.blockX
-                selection.maxY = clicked.blockY
-                selection.minY = clicked.blockY
-                selection.minZ = clicked.blockZ
-                selection.maxZ = clicked.blockZ
-                selections.put(player.uniqueId, selection)
-                return
-            }
-            selections.put(player.uniqueId, Selection(clicked.blockX, clicked.blockX, clicked.blockY, clicked.blockY, clicked.blockZ, clicked.blockZ, clicked.world!!))
-            return
-        }
-        val selection = selections[player.uniqueId]
-        if (selection == null) {
-            player.sendMessage(COMMAND_PREFIX + "There is no selection available. Start by left-click the block of the hyperdrive structure, then right click to encompass the structure")
-            return
-        }
-        var selChanged = false
-        if (selection.minX > clicked.blockX) {
-            selChanged = true
-            selection.minX = clicked.blockX
-        }
-        if (selection.maxX < clicked.blockX) {
-            selChanged = true
-            selection.maxX = clicked.blockX
-        }
-        if (selection.minY > clicked.blockY) {
-            selChanged = true
-            selection.minY = clicked.blockY
-        }
-        if (selection.maxY < clicked.blockY) {
-            selChanged = true
-            selection.maxY = clicked.blockY
-        }
-        if (selection.minZ > clicked.blockZ) {
-            selChanged = true
-            selection.minZ = clicked.blockZ
-        }
-        if (selection.maxZ < clicked.blockZ) {
-            selChanged = true
-            selection.maxZ = clicked.blockZ
-        }
-        if (selChanged) {
-            player.sendMessage(COMMAND_PREFIX + "Encompassed selection to (" + clicked.blockX + ", " + clicked.blockY + ", " + clicked.blockZ + "). Size " + selection.size)
-            selections.put(player.uniqueId, selection)
-        }
-
-    }
 
     @EventHandler
     fun onSignChange(event: SignChangeEvent) {
@@ -149,7 +82,7 @@ object HyperdriveManager : Listener, Iterable<Hyperdrive> {
     @EventHandler
     fun onDetect(event : CraftDetectEvent) {
         val hyperdrivesOnCraft = getHyperdrivesOnCraft(event.craft)
-        val max = HyperspaceExpansion.instance.maxHyperdrivesOnCraft.getOrDefault(event.craft.type, 0)
+        val max = HyperspaceExpansion.instance.maxHyperdrivesOnCraft.getOrDefault(event.craft.type.craftName, 0)
         if (hyperdrivesOnCraft.size > max) {
             event.failMessage = COMMAND_PREFIX + ERROR + "Craft type " + event.craft.type.craftName + " can have maximum of " + max + " hyperdrives."
             event.isCancelled = true
@@ -210,7 +143,7 @@ object HyperdriveManager : Listener, Iterable<Hyperdrive> {
                 val block = ImmutableVector.fromLocation(sign.location).add(vec.rotate(angle, ImmutableVector.ZERO).add(0,vec.y,0)).toLocation(sign.world).block
                 if (block.type.name.endsWith("WALL_SIGN"))
                     continue
-                if (block.type != hdBlock.type || block.data != hdBlock.data) {
+                if (!hdBlock.isSimilar(block)) {
                     hyperdriveFound = false
                     break
                 }
@@ -240,7 +173,9 @@ object HyperdriveManager : Listener, Iterable<Hyperdrive> {
             for (hdFile in hyperdriveDir.listFiles { dir, name -> name.endsWith(".yml", true) }) {
                 if (hdFile == null)
                     continue
-                hyperdrives.add(Hyperdrive.loadFromFile(hdFile))
+                val drive = Hyperdrive.loadFromFile(hdFile)
+                hyperdrives.add(drive)
+                drive.save()
 
             }
         }
@@ -253,44 +188,7 @@ object HyperdriveManager : Listener, Iterable<Hyperdrive> {
         return hyperdrives.add(hyperdrive)
     }
 
-    data class Selection(var minX : Int, var maxX : Int, var minY : Int, var maxY : Int, var minZ : Int, var maxZ : Int, val world: World) : Iterable<ImmutableVector> {
-        val size : Int get() { return (maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1) }
 
-        /**
-         * Returns an iterator over the elements of this object.
-         */
-        override fun iterator(): Iterator<ImmutableVector> {
-            return object : Iterator<ImmutableVector> {
-                var x = minX
-                var y = minY
-                var z = minZ
-                /**
-                 * Returns `true` if the iteration has more elements.
-                 */
-                override fun hasNext(): Boolean {
-                    return z <= maxZ
-                }
-
-                /**
-                 * Returns the next element in the iteration.
-                 */
-                override fun next(): ImmutableVector {
-                    val output = ImmutableVector(x, y, z)
-                    x++
-                    if (x > maxX) {
-                        x = minX
-                        y++
-                    }
-                    if (y > maxY) {
-                        y = minY
-                        z++
-                    }
-                    return output
-                }
-
-            }
-        }
-    }
 
     /**
      * Returns an iterator over the elements of this object.

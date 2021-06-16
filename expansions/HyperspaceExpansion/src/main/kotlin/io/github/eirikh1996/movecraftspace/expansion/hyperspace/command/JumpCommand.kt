@@ -66,6 +66,10 @@ object JumpCommand : CommandExecutor {
             return true
         }
         val midpoint = craft.hitBox.midPoint
+        if (targX == midpoint.x && targZ == midpoint.z) {
+            sender.sendMessage(COMMAND_PREFIX + ERROR + "Cannot jump to the same coordinates as your craft")
+            return true
+        }
         val dx = targX - midpoint.x
         val dz = targZ - midpoint.z
         val range = HyperdriveManager.getMaxRange(craft)
@@ -78,7 +82,7 @@ object JumpCommand : CommandExecutor {
             if (hyperdrivesOnCraft.size > 1) "s " else " " + if (hyperdrivesOnCraft.size > 1) "are " else "is " + range + " blocks. New target is x" + (midpoint.x + distanceVec.blockX) + " z" + (midpoint.z + distanceVec.blockZ))
         }
         val origin = midpoint.toBukkit(craft.w)
-        HyperspaceManager.scheduleHyperspaceTravel(craft, origin, origin.add(distanceVec))
+        HyperspaceManager.scheduleHyperspaceTravel(craft, origin, origin.clone().add(distanceVec))
         return true
     }
 }

@@ -17,6 +17,7 @@ import net.countercraft.movecraft.events.CraftReleaseEvent
 import net.countercraft.movecraft.events.CraftRotateEvent
 import net.countercraft.movecraft.events.CraftTranslateEvent
 import net.countercraft.movecraft.utils.HitBox
+import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.*
@@ -27,6 +28,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.inventory.InventoryHolder
+import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
 import java.io.File
 import java.math.RoundingMode
@@ -70,15 +72,18 @@ object HyperspaceManager : BukkitRunnable(), Listener {
             val distance = entry.destination.toVector().clone().subtract(entry.origin.toVector().clone())
             val totalDistance = distance.length()
             val unit = distance.clone().normalize()
+            unit.y = 0.0
             val speed = HyperspaceExpansion.instance.config.getDouble("Hyperspace travel speed", 1.0)
             unit.x *= speed
             unit.z *= speed
+            var massShadow = false
             for (i in 1..speed.toInt()) {
                 val testLoc = entry.origin.clone().add(entry.progress)
                 val testUnit = unit.clone()
-                testUnit.x *= i
-                testUnit.z *= i
+                testUnit.x += i
+                testUnit.z += i
                 testLoc.add(testUnit)
+                Bukkit.broadcastMessage(testLoc.toString() + " Planet found: " + (PlanetCollection.getPlanetAt(testLoc) != null) + " Star found: " + (StarCollection.getStarAt(testLoc) != null))
                 if (PlanetCollection.getPlanetAt(testLoc) != null || StarCollection.getStarAt(testLoc) != null) {
                     entry.craft.notificationPlayer!!.sendMessage("Space craft caught in a mass shadow. Exiting hyperspace")
                     entry.craft.setProcessing(false)
@@ -91,8 +96,12 @@ object HyperspaceManager : BukkitRunnable(), Listener {
                     entry.craft.translate(entry.destination.world, coords[0] - midPoint.x, coords[1] - midPoint.y, coords[2] - midPoint.z)
                     entry.progressBar.isVisible = false
                     processingEntries.remove(entry.craft)
+                    massShadow = true
+                    break
                 }
             }
+            if (massShadow)
+                continue
             entry.progress.add(unit)
             val progress = min(entry.progress.length() / totalDistance, 1.0)
             val percent = progress * 100
@@ -250,41 +259,60 @@ object HyperspaceManager : BukkitRunnable(), Listener {
             return
         }
         val hypermatter = HyperspaceExpansion.instance.hypermatter
-        if (!hyperdrivesOnCraft.any {
-                    entry -> entry.value.getInventoryBlocks(entry.key).any {
-                    holder -> holder.inventory.any { stack -> stack.isSimilar(hypermatter) }
-                    }
-        }
-        ) {
-            craft.notificationPlayer!!.sendMessage(COMMAND_PREFIX + ERROR + "There is no hypermatter in any of the hyperdrives on the craft")
-            return
-        }
+        val hypermatterName = HyperspaceExpansion.instance.hypermatterName
+
+
         if (craft.cruising)
             craft.cruising = false
         if (runnableMap.containsKey(craft.notificationPlayer!!.uniqueId)) {
-            craft.notificationPlayer!!.sendMessage("You are already processing  hyperspace warmup")
+            craft.notificationPlayer!!.sendMessage("You are already processing hyperspace warmup")
             return
         }
+        var foundHypermatter = false
         for (entry in hyperdrivesOnCraft) {
             val sign = entry.key
             val invBlocks = entry.value.getInventoryBlocks(sign)
-            if (!invBlocks.any { holder -> holder.inventory.any { stack -> stack.isSimilar(hypermatter) } }) {
-                continue
+
+            var foundFuelContainer : InventoryHolder? = null
+            for (holder in invBlocks) {
+                if (!holder.inventory.contains(hypermatter))
+                    continue
+                foundFuelContainer = holder
             }
-            val foundFuelContainer = invBlocks.first { holder -> holder.inventory.any { stack -> stack.isSimilar(hypermatter) } }
-            val stack = foundFuelContainer.inventory.getItem(foundFuelContainer.inventory.first(hypermatter.type))!!
-            if (!stack.isSimilar(hypermatter))
-                return
+            if (foundFuelContainer == null)
+                continue
+
+            val stack =  if (hypermatterName.length == 0)
+                foundFuelContainer.inventory.getItem(foundFuelContainer.inventory.first(hypermatter))
+                        else {
+                            var index = -1
+                            for (e in foundFuelContainer.inventory.all(hypermatter)) {
+                                if (!e.value.itemMeta!!.displayName.equals(hypermatterName))
+                                    continue
+                                index = e.key
+                            }
+                if (index <= -1)
+                    null
+                else
+                foundFuelContainer.inventory.getItem(index)
+                        }
+
+
+            if (stack == null)
+                continue
+            foundHypermatter = true
             if (stack.amount == 1) {
                 foundFuelContainer.inventory.remove(stack)
             } else {
                 stack.amount--
             }
-
             sign.setLine(3, ChatColor.GOLD.toString() + "Warming up")
             sign.update()
         }
-
+        if (!foundHypermatter) {
+            craft.notificationPlayer!!.sendMessage(COMMAND_PREFIX + ERROR + "There is no hypermatter in any of the hyperdrives on the craft")
+            return
+        }
 
         val hitBox =craft.hitBox
         val entry = HyperspaceTravelEntry(craft, origin, destination)

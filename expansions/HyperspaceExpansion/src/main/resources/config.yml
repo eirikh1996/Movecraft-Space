@@ -8,6 +8,12 @@ Hyperspace charge sound: BLOCK_STONE_BREAK
 Max hyperdrives on craft:
   Starfighter: 1
   Starship: 2
+Allowed craft types for hyperspace sign:
+  - Starfighter
+  - Starship
+Allowed craft types for jump command:
+  - Starfighter
+  - Starship
 Hypermatter:
   type: EMERALD
 #

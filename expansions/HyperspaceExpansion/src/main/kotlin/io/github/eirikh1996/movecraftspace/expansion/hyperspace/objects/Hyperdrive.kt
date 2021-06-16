@@ -7,6 +7,7 @@ import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
 import io.github.eirikh1996.movecraftspace.utils.MSUtils
 import net.countercraft.movecraft.craft.CraftManager
 import net.countercraft.movecraft.craft.CraftType
+import org.bukkit.Bukkit
 import org.bukkit.block.Block
 import org.bukkit.block.Sign
 import org.bukkit.block.data.type.WallSign
@@ -54,7 +55,7 @@ data class Hyperdrive(val name : String, val blocks : Map<ImmutableVector, MSBlo
             val signData = sign.blockData as WallSign
             signData.facing
         }
-        val angle = MSUtils.angleBetweenBlockFaces(face, blocks[ImmutableVector.ZERO]!!.facing)
+        val angle = MSUtils.angleBetweenBlockFaces(blocks[ImmutableVector.ZERO]!!.facing, face)
 
         val blockList = ArrayList<Block>()
         for (vec in blocks.keys) {
@@ -78,6 +79,11 @@ data class Hyperdrive(val name : String, val blocks : Map<ImmutableVector, MSBlo
             map.putAll(blocks[loc]!!.serialize())
             mapList.add(map)
 
+        }
+        if (!allowedOnCraftTypes.isEmpty()) {
+            val list = ArrayList<String>()
+            allowedOnCraftTypes.forEach { t -> list.add(t.craftName) }
+            yaml.set("allowedOnCraftTypes", list)
         }
         yaml.set("blocks", mapList)
         yaml.save(hyperdriveFile)

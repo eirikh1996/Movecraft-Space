@@ -2,6 +2,8 @@ package io.github.eirikh1996.movecraftspace.expansion
 
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
+import io.github.eirikh1996.movecraftspace.expansion.selection.SelectionManager
+import io.github.eirikh1996.movecraftspace.expansion.selection.SelectionSupported
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
 import io.github.eirikh1996.movecraftspace.objects.StarCollection
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
@@ -27,6 +29,8 @@ import kotlin.collections.HashSet
 object ExpansionManager : Iterable<Expansion> {
     val expansions = HashSet<Expansion>()
     val classCache = HashMap<String, Class<*>>()
+    private var foundSelectionSupported = false
+    val selectionsEnabled : Boolean get() = foundSelectionSupported
     lateinit var pl: JavaPlugin
 
     fun worldBoundrary(world: World) : IntArray {
@@ -155,6 +159,8 @@ object ExpansionManager : Iterable<Expansion> {
                 softDependExpansions.add(ex)
                 continue
             }
+            if (ex is SelectionSupported)
+                foundSelectionSupported = true
             try {
                 ex.state = ExpansionState.ENABLED
             } catch (t : Throwable) {
@@ -172,6 +178,13 @@ object ExpansionManager : Iterable<Expansion> {
                 t.printStackTrace()
                 ex.state = ExpansionState.DISABLED
             }
+        }
+        if (foundSelectionSupported) {
+            getConsoleSender().sendMessage(COMMAND_PREFIX + "One or more expansions supporting selections have been found. Enabling selections")
+            SelectionManager.pl = pl
+            SelectionManager.initialize()
+            Bukkit.getPluginManager().registerEvents(SelectionManager, pl)
+
         }
     }
 
@@ -195,5 +208,12 @@ object ExpansionManager : Iterable<Expansion> {
             return ex
         }
         return null
+    }
+
+    fun reloadExpansions() {
+        disableExpansions()
+        expansions.clear()
+        loadExpansions()
+        enableExpansions()
     }
 }

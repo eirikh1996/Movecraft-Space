@@ -40,7 +40,7 @@ object BlockUtils {
     }
 
     fun rotateBlockFace(angle : Double, startPoint : BlockFace) : BlockFace {
-        if (angle == 0.0)
+        if (angle == 0.0 || startPoint == BlockFace.SELF)
             return startPoint
         var index = faces.indexOf(startPoint)
         var varAngle = angle

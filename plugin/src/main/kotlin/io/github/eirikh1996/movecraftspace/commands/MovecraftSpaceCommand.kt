@@ -1,8 +1,11 @@
 package io.github.eirikh1996.movecraftspace.commands
 
 import io.github.eirikh1996.movecraftspace.MovecraftSpace
+import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionManager
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionState
+import io.github.eirikh1996.movecraftspace.expansion.selection.SelectionManager
+import io.github.eirikh1996.movecraftspace.utils.MSUtils
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import net.md_5.bungee.api.chat.ClickEvent
@@ -14,6 +17,8 @@ import org.bukkit.ChatColor
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabExecutor
+import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
@@ -49,24 +54,68 @@ object MovecraftSpaceCommand : TabExecutor {
                 sender.spigot().sendMessage(expansionList)
                 return true
             }
-            val expansion = ExpansionManager.getExpansion(args[1])
-            if (expansion == null) {
-                sender.sendMessage(COMMAND_PREFIX + ERROR + "No such expansion is loaded: " + args[1])
+            else if (args[1].equals("info")) {
+                if (args.size <= 2) {
+                    sender.sendMessage(COMMAND_PREFIX + ERROR + "Correct syntax is /movecraftspace expansions info <expansion>")
+                    return true
+                }
+                val expansion = ExpansionManager.getExpansion(args[2])
+                if (expansion == null) {
+                    sender.sendMessage(COMMAND_PREFIX + ERROR + "No such expansion is loaded: " + args[1])
+                    return true
+                }
+                sender.sendMessage("===========[" + expansion.name + "]===========")
+                sender.sendMessage("Description: " + expansion.description)
+                sender.sendMessage("Version: " + expansion.version)
+                sender.sendMessage("Depend: " + expansion.depend.joinToString())
+                sender.sendMessage("Soft depend: " + expansion.softdepend.joinToString())
+                sender.sendMessage("Expansion depend: " + expansion.expansionDepend.joinToString())
+                sender.sendMessage("Expansion soft depend: " + expansion.expansionSoftDepend.joinToString())
+            }
+            else if (args[1].equals("reload")) {
+                ExpansionManager.reloadExpansions()
+                sender.sendMessage(COMMAND_PREFIX + "Reloaded expansions")
+            }
+
+        } else if (args[0].equals("wand", true)) {
+            if (sender !is Player) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + MSUtils.MUST_BE_PLAYER)
                 return true
             }
-            sender.sendMessage("===========[" + expansion.name + "]===========")
-            sender.sendMessage("Description: " + expansion.description)
-            sender.sendMessage("Version: " + expansion.version)
-            sender.sendMessage("Depend: " + expansion.depend.joinToString())
-            sender.sendMessage("Soft depend: " + expansion.softdepend.joinToString())
-            sender.sendMessage("Expansion depend: " + expansion.expansionDepend.joinToString())
-            sender.sendMessage("Expansion soft depend: " + expansion.expansionSoftDepend.joinToString())
+            if (!sender.hasPermission("movecraftspace.wand")) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + MSUtils.COMMAND_NO_PERMISSION)
+                return true
+            }
+            if (!ExpansionManager.selectionsEnabled) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "Selections are not enabled as no selection supported expansions are installed")
+                return true
+            }
+            sender.inventory.addItem(ItemStack(Settings.SelectionWand))
+        } else if (args[0].equals("disablewand", true)) {
+            if (sender !is Player) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + MSUtils.MUST_BE_PLAYER)
+                return true
+            }
+            if (!sender.hasPermission("movecraftspace.disablewand")) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + MSUtils.COMMAND_NO_PERMISSION)
+                return true
+            }
+            if (!ExpansionManager.selectionsEnabled) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "Selections are not enabled as no selection supported expansions are installed")
+                return true
+            }
+            if (SelectionManager.selectionsDisabled.contains(sender.uniqueId)) {
+                SelectionManager.selectionsDisabled.remove(sender.uniqueId)
+            } else {
+                SelectionManager.selectionsDisabled.add(sender.uniqueId)
+            }
+            SelectionManager.saveDisableWandList()
         }
         return true
     }
 
     override fun onTabComplete(sender : CommandSender, cmd : Command, label : String, args : Array<out String>) : List<String> {
-        var tabCompletions = listOf("expansions").sorted()
+        var tabCompletions = listOf("expansions", "wand").sorted()
         if (args.size == 0)
             return tabCompletions
         else if (args[0].equals("expansions", true)) {

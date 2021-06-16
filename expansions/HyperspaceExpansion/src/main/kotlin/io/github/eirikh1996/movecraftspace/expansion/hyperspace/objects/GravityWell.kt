@@ -15,7 +15,7 @@ import java.io.File
 
 data class GravityWell(val name : String, val blocks : Map<ImmutableVector, MSBlock>, val range : Int, val allowedOnCraftTypes : Set<CraftType> = HashSet()) {
 
-    private fun getStructure(sign: Sign) : List<Block> {
+    fun getStructure(sign: Sign) : List<Block> {
         val face = if (Settings.IsLegacy) {
             val signData = sign.data as org.bukkit.material.Sign
             signData.facing
@@ -47,6 +47,11 @@ data class GravityWell(val name : String, val blocks : Map<ImmutableVector, MSBl
             map.putAll(blocks[loc]!!.serialize())
             mapList.add(map)
 
+        }
+        if (!allowedOnCraftTypes.isEmpty()) {
+            val list = ArrayList<String>()
+            allowedOnCraftTypes.forEach { t -> list.add(t.craftName) }
+            yaml.set("allowedOnCraftTypes", list)
         }
         yaml.set("blocks", mapList)
         yaml.save(gravityWellFile)
