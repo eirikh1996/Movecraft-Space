@@ -86,9 +86,11 @@ object HyperspaceManager : BukkitRunnable(), Listener {
                 testUnit.x += i
                 testUnit.z += i
                 testLoc.add(testUnit)
-                if (PlanetCollection.getPlanetAt(testLoc, HyperspaceExpansion.instance.extraMassShadowRangeOfPlanets) != null || StarCollection.getStarAt(testLoc, HyperspaceExpansion.instance.extraMassShadowRangeOfStars) != null || GravityWellManager.getActiveGravityWellAt(testLoc) != null) {
+                val foundGravityWell = Bukkit.getScheduler().callSyncMethod(HyperspaceExpansion.instance.plugin, {GravityWellManager.getActiveGravityWellAt(testLoc)}).get()
+                if (PlanetCollection.getPlanetAt(testLoc, HyperspaceExpansion.instance.extraMassShadowRangeOfPlanets) != null || StarCollection.getStarAt(testLoc, HyperspaceExpansion.instance.extraMassShadowRangeOfStars) != null || foundGravityWell != null) {
                     entry.craft.notificationPlayer!!.sendMessage("Space craft caught in a mass shadow. Exiting hyperspace")
                     entry.craft.setProcessing(false)
+                    entry.craft.burningFuel += entry.craft.type.getFuelBurnRate(entry.craft.w)
                     val coords = randomCoords(entry.craft.notificationPlayer!!, testLoc,500,entry.craft.hitBox.yLength)
                     val midPoint = entry.craft.hitBox.midPoint
                     Bukkit.getScheduler().callSyncMethod( HyperspaceExpansion.instance.plugin, {
@@ -121,6 +123,7 @@ object HyperspaceManager : BukkitRunnable(), Listener {
                     HyperspaceExpansion.instance.config.getInt("Beacon range", 200) + if (hitbox.xLength > hitbox.zLength) hitbox.xLength else hitbox.zLength ,entry.craft.hitBox.yLength)
                 val midPoint = entry.craft.hitBox.midPoint
                 entry.craft.notificationPlayer!!.sendMessage("Space craft arrived at destination. Exiting hyperspace")
+                entry.craft.burningFuel += entry.craft.type.getFuelBurnRate(entry.craft.w)
                 entry.progressBar.isVisible = false
                 Bukkit.getScheduler().callSyncMethod(HyperspaceExpansion.instance.plugin, {
                     for (hdentry in HyperdriveManager.getHyperdrivesOnCraft(entry.craft)) {

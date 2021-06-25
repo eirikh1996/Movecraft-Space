@@ -43,6 +43,7 @@ abstract class Expansion {
     val commands = HashMap<String, Map<String, Any>>()
     val plugin = classLoader.plugin
     val logger = classLoader.plugin.logger
+    val serverThread = Thread.currentThread()
     var state = ExpansionState.NOT_LOADED
     set(state) {
         field = state
