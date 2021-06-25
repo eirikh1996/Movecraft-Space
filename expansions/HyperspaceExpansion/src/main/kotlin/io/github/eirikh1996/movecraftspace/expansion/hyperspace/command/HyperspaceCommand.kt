@@ -87,7 +87,7 @@ object HyperspaceCommand : TabExecutor {
                 p0.sendMessage(COMMAND_PREFIX + ERROR + "You are not within the range of a hyperspace beacon")
                 return true
             }
-            HyperspaceManager.scheduleHyperspaceTravel(craft, foundLoc, destination!!, str)
+            HyperspaceManager.scheduleHyperspaceTravel(craft, foundLoc, destination!!, str, true)
 
         } else if (p3[0].equals("createbeacon", true)) {
             if (!p0.hasPermission("movecraftspace.command.hyperspace.createbeacon")) {

@@ -39,7 +39,7 @@ object JumpCommand : CommandExecutor {
             return true
         }
 
-        if (!HyperspaceExpansion.instance.allowedCraftTypesForJumpCommand.contains(craft.type)) {
+        if (!HyperspaceExpansion.instance.allowedCraftTypesForJumpCommand.contains(craft.type.craftName)) {
             sender.sendMessage(COMMAND_PREFIX + ERROR + "Craft type " + craft.type.craftName + " is not allowed for hyperspace travel using jump command")
             return true
         }
@@ -78,8 +78,7 @@ object JumpCommand : CommandExecutor {
             val origDistance = distanceVec.length()
             distanceVec.normalize()
             distanceVec.multiply(range)
-            sender.sendMessage(COMMAND_PREFIX + WARNING + "Travel distance to x" + targX + " and z" + targZ + " is " + origDistance + ", but the range of the craft's hyperdrive" +
-            if (hyperdrivesOnCraft.size > 1) "s " else " " + if (hyperdrivesOnCraft.size > 1) "are " else "is " + range + " blocks. New target is x" + (midpoint.x + distanceVec.blockX) + " z" + (midpoint.z + distanceVec.blockZ))
+            sender.sendMessage(COMMAND_PREFIX + WARNING + "Travel distance to x" + targX + " and z" + targZ + " is " + origDistance + ", but the range of the craft's hyperdrive" + (if (hyperdrivesOnCraft.size > 1) "s " else " ") + (if (hyperdrivesOnCraft.size > 1) "are " else "is ") + range + " blocks. New target is x" + (midpoint.x + distanceVec.blockX) + " z" + (midpoint.z + distanceVec.blockZ))
         }
         val origin = midpoint.toBukkit(craft.w)
         HyperspaceManager.scheduleHyperspaceTravel(craft, origin, origin.clone().add(distanceVec))

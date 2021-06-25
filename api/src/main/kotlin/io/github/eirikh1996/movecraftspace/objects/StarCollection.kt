@@ -118,9 +118,9 @@ object StarCollection : Iterable<Star> {
         return null
     }
 
-    fun getStarAt(testLoc: Location) : Star? {
+    fun getStarAt(testLoc: Location, extraRadius : Int = 0) : Star? {
         for (star in this) {
-            if (star.space != testLoc.world || star.loc.distance(ImmutableVector.fromLocation(testLoc)) > star.radius + 2)
+            if (star.space != testLoc.world || star.loc.distance(ImmutableVector.fromLocation(testLoc)) > star.radius + extraRadius + 2)
                 continue
             return star
         }

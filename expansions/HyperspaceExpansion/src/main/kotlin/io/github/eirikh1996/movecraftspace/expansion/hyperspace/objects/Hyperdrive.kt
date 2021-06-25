@@ -72,6 +72,7 @@ data class Hyperdrive(val name : String, val blocks : Map<ImmutableVector, MSBlo
         val yaml = YamlConfiguration()
         yaml.set("name", name)
         yaml.set("maxRange", maxRange)
+        yaml.set("warmupTime", warmupTime)
         val mapList = ArrayList<Map<String, Any>>()
         for (loc in blocks.keys) {
             val map = HashMap<String, Any>()
@@ -97,7 +98,7 @@ data class Hyperdrive(val name : String, val blocks : Map<ImmutableVector, MSBlo
             val blocks = yaml.getMapList("blocks") as List<Map<String, Any>>
             val name = yaml.getString("name")!!
             val range = yaml.getInt("maxRange")
-            val warmupTime = yaml.getInt("warmupTime")
+            val warmupTime = yaml.getInt("warmupTime", 60)
             val blockMap = HashMap<ImmutableVector, MSBlock>()
             for (block in blocks) {
                 blockMap.put(ImmutableVector.deserialize(block), MSBlock.deserialize(block))

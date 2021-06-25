@@ -11,6 +11,7 @@ import io.github.eirikh1996.movecraftspace.objects.StarCollection
 import io.github.eirikh1996.movecraftspace.utils.MSUtils
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
+import io.github.eirikh1996.movecraftspace.utils.MSUtils.WARNING
 import net.countercraft.movecraft.MovecraftLocation
 import net.countercraft.movecraft.craft.Craft
 import net.countercraft.movecraft.events.CraftReleaseEvent
@@ -69,6 +70,8 @@ object HyperspaceManager : BukkitRunnable(), Listener {
         val iterator = processingEntries.values.iterator()
         while (iterator.hasNext()) {
             val entry = iterator.next()
+            if (System.currentTimeMillis() - entry.lastTeleportTime < 5000)
+                continue
             val distance = entry.destination.toVector().clone().subtract(entry.origin.toVector().clone())
             val totalDistance = distance.length()
             val unit = distance.clone().normalize()
@@ -83,16 +86,18 @@ object HyperspaceManager : BukkitRunnable(), Listener {
                 testUnit.x += i
                 testUnit.z += i
                 testLoc.add(testUnit)
-                Bukkit.broadcastMessage(testLoc.toString() + " Planet found: " + (PlanetCollection.getPlanetAt(testLoc) != null) + " Star found: " + (StarCollection.getStarAt(testLoc) != null))
-                if (PlanetCollection.getPlanetAt(testLoc) != null || StarCollection.getStarAt(testLoc) != null) {
+                if (PlanetCollection.getPlanetAt(testLoc, HyperspaceExpansion.instance.extraMassShadowRangeOfPlanets) != null || StarCollection.getStarAt(testLoc, HyperspaceExpansion.instance.extraMassShadowRangeOfStars) != null || GravityWellManager.getActiveGravityWellAt(testLoc) != null) {
                     entry.craft.notificationPlayer!!.sendMessage("Space craft caught in a mass shadow. Exiting hyperspace")
                     entry.craft.setProcessing(false)
                     val coords = randomCoords(entry.craft.notificationPlayer!!, testLoc,500,entry.craft.hitBox.yLength)
                     val midPoint = entry.craft.hitBox.midPoint
-                    for (hdentry in HyperdriveManager.getHyperdrivesOnCraft(entry.craft)) {
-                        hdentry.key.setLine(3, ChatColor.GOLD.toString() + "Standby")
-                        hdentry.key.update()
-                    }
+                    Bukkit.getScheduler().callSyncMethod( HyperspaceExpansion.instance.plugin, {
+                        for (hdentry in HyperdriveManager.getHyperdrivesOnCraft(entry.craft)) {
+                            hdentry.key.setLine(3, ChatColor.GOLD.toString() + "Standby")
+                            hdentry.key.update()
+                        }
+                    })
+
                     entry.craft.translate(entry.destination.world, coords[0] - midPoint.x, coords[1] - midPoint.y, coords[2] - midPoint.z)
                     entry.progressBar.isVisible = false
                     processingEntries.remove(entry.craft)
@@ -123,28 +128,11 @@ object HyperspaceManager : BukkitRunnable(), Listener {
                         hdentry.key.update()
                     }
                 })
-
                 entry.craft.translate(entry.destination.world, coords[0] - midPoint.x, coords[1] - midPoint.y, coords[2] - midPoint.z)
                 iterator.remove()
                 processingEntries.remove(entry.craft)
 
                 entry.craft.notificationPlayer!!.playSound(entry.craft.notificationPlayer!!.location, HyperspaceExpansion.instance.hyperspaceExitSound, 3f, 0f)
-            }
-            if (entry.origin.world != entry.destination.world)
-                continue
-            val testLoc = entry.origin.clone().add(entry.progress)
-            if (PlanetCollection.getPlanetAt(testLoc) != null || StarCollection.getStarAt(testLoc) != null) {
-                entry.craft.notificationPlayer!!.sendMessage("Space craft caught in a mass shadow. Exiting hyperspace")
-                entry.craft.setProcessing(false)
-                val coords = randomCoords(entry.craft.notificationPlayer!!, testLoc,500,entry.craft.hitBox.yLength)
-                val midPoint = entry.craft.hitBox.midPoint
-                for (hdentry in HyperdriveManager.getHyperdrivesOnCraft(entry.craft)) {
-                    hdentry.key.setLine(3, ChatColor.GOLD.toString() + "Standby")
-                    hdentry.key.update()
-                }
-                entry.craft.translate(entry.destination.world, coords[0] - midPoint.x, coords[1] - midPoint.y, coords[2] - midPoint.z)
-                entry.progressBar.isVisible = false
-                processingEntries.remove(entry.craft)
             }
 
 
@@ -252,11 +240,20 @@ object HyperspaceManager : BukkitRunnable(), Listener {
         }
     }
 
-    fun scheduleHyperspaceTravel(craft: Craft, origin : Location, destination : Location, str : String = "") {
+    fun scheduleHyperspaceTravel(craft: Craft, origin : Location, destination : Location, str : String = "", beaconTravel : Boolean = false) {
+
+
         val hyperdrivesOnCraft = HyperdriveManager.getHyperdrivesOnCraft(craft)
         if (hyperdrivesOnCraft.isEmpty()) {
             craft.notificationPlayer!!.sendMessage(COMMAND_PREFIX + ERROR + "There are no hyperdrives on this craft")
             return
+        }
+        for (ml in craft.hitBox) {
+            val testLoc = ml.toBukkit(craft.w)
+            if (PlanetCollection.getPlanetAt(testLoc, HyperspaceExpansion.instance.extraMassShadowRangeOfPlanets) != null || StarCollection.getStarAt(testLoc, HyperspaceExpansion.instance.extraMassShadowRangeOfStars) != null || GravityWellManager.getActiveGravityWellAt(testLoc, craft) != null) {
+                craft.notificationPlayer!!.sendMessage(COMMAND_PREFIX + ERROR + "Craft is within the range of a mass shadow. Move out of the mass shadow to initiate hyperspace jump")
+                return
+            }
         }
         val hypermatter = HyperspaceExpansion.instance.hypermatter
         val hypermatterName = HyperspaceExpansion.instance.hypermatterName
@@ -315,12 +312,17 @@ object HyperspaceManager : BukkitRunnable(), Listener {
         }
 
         val hitBox =craft.hitBox
-        val entry = HyperspaceTravelEntry(craft, origin, destination)
+        val entry = HyperspaceTravelEntry(craft, origin, destination, beaconTravel)
         entry.progressBar.addPlayer(craft.notificationPlayer!!)
         entry.progressBar.setTitle(str + " Warmup 0.0%")
         val notifyP = craft.notificationPlayer!!
         val runnable = object : BukkitRunnable() {
-            val warmupTime = HyperspaceExpansion.instance.config.getInt("Hyperspace travel warmup", 60)
+            var warmupTime = 0
+            init {
+                hyperdrivesOnCraft.forEach { t, u -> warmupTime += u.warmupTime }
+                warmupTime /= hyperdrivesOnCraft.size
+                warmupTime /= hyperdrivesOnCraft.size
+            }
             val timeStarted = System.currentTimeMillis()
             override fun run() {
                 notifyP.playSound(notifyP.location, HyperspaceExpansion.instance.hyperspaceChargeSound, 0.1f, 0f)
@@ -376,7 +378,9 @@ object HyperspaceManager : BukkitRunnable(), Listener {
                     runnable.cancel()
                 }
                 craftsWithinBeaconRange.remove(craft)
+                craft.burningFuel += craft.type.getFuelBurnRate(craft.w)
                 craft.translate(hyperspaceWorld, dx, 0, dz)
+                entry.lastTeleportTime = System.currentTimeMillis()
                 addEntry(craft, entry)
             }
 

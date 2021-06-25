@@ -98,7 +98,7 @@ object PlanetCommand : TabExecutor {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "No stars nearby. Create one using /star create <name>")
                 return true
             }
-            var exitHeight =  250
+            var exitHeight =  sender.world.maxHeight - 5
             var orbitTime = 10
             var surface : Material? = Material.STONE
             var data = 0.toByte()

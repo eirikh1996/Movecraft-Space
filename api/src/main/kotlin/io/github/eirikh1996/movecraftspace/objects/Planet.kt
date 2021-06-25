@@ -40,11 +40,11 @@ data class Planet(
     val name : String get() { return destination.name }
     val moons = HashSet<Planet>()
     val id = UUID.randomUUID()
-    fun contains(location: Location) : Boolean {
+    fun contains(location: Location, extraRadius : Int = 0) : Boolean {
         if (!space.equals(location.world)) {
             return false
         }
-        return center.distance(ImmutableVector.fromLocation(location)) <= radius
+        return center.distance(ImmutableVector.fromLocation(location)) <= radius + extraRadius
     }
 
     fun isPlanet(world: World) : Boolean {

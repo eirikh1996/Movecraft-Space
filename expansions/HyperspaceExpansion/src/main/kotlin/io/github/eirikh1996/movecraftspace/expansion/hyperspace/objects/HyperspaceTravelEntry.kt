@@ -7,8 +7,9 @@ import org.bukkit.boss.BarColor
 import org.bukkit.boss.BarStyle
 import org.bukkit.util.Vector
 
-data class HyperspaceTravelEntry(val craft : Craft, val origin : Location, val destination : Location, val travelDistance : Int = 1) {
+data class HyperspaceTravelEntry(val craft : Craft, val origin : Location, val destination : Location, val beaconTravel : Boolean = false) {
     var progress = Vector(0,0,0)
+    var lastTeleportTime = System.currentTimeMillis()
     val progressBar = Bukkit.createBossBar("", BarColor.PURPLE, BarStyle.SEGMENTED_20)
     init {
         progressBar.isVisible = true

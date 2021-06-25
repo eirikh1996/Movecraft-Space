@@ -12,9 +12,12 @@ import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import net.countercraft.movecraft.craft.Craft
 import net.countercraft.movecraft.craft.CraftManager
+import net.countercraft.movecraft.events.CraftDetectEvent
+import net.countercraft.movecraft.events.CraftReleaseEvent
 import net.countercraft.movecraft.utils.MathUtils
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
+import org.bukkit.Location
 import org.bukkit.block.Sign
 import org.bukkit.block.data.type.WallSign
 import org.bukkit.event.EventHandler
@@ -67,7 +70,7 @@ object GravityWellManager : Iterable<GravityWell>, Listener {
                     continue
                 val testSign = test.toLocation(event.block.world).block.state as Sign
                 if (testSign.getLine(0).equals(ChatColor.AQUA.toString() + "Gravity well") && testSign.equals(ChatColor.RED.toString() + gravityWell.name)) {
-                    event.player.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "This gravity well structure already has a sign attached to it")
+                    event.player.sendMessage(COMMAND_PREFIX + ERROR + "This gravity well structure already has a sign attached to it")
                     event.isCancelled = true
                     return
                 }
@@ -113,8 +116,36 @@ object GravityWellManager : Iterable<GravityWell>, Listener {
 
     }
 
+    @EventHandler
+    fun onDetect(event : CraftDetectEvent) {
+        val gravityWellsOnCraft = getGravityWellsOnCraft(event.craft)
+        for (entry in gravityWellsOnCraft) {
+            if (entry.value.allowedOnCraftTypes.contains(event.craft.type)) {
+                event.failMessage = COMMAND_PREFIX + ERROR + "Gravity well " + entry.value.name + " is not allowed on craft type " + event.craft.type.craftName
+                event.isCancelled = true
+                return
+            }
+        }
+        if (HyperspaceExpansion.instance.maxGravityWellsOnCraft.contains(event.craft.type.craftName) && gravityWellsOnCraft.size > HyperspaceExpansion.instance.maxGravityWellsOnCraft.get(event.craft.type.craftName)!!) {
+            event.failMessage = COMMAND_PREFIX + ERROR + "Craft type " + event.craft.type.craftName + " can have maximum of " + HyperspaceExpansion.instance.maxGravityWellsOnCraft.get(event.craft.type.craftName)!! + " hyperdrives on it"
+            event.isCancelled = true
+            return
+        }
+
+    }
+
+    @EventHandler
+    fun onRelease(event :CraftReleaseEvent) {
+        for (entry in getGravityWellsOnCraft(event.craft)) {
+            entry.key.setLine(3, GRAVITY_WELL_STANDBY_TEXT)
+            entry.key.update()
+        }
+    }
+
     fun getGravityWellsOnCraft(craft: Craft) : Map<Sign, GravityWell> {
         val returnMap = HashMap<Sign, GravityWell>()
+        if (craft.hitBox.isEmpty)
+            return returnMap
         for (ml in craft.hitBox) {
             val block = ml.toBukkit(craft.w).block
             if (!block.type.name.endsWith("WALL_SIGN"))
@@ -142,29 +173,49 @@ object GravityWellManager : Iterable<GravityWell>, Listener {
         val iter = gravityWells.iterator()
         while (iter.hasNext()) {
             val next = iter.next()
-            var hyperdriveFound = true
+            var gravityWellFound = true
             val angle = MSUtils.angleBetweenBlockFaces(next.blocks[ImmutableVector.ZERO]!!.facing, face)
-            Bukkit.broadcastMessage(angle.toString())
             for (vec in next.blocks.keys) {
-                Bukkit.broadcastMessage(face.name)
-                Bukkit.broadcastMessage(BlockUtils.rotateBlockFace(angle, next.blocks[vec]!!.facing).name)
                 val hdBlock = next.blocks[vec]!!.rotate(BlockUtils.rotateBlockFace(angle, next.blocks[vec]!!.facing))
                 val block = ImmutableVector.fromLocation(sign.location).add(vec.rotate(angle, ImmutableVector.ZERO).add(0,vec.y,0)).toLocation(sign.world).block
                 if (block.type.name.endsWith("WALL_SIGN"))
                     continue
-                Bukkit.broadcastMessage("Block: Type " + block.type + " Data " + block.data + " MSBlock: Type " + hdBlock.type + " Data " + hdBlock.data)
-                if (!hdBlock.isSimilar(block)) {1
-                    hyperdriveFound = false
+                if (!hdBlock.isSimilar(block)) {
+                    gravityWellFound = false
                     break
                 }
 
             }
-            if (!hyperdriveFound)
+            if (!gravityWellFound)
                 continue
             foundGravityWell = next
             break
         }
         return foundGravityWell
+    }
+
+    fun getActiveGravityWellAt(loc : Location, craftToExclude : Craft? = null): GravityWell? {
+        for (craft in CraftManager.getInstance().getCraftsInWorld(loc.world!!)) {
+            if (craft == null || craftToExclude == craft)
+                continue
+            for (ml in craft.hitBox) {
+                val b = ml.toBukkit(loc.world).block
+                if (!b.type.name.endsWith("WALL_SIGN"))
+                    continue
+                val sign = b.state as Sign
+                if (!sign.getLine(0).equals(GRAVITY_WELL_HEADER))
+                    continue
+                val gravityWell = getGravityWell(sign)
+                if (gravityWell == null)
+                    continue
+                if (sign.location.distance(loc) > gravityWell.range)
+                    continue
+                if (!sign.getLine(3).equals(GRAVITY_WELL_ACTIVE_TEXT))
+                    continue
+                return gravityWell
+            }
+        }
+        return null
     }
 
     fun getGravityWell(name : String) : GravityWell? {

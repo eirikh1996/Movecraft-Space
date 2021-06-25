@@ -42,6 +42,11 @@
       <option name="url" value="https://raw.githubusercontent.com/FabioZumbi12/RedProtect/mvn-repo/" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="dynmap-repo" />
+      <option name="name" value="dynmap-repo" />
+      <option name="url" value="https://repo.mikeprimm.com" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="jboss.community" />
       <option name="name" value="JBoss Community repository" />
       <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />

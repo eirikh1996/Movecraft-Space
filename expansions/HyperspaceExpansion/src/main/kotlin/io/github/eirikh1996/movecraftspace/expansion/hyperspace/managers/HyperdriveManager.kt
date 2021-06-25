@@ -36,7 +36,7 @@ object HyperdriveManager : Listener, Iterable<Hyperdrive> {
 
     @EventHandler
     fun onSignChange(event: SignChangeEvent) {
-        if (!ChatColor.stripColor(event.getLine(0)).equals("[hyperdrive]") || !event.block.type.name.endsWith("WALL_SIGN"))
+        if (!ChatColor.stripColor(event.getLine(0)).equals("[hyperdrive]", true) || !event.block.type.name.endsWith("WALL_SIGN"))
             return
         val hyperdrive = getHyperdrive(event.block.state as Sign)
         if (hyperdrive == null) {

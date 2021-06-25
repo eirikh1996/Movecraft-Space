@@ -26,9 +26,12 @@ class HyperspaceExpansion : Expansion(), SelectionSupported {
     lateinit var hyperdriveSelectionWand : Material
     lateinit var hypermatter : Material
     lateinit var hypermatterName : String
-    val allowedCraftTypesForHyperspaceSign = HashSet<CraftType>()
-    val allowedCraftTypesForJumpCommand = HashSet<CraftType>()
+    lateinit var allowedCraftTypesForHyperspaceSign : Set<String>
+    lateinit var allowedCraftTypesForJumpCommand : Set<String>
+    var extraMassShadowRangeOfPlanets = 0
+    var extraMassShadowRangeOfStars = 0
     val maxHyperdrivesOnCraft = HashMap<String, Int>()
+    val maxGravityWellsOnCraft = HashMap<String, Int>()
 
     override fun enable() {
         saveDefaultConfig()
@@ -56,8 +59,12 @@ class HyperspaceExpansion : Expansion(), SelectionSupported {
         hypermatterName = config.getString("Hypermatter.name", "")!!
         if (config.contains("Max hyperdrives on craft"))
             config.getConfigurationSection("Max hyperdrives on craft")!!.getValues(false).forEach { t, u -> maxHyperdrivesOnCraft.put(t, u as Int) }
-        config.getStringList("Allowed craft types for hyperspace sign").forEach { s -> allowedCraftTypesForHyperspaceSign.add(CraftManager.getInstance().getCraftTypeFromString(s)) }
-        config.getStringList("Allowed craft types for jump command").forEach { s -> allowedCraftTypesForJumpCommand.add(CraftManager.getInstance().getCraftTypeFromString(s)) }
+        if (config.contains("Max gravity wells on craft"))
+            config.getConfigurationSection("Max gravity wells on craft")!!.getValues(false).forEach { t, u -> maxGravityWellsOnCraft.put(t, u as Int) }
+        allowedCraftTypesForHyperspaceSign = config.getStringList("Allowed craft types for hyperspace sign").toSet()
+        allowedCraftTypesForJumpCommand = config.getStringList("Allowed craft types for jump command").toSet()
+        extraMassShadowRangeOfPlanets = config.getInt("Extra mass shadow range of planets", 0)
+        extraMassShadowRangeOfStars = config.getInt("Extra mass shadow range of stars", 0)
         plugin.getCommand("hyperspace")!!.setExecutor(HyperspaceCommand)
         plugin.getCommand("hyperdrive")!!.setExecutor(HyperdriveCommand)
         plugin.getCommand("jump")!!.setExecutor(JumpCommand)

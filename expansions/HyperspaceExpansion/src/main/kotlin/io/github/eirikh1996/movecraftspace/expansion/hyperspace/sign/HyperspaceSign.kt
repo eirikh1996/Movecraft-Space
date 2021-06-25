@@ -74,7 +74,7 @@ object HyperspaceSign : Listener {
             e.player.sendMessage(COMMAND_PREFIX + ERROR + "You can only use hyperspace travel in space worlds")
             return
         }
-        if (!HyperspaceExpansion.instance.allowedCraftTypesForHyperspaceSign.contains(craft.type)) {
+        if (!HyperspaceExpansion.instance.allowedCraftTypesForHyperspaceSign.contains(craft.type.craftName)) {
             e.player.sendMessage(COMMAND_PREFIX + ERROR + "Craft type " + craft.type.craftName + " is not allowed for hyperspace travel using sign")
             return
         }
