@@ -67,7 +67,11 @@ data class MSBlock(val type : Material, val data : Any, val facing : BlockFace =
             val type = Material.getMaterial(map["type"] as String)!!
             return MSBlock(
                 type,
-                if (Settings.IsLegacy) data.toString().toByte() else if (data is Int) BlockUtils.blockDataFromMaterialandLegacyData(type, data.toByte()) else Bukkit.createBlockData(data as String),
+                if (Settings.IsLegacy)
+                    data.toString().toByte()
+                else if (!Settings.IsLegacy && data is Int)
+                    BlockUtils.blockDataFromMaterialandLegacyData(type, data.toByte())
+                else Bukkit.createBlockData(data as String),
                 BlockFace.valueOf(map["facing"] as String)
             )
         }

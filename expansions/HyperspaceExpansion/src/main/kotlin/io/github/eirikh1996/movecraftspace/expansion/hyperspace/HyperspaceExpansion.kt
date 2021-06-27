@@ -1,5 +1,6 @@
 package io.github.eirikh1996.movecraftspace.expansion.hyperspace
 
+import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.expansion.Expansion
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionState
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.command.GravityWellCommand
@@ -11,12 +12,14 @@ import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.Hyperdr
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.HyperspaceManager
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.sign.HyperspaceSign
 import io.github.eirikh1996.movecraftspace.expansion.selection.SelectionSupported
+import io.github.eirikh1996.movecraftspace.expansion.selection.Structure
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
 import net.countercraft.movecraft.craft.CraftManager
 import net.countercraft.movecraft.craft.CraftType
 import org.bukkit.*
 import org.bukkit.Bukkit.getPluginManager
 import org.bukkit.inventory.ItemStack
+import java.io.File
 
 class HyperspaceExpansion : Expansion(), SelectionSupported {
     lateinit var hyperspaceWorld : World
@@ -49,6 +52,23 @@ class HyperspaceExpansion : Expansion(), SelectionSupported {
             state = ExpansionState.DISABLED
             return
         }
+        val packgeName = plugin.server.javaClass.`package`.name
+        val is1_11 = packgeName.substring(packgeName.lastIndexOf(".") + 1).split("_")[1].toInt() <= 11
+        var sourcePathPrefix = (if (is1_11) "1_11/" else if (Settings.IsLegacy) "1_12/" else "")
+        saveResource(sourcePathPrefix + "beaconstructure.yml", false, "beaconstructure.yml")
+        sourcePathPrefix = (if (Settings.IsLegacy) "1_12/" else "")
+        if (!File(dataFolder, "hyperdrives").exists()) {
+            for (i in 1..2) {
+                saveResource(sourcePathPrefix + "hyperdrives/ExampleDrive" + i + ".yml", false, "hyperdrives/ExampleDrive" + i + ".yml")
+            }
+
+        }
+        if (!File(dataFolder, "gravitywells").exists()) {
+            for (i in 1..2) {
+                saveResource(sourcePathPrefix + "gravitywells/ExampleWell" + i + ".yml", false, "gravitywells/ExampleWell" + i + ".yml")
+            }
+
+        }
         HyperspaceManager.loadFile()
         hyperspaceWorld = hsWorld
         hyperspaceEnterSound = Sound.valueOf(config.getString("Hyperspace enter sound", "ENTITY_ENDERMAN_TELEPORT")!!)
@@ -71,6 +91,7 @@ class HyperspaceExpansion : Expansion(), SelectionSupported {
         plugin.getCommand("gravitywell")!!.setExecutor(GravityWellCommand)
         HyperspaceManager.runTaskTimerAsynchronously(plugin, 0, 1)
         getPluginManager().registerEvents(HyperspaceManager, plugin)
+        logMessage(LogMessageType.INFO, Structure::class.java.classLoader.toString())
         HyperdriveManager.loadHyperdrives()
         getPluginManager().registerEvents(HyperdriveManager, plugin)
         GravityWellManager.loadGravityWells()

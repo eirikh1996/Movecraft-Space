@@ -1,5 +1,8 @@
 package io.github.eirikh1996.movecraftspace.expansion
 
+import io.github.eirikh1996.movecraftspace.event.expansion.ExpansionDisableEvent
+import io.github.eirikh1996.movecraftspace.event.expansion.ExpansionEnableEvent
+import io.github.eirikh1996.movecraftspace.event.expansion.ExpansionLoadEvent
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -49,12 +52,15 @@ abstract class Expansion {
         field = state
         if (state == ExpansionState.ENABLED) {
             logMessage(LogMessageType.INFO, "Enabling expansion " + name)
+            Bukkit.getPluginManager().callEvent(ExpansionEnableEvent(this))
             enable()
         } else if (state == ExpansionState.DISABLED) {
             logMessage(LogMessageType.INFO, "Disabling expansion " + name)
+            Bukkit.getPluginManager().callEvent(ExpansionDisableEvent(this))
             disable()
         } else if (state == ExpansionState.LOADED) {
             logMessage(LogMessageType.INFO, "Loading expansion " + name)
+            Bukkit.getPluginManager().callEvent(ExpansionLoadEvent(this))
             load()
         }
     }
@@ -114,7 +120,16 @@ abstract class Expansion {
         saveResource("config.yml", false)
         config.load(File(dataFolder, "config.yml"))
     }
-    fun saveResource(path : String, replace : Boolean) {
+
+    /**
+     *
+     * Saves a resource stored at the given path
+     *
+     * @param path String
+     * @param replace Boolean
+     * @param targetPath String
+     */
+    fun saveResource(path : String, replace : Boolean = false, targetPath : String = path) {
         if (path.length == 0) {
             return
         }
@@ -125,21 +140,28 @@ abstract class Expansion {
         }
         if (!dataFolder.exists())
             dataFolder.mkdirs()
-        val file = File(dataFolder, path)
+        val file = File(dataFolder, targetPath)
         if (file.exists() && !replace) {
             logMessage(LogMessageType.CRITICAL,"Resource " + path + "already exists at target location")
             return
         }
-        val buffer = ByteArray(input.available())
-        input.read(buffer)
+        val buffer = ByteArray(1024)
         val output = FileOutputStream(file)
-        output.write(buffer)
+        var len : Int
+        while ((input.read(buffer).also { len = it }) > 0) {
+            output.write(buffer, 0, len)
+        }
         input.close()
         output.close()
     }
 
     fun getResource(path : String) : InputStream? {
-        return classLoader.getResourceAsStream(path)
+        val url = classLoader.getResource(path)
+        if (url == null)
+            return null
+        val connection = url.openConnection()
+        connection.useCaches = false
+        return connection.getInputStream()
     }
     open fun load() {
 

@@ -1,20 +1,22 @@
 package io.github.eirikh1996.movecraftspace.utils
 
+import io.github.eirikh1996.movecraftspace.Settings
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import org.bukkit.block.data.BlockData
+import java.lang.Exception
 import java.lang.reflect.Method
 import kotlin.math.PI
 
 object BlockUtils {
     val iBlockData : Class<*>
     val craftMagicNumbers : Class<*>
-    val craftBlockData : Class<*>
-    val getBlock : Method
-    val fromData : Method
-    val getState : Method
-    val toLegacyData : Method
+    lateinit var craftBlockData : Class<*>
+    lateinit var getBlock : Method
+    lateinit var fromData : Method
+    lateinit var getState : Method
+    lateinit var toLegacyData : Method
     val faces = arrayOf(BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST)
 
     init {
@@ -22,11 +24,17 @@ object BlockUtils {
         val version = packageName.substring(packageName.lastIndexOf(".") + 1)
         iBlockData = Class.forName("net.minecraft." + if (version.split("_")[1].toInt() >= 17) "world.level.block.state"  else "server." + version + ".IBlockData")
         craftMagicNumbers = Class.forName("org.bukkit.craftbukkit." + version + ".util.CraftMagicNumbers")
-        craftBlockData = Class.forName("org.bukkit.craftbukkit." + version + ".block.data.CraftBlockData")
-        getBlock = craftMagicNumbers.getDeclaredMethod("getBlock", Material::class.java, Byte::class.java)
-        fromData = craftBlockData.getDeclaredMethod("fromData", iBlockData)
-        getState = craftBlockData.getDeclaredMethod("getState")
-        toLegacyData = craftMagicNumbers.getDeclaredMethod("toLegacyData", iBlockData)
+        try {
+            if (!Settings.IsLegacy) {
+                craftBlockData = Class.forName("org.bukkit.craftbukkit." + version + ".block.data.CraftBlockData")
+                fromData = craftBlockData.getDeclaredMethod("fromData", iBlockData)
+                getState = craftBlockData.getDeclaredMethod("getState")
+                getBlock = craftMagicNumbers.getDeclaredMethod("getBlock", Material::class.java, Byte::class.java)
+                toLegacyData = craftMagicNumbers.getDeclaredMethod("toLegacyData", iBlockData)
+            }
+        } catch (e : Exception) {}
+
+
     }
 
     fun blockDataFromMaterialandLegacyData(type : Material, data : Byte) : BlockData {

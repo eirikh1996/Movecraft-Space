@@ -107,17 +107,13 @@ object ExpansionManager : Iterable<Expansion> {
                 continue
             }
             val ex = classLoader.expansion
-            val dependField = PluginDescriptionFile::class.java.getDeclaredField("depend")
-            dependField.isAccessible = true
-            val dependList = dependField.get(pl.description) as List<String>
-            val newDependList = ArrayList(dependList)
-            newDependList.addAll(ex.depend)
-            dependField.set(pl.description, ImmutableList.copyOf(newDependList))
             val softDependField = PluginDescriptionFile::class.java.getDeclaredField("softDepend")
             softDependField.isAccessible = true
-            val newSoftDependList = ArrayList(dependList)
+            val softDependList = softDependField.get(pl.description) as List<String>
+            val newSoftDependList = ArrayList(softDependList)
+            newSoftDependList.addAll(ex.depend)
             newSoftDependList.addAll(ex.softdepend)
-            softDependField.set(pl.description, ImmutableList.copyOf(newDependList))
+            softDependField.set(pl.description, ImmutableList.copyOf(newSoftDependList))
             val missingDependencies = HashSet<String>()
             val disabledDependencies = HashSet<String>()
             if (!missingDependencies.isEmpty()) {

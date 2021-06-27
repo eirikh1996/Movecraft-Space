@@ -91,21 +91,14 @@ object GravityWellCommand : TabExecutor {
                 sender.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Gravity well structures can have maximum one sign")
                 return true
             }
-            val blockMap = HashMap<ImmutableVector, MSBlock>()
-            for (loc in sel) {
-                val block = loc.toLocation(sel.world).block
-                if (block.type.name.endsWith("AIR"))
-                    continue
-                blockMap.put(loc.subtract(signLoc), MSBlock.fromBlock(block))
-
-            }
             val gravityWell : GravityWell
             try {
                 val allowedOnCraftTypes = HashSet<CraftType>()
                 if (args.size > 4) {
                     args.copyOfRange(4, args.size - 1).forEach { s -> allowedOnCraftTypes.add(CraftManager.getInstance().getCraftTypeFromString(s)) }
                 }
-                gravityWell = GravityWell(args[1], blockMap, args[2].toInt(), allowedOnCraftTypes)
+                gravityWell = GravityWell(args[1], args[2].toInt(), allowedOnCraftTypes)
+                gravityWell.copy(sel, signLoc)
             } catch (e : NumberFormatException) {
                 sender.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + args[2] + " is not a number")
                 return true
@@ -132,16 +125,7 @@ object GravityWellCommand : TabExecutor {
                 sender.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Hyperdrive " + args[1] + " does not exist")
                 return true
             }
-            for (vec in hd.blocks.keys) {
-                val block = hd.blocks[vec]!!
-                val b = sender.world.getBlockAt(sender.location.add(vec.toLocation(sender.world)))
-                if (Settings.IsLegacy) {
-                    b.type = block.type
-                    Block::class.java.getDeclaredMethod("getData", Byte::class.java).invoke(b, block.data)
-                } else {
-                    b.blockData = block.data as BlockData
-                }
-            }
+            hd.paste(sender.location)
         }
         return true
     }

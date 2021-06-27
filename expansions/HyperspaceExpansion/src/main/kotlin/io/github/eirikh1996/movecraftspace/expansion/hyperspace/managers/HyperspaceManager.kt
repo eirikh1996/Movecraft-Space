@@ -132,7 +132,12 @@ object HyperspaceManager : BukkitRunnable(), Listener {
                     }
                 })
                 entry.craft.translate(entry.destination.world, coords[0] - midPoint.x, coords[1] - midPoint.y, coords[2] - midPoint.z)
-                iterator.remove()
+                try {
+                    iterator.remove()
+                } catch (t : Throwable) {
+
+                }
+
                 processingEntries.remove(entry.craft)
 
                 entry.craft.notificationPlayer!!.playSound(entry.craft.notificationPlayer!!.location, HyperspaceExpansion.instance.hyperspaceExitSound, 3f, 0f)
@@ -348,6 +353,7 @@ object HyperspaceManager : BukkitRunnable(), Listener {
                 cancel()
                 val hyperspaceWorld = HyperspaceExpansion.instance.hyperspaceWorld
                 val bounds = ExpansionManager.worldBoundrary(hyperspaceWorld)
+                Bukkit.broadcastMessage(bounds.toString())
                 val minX = (bounds[0] + (hitBox.xLength / 2)) + 10
                 val maxX = (bounds[1] - (hitBox.xLength / 2)) - 10
                 val minZ = (bounds[2] + (hitBox.zLength / 2)) + 10

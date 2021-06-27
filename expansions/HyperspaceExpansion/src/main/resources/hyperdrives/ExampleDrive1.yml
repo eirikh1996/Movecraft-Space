@@ -1,0 +1,46 @@
+name: ExampleDrive1
+maxRange: 5000
+warmupTime: 60
+blocks:
+- x: 0
+  y: 0
+  facing: NORTH
+  z: 0
+  data: minecraft:oak_wall_sign[facing=north,waterlogged=false]
+  type: OAK_WALL_SIGN
+- x: 0
+  y: 0
+  facing: SELF
+  z: 1
+  data: minecraft:quartz_block
+  type: QUARTZ_BLOCK
+- x: 1
+  y: 0
+  facing: SELF
+  z: 1
+  data: minecraft:glass
+  type: GLASS
+- x: 1
+  y: -1
+  facing: WEST
+  z: 1
+  data: minecraft:hopper[enabled=true,facing=west]
+  type: HOPPER
+- x: 0
+  y: -1
+  facing: SELF
+  z: 1
+  data: minecraft:note_block[instrument=harp,note=0,powered=false]
+  type: NOTE_BLOCK
+- x: -1
+  y: -1
+  facing: EAST
+  z: 1
+  data: minecraft:hopper[enabled=true,facing=east]
+  type: HOPPER
+- x: -1
+  y: 0
+  facing: SELF
+  z: 1
+  data: minecraft:glass
+  type: GLASS

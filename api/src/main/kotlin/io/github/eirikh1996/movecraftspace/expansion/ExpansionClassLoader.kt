@@ -2,18 +2,14 @@ package io.github.eirikh1996.movecraftspace.expansion
 
 import com.google.common.io.ByteStreams
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionManager.classCache
-import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
-import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 import java.net.URL
 import java.net.URLClassLoader
 import java.security.CodeSource
 import java.util.jar.JarFile
-import java.util.logging.Logger
 
 
 class ExpansionClassLoader constructor(parent : ClassLoader, val desc : YamlConfiguration, val datafolder : File, jar : File, val plugin: JavaPlugin) : URLClassLoader(arrayOf(jar.toURI().toURL()), parent) {
@@ -65,6 +61,11 @@ class ExpansionClassLoader constructor(parent : ClassLoader, val desc : YamlConf
             val signers = entry.codeSigners
             val source = CodeSource(url, signers)
             result = defineClass(name, classBytes, 0, classBytes.size, source)
+        }
+        if (result == null) {
+            val findClassMethod = plugin.javaClass.classLoader.javaClass.getDeclaredMethod("findClass", String::class.java)
+            findClassMethod.isAccessible = true
+            result = findClassMethod.invoke(plugin.javaClass.classLoader, path) as Class<*>?
         }
 
         if (result == null) {

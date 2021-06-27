@@ -32,12 +32,12 @@ class MovecraftSpace : JavaPlugin() {
         MSUtils.displayTitle()
         saveDefaultConfig()
         ConfigHolder.config = config
-        ExpansionManager.enableExpansions()
-
-
         val packageName = server.javaClass.`package`.name
         val ver = packageName.substring(packageName.lastIndexOf(".") + 1).split("_")[1].toInt()
         Settings.IsLegacy = ver <= 12
+
+
+
         PlanetCollection.pl = this
         PlanetCollection.loadPlanets()
         StarCollection.pl = this
@@ -63,6 +63,11 @@ class MovecraftSpace : JavaPlugin() {
             }
 
         }.runTaskTimer(this, 0, 1)
+        object : BukkitRunnable() {
+            override fun run() {
+                ExpansionManager.enableExpansions()
+            }
+        }.runTaskLater(this, 10)
         server.pluginManager.registerEvents(UpdateManager, this)
     }
 

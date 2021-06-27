@@ -2,6 +2,7 @@ package io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects
 
 import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.HyperspaceExpansion
+import io.github.eirikh1996.movecraftspace.expansion.selection.Structure
 import io.github.eirikh1996.movecraftspace.objects.MSBlock
 import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
 import io.github.eirikh1996.movecraftspace.utils.MSUtils
@@ -15,7 +16,7 @@ import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.inventory.InventoryHolder
 import java.io.File
 
-data class Hyperdrive(val name : String, val blocks : Map<ImmutableVector, MSBlock>, val maxRange : Int, val warmupTime : Int, val allowedOnCraftTypes : Set<CraftType> = HashSet()) {
+data class Hyperdrive(val name : String, val maxRange : Int, val warmupTime : Int, val allowedOnCraftTypes : Set<CraftType> = HashSet()) : Structure() {
 
     fun getInventoryBlocks(sign: Sign) : List<InventoryHolder> {
         val inventoryBlocks = ArrayList<InventoryHolder>()
@@ -107,7 +108,9 @@ data class Hyperdrive(val name : String, val blocks : Map<ImmutableVector, MSBlo
             if (yaml.contains("allowedOnCraftTypes")) {
                 yaml.getStringList("allowedOnCraftTypes").forEach { s -> allowedOnCraftTypes.add(CraftManager.getInstance().getCraftTypeFromString(s)) }
             }
-            return Hyperdrive(name, blockMap, range, warmupTime, allowedOnCraftTypes)
+            val hd =  Hyperdrive(name, range, warmupTime, allowedOnCraftTypes)
+            hd.blocks = blockMap
+            return hd
         }
     }
 

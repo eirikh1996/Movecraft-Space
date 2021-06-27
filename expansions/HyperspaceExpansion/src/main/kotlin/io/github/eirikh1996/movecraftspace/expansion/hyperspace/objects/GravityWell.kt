@@ -2,6 +2,7 @@ package io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects
 
 import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.HyperspaceExpansion
+import io.github.eirikh1996.movecraftspace.expansion.selection.Structure
 import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
 import io.github.eirikh1996.movecraftspace.objects.MSBlock
 import io.github.eirikh1996.movecraftspace.utils.MSUtils
@@ -13,7 +14,7 @@ import org.bukkit.block.data.type.WallSign
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
 
-data class GravityWell(val name : String, val blocks : Map<ImmutableVector, MSBlock>, val range : Int, val allowedOnCraftTypes : Set<CraftType> = HashSet()) {
+data class GravityWell(val name : String, val range : Int, val allowedOnCraftTypes : Set<CraftType> = HashSet()) : Structure() {
 
     fun getStructure(sign: Sign) : List<Block> {
         val face = if (Settings.IsLegacy) {
@@ -83,7 +84,9 @@ data class GravityWell(val name : String, val blocks : Map<ImmutableVector, MSBl
             if (yaml.contains("allowedOnCraftTypes")) {
                 yaml.getStringList("allowedOnCraftTypes").forEach { s -> allowedOnCraftTypes.add(CraftManager.getInstance().getCraftTypeFromString(s)) }
             }
-            return GravityWell(name, blockMap, range, allowedOnCraftTypes)
+            val gw = GravityWell(name, range, allowedOnCraftTypes)
+            gw.blocks = blockMap
+            return gw
         }
     }
 }
