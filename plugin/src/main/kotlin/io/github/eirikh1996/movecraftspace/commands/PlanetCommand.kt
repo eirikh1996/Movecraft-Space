@@ -25,6 +25,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Bukkit.getPluginManager
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.block.Block
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabExecutor
@@ -98,7 +99,7 @@ object PlanetCommand : TabExecutor {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "No stars nearby. Create one using /star create <name>")
                 return true
             }
-            var exitHeight =  sender.world.maxHeight - 5
+            var exitHeight =  destination.maxHeight - 5
             var orbitTime = 10
             var surface : Material? = Material.STONE
             var data = 0.toByte()
@@ -152,8 +153,17 @@ object PlanetCommand : TabExecutor {
             } else {
                 nearestStar.loc
             }
-            pLoc.y = 127.5
-            val planet = Planet(ImmutableVector.fromLocation(pLoc), orbitCenter, radius, pLoc.world!!, destination, orbitTime, exitHeight)
+            val space = pLoc.world!!
+            var height = space.maxHeight.toDouble()
+            if (Settings.IsV1_17) {
+                height -= space.minHeight.toDouble()
+            }
+            height /= 2.0
+            if (Settings.IsV1_17)
+                height += space.minHeight.toDouble()
+            height += .5
+            pLoc.y = height
+            val planet = Planet(ImmutableVector.fromLocation(pLoc), orbitCenter, radius, space, destination, orbitTime, exitHeight)
             if (PlanetCollection.getPlanetByName(args[1]) != null) {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "Planet " + args[1] + " already exists!")
                 return true
@@ -210,8 +220,10 @@ object PlanetCommand : TabExecutor {
                         cancel()
                     for (i in 0..size) {
                         val loc = sphere.pop().toLocation(planet.space)
-
-                        setBlock(loc, surface!!, if (Settings.IsLegacy) data else Bukkit.createBlockData(surface!!))
+                        val b = loc.block
+                        b.type = surface!!
+                        if (Settings.IsLegacy)
+                            Block::class.java.getDeclaredMethod("setData", Byte::class.java).invoke(b, data)
                     }
                 }
             }.runTaskTimer(MovecraftSpace.instance,0,1)

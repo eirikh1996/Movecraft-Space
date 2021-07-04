@@ -22,7 +22,7 @@ object BlockUtils {
     init {
         val packageName = Bukkit.getServer().javaClass.`package`.name
         val version = packageName.substring(packageName.lastIndexOf(".") + 1)
-        iBlockData = Class.forName("net.minecraft." + if (version.split("_")[1].toInt() >= 17) "world.level.block.state"  else "server." + version + ".IBlockData")
+        iBlockData = Class.forName("net.minecraft." + (if (Settings.IsV1_17) "world.level.block.state"  else "server." + version) + ".IBlockData")
         craftMagicNumbers = Class.forName("org.bukkit.craftbukkit." + version + ".util.CraftMagicNumbers")
         try {
             if (!Settings.IsLegacy) {

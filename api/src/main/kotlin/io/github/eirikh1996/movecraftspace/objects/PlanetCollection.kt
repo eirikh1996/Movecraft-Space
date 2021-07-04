@@ -1,5 +1,6 @@
 package io.github.eirikh1996.movecraftspace.objects
 
+import io.github.eirikh1996.movecraftspace.event.planet.PlanetRemoveEvent
 import net.countercraft.movecraft.MovecraftChunk
 import org.bukkit.Bukkit
 import org.bukkit.Bukkit.broadcastMessage
@@ -85,6 +86,7 @@ object PlanetCollection : Iterable<Planet> {
 
     fun remove (planet: Planet) {
         planets.remove(planet)
+        Bukkit.getPluginManager().callEvent(PlanetRemoveEvent(planet))
         saveFile()
     }
 

@@ -9,6 +9,7 @@ import io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects.Hyperspa
 import io.github.eirikh1996.movecraftspace.expansion.selection.SelectionManager
 import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
 import io.github.eirikh1996.movecraftspace.objects.MSBlock
+import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
 import io.github.eirikh1996.movecraftspace.objects.StarCollection
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_NO_PERMISSION
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
@@ -122,10 +123,23 @@ object HyperspaceCommand : TabExecutor {
                 return true
             }
             if (p3[1].equals("create", true)) {
+                if (!PlanetCollection.any { p -> p.space.equals(p0.world) } && !StarCollection.any { s -> s.space.equals(p0.world) }) {
+                    p0.sendMessage(COMMAND_PREFIX + ERROR + "Beacons can only be created in space worlds")
+                    return true
+                }
+                val space = p0.world
+                var height = space.maxHeight.toDouble()
+                if (Settings.IsV1_17) {
+                    height -= space.minHeight.toDouble()
+                }
+                height /= 2.0
+                if (Settings.IsV1_17)
+                    height += space.minHeight.toDouble()
+                height += .5
                 if (locationMap.containsKey(p0.uniqueId)) {
                     val origin = locationMap.remove(p0.uniqueId)!!
                     val second = p0.location.clone()
-                    second.y = 127.0
+                    second.y = height
                     val originStar = StarCollection.closestStar(origin)!!
                     val destinationStar = StarCollection.closestStar(second)
                     val maxDistance = HyperspaceExpansion.instance.config.getInt("Max distance from star systems", 3000)
@@ -145,7 +159,7 @@ object HyperspaceCommand : TabExecutor {
                     return true
                 }
                 val origin = p0.location.clone()
-                origin.y = 127.0
+                origin.y = height
                 val originStar = StarCollection.closestStar(origin)
                 if (originStar == null) {
                     p0.sendMessage(COMMAND_PREFIX + ERROR + "No stars are present in this space world")

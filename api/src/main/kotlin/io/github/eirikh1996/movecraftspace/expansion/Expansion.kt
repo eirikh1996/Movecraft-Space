@@ -129,22 +129,26 @@ abstract class Expansion {
      * @param replace Boolean
      * @param targetPath String
      */
-    fun saveResource(path : String, replace : Boolean = false, targetPath : String = path) {
+    fun saveResource( path : String, replace : Boolean = false, targetPath : String = path.replace("\\", "/")) {
         if (path.length == 0) {
             return
         }
-        val input = getResource(path)
+        val input = getResource(path.replace("\\", "/"))
         if (input == null) {
-            logMessage(LogMessageType.CRITICAL,"Resource " + path + "does not exist")
+            logMessage(LogMessageType.CRITICAL,"Resource " + path.replace("\\", "/") + "does not exist")
             return
         }
         if (!dataFolder.exists())
             dataFolder.mkdirs()
-        val file = File(dataFolder, targetPath)
+        val file = File(dataFolder, targetPath.replace("\\", "/"))
         if (file.exists() && !replace) {
-            logMessage(LogMessageType.CRITICAL,"Resource " + path + "already exists at target location")
+            logMessage(LogMessageType.CRITICAL,"Resource " + path.replace("\\", "/") + "already exists at target location")
             return
         }
+        val lastIndex = targetPath.replace("\\", "/").lastIndexOf("/")
+        val outDir = File(dataFolder.absolutePath, targetPath.replace("\\", "/").substring(0, if (lastIndex >= 0) lastIndex else 0))
+        if (!outDir.exists())
+            outDir.mkdirs()
         val buffer = ByteArray(1024)
         val output = FileOutputStream(file)
         var len : Int
@@ -156,7 +160,7 @@ abstract class Expansion {
     }
 
     fun getResource(path : String) : InputStream? {
-        val url = classLoader.getResource(path)
+        val url = classLoader.getResource(path.replace("\\", "/"))
         if (url == null)
             return null
         val connection = url.openConnection()

@@ -7,6 +7,8 @@ import net.countercraft.movecraft.Movecraft
 import net.countercraft.movecraft.MovecraftLocation
 import net.countercraft.movecraft.WorldHandler
 import net.countercraft.movecraft.craft.Craft
+import net.countercraft.movecraft.utils.BitmapHitBox
+import net.countercraft.movecraft.utils.HitBox
 import net.countercraft.movecraft.utils.MathUtils
 import org.bukkit.*
 import org.bukkit.Bukkit.getConsoleSender
@@ -60,9 +62,9 @@ object MSUtils {
 
     fun displayTitle() {
         getConsoleSender().sendMessage(" __      __                                                ___    _            ____")
-        getConsoleSender().sendMessage("|  \\    / |                                               / __\\  | |          / __ \\ ")
-        getConsoleSender().sendMessage("|   \\  /  |                                               | |    | |         / /  \\_\\ ")
-        getConsoleSender().sendMessage("|    \\/   |   __  _  _     ___    __   __  ___    ____   _| |_  _| |_   ___  | |__    _  ___   ____      __    ___")
+        getConsoleSender().sendMessage("|  \\    /  |                                               / __\\  | |          / __ \\ ")
+        getConsoleSender().sendMessage("|   \\  /   |                                               | |    | |         / /  \\_\\ ")
+        getConsoleSender().sendMessage("|    \\/    |   __  _  _     ___    __   __  ___    ____   _| |_  _| |_   ___  | |__    _  ___   ____      __    ___")
         getConsoleSender().sendMessage("| |\\    /| | /  \\ | || |  / _ \\  /  \\ |  |/ _ \\  /___ \\ |_   _||_   _| |___| \\\\__ \\  | |/ _ \\ /___  \\   /  \\  / _ \\ ")
         getConsoleSender().sendMessage("| | \\  / | |/ /\\ \\| || | / /_\\_\\/ /\\_\\|    / \\_\\ ____| |  | |    | |             \\ \\ |   / \\ | ____| | / /\\_\\/ /_\\_\\ ")
         getConsoleSender().sendMessage("| |  \\/  | || || || || || |   __| | __|   /     /  __  |  | |    | |         __   | ||   | | |/  __  | | | __| |  __" )
@@ -73,6 +75,8 @@ object MSUtils {
         getConsoleSender().sendMessage("                                                                                     |_|")
 
     }
+
+
 
     fun setBlock(loc : Location, type : Material, data : Any) {
         val wh = Movecraft.getInstance().worldHandler

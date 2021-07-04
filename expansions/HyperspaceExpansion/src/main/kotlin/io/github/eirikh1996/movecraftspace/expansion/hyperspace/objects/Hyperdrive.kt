@@ -16,7 +16,7 @@ import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.inventory.InventoryHolder
 import java.io.File
 
-data class Hyperdrive(val name : String, val maxRange : Int, val warmupTime : Int, val allowedOnCraftTypes : Set<CraftType> = HashSet()) : Structure() {
+data class Hyperdrive(val name : String, val maxRange : Int, val warmupTime : Int, val allowedOnCraftTypes : Set<String> = HashSet()) : Structure() {
 
     fun getInventoryBlocks(sign: Sign) : List<InventoryHolder> {
         val inventoryBlocks = ArrayList<InventoryHolder>()
@@ -83,9 +83,7 @@ data class Hyperdrive(val name : String, val maxRange : Int, val warmupTime : In
 
         }
         if (!allowedOnCraftTypes.isEmpty()) {
-            val list = ArrayList<String>()
-            allowedOnCraftTypes.forEach { t -> list.add(t.craftName) }
-            yaml.set("allowedOnCraftTypes", list)
+            yaml.set("allowedOnCraftTypes", allowedOnCraftTypes)
         }
         yaml.set("blocks", mapList)
         yaml.save(hyperdriveFile)
@@ -104,10 +102,8 @@ data class Hyperdrive(val name : String, val maxRange : Int, val warmupTime : In
             for (block in blocks) {
                 blockMap.put(ImmutableVector.deserialize(block), MSBlock.deserialize(block))
             }
-            val allowedOnCraftTypes = HashSet<CraftType>()
-            if (yaml.contains("allowedOnCraftTypes")) {
-                yaml.getStringList("allowedOnCraftTypes").forEach { s -> allowedOnCraftTypes.add(CraftManager.getInstance().getCraftTypeFromString(s)) }
-            }
+            val allowedOnCraftTypes = yaml.getStringList("allowedOnCraftTypes").toSet()
+
             val hd =  Hyperdrive(name, range, warmupTime, allowedOnCraftTypes)
             hd.blocks = blockMap
             return hd

@@ -89,7 +89,7 @@ object HyperdriveManager : Listener, Iterable<Hyperdrive> {
             return
         }
         for (hd in hyperdrivesOnCraft.values) {
-            if (!hd.allowedOnCraftTypes.isEmpty() && !hd.allowedOnCraftTypes.contains(event.craft.type)) {
+            if (!hd.allowedOnCraftTypes.isEmpty() && !hd.allowedOnCraftTypes.contains(event.craft.type.craftName)) {
                 event.failMessage = COMMAND_PREFIX + ERROR + "Hyperdrive " + hd.name + " is not allowed to use on craft type " + event.craft.type.craftName
                 event.isCancelled
                 return

@@ -35,6 +35,7 @@ class MovecraftSpace : JavaPlugin() {
         val packageName = server.javaClass.`package`.name
         val ver = packageName.substring(packageName.lastIndexOf(".") + 1).split("_")[1].toInt()
         Settings.IsLegacy = ver <= 12
+        Settings.IsV1_17 = ver >= 17
 
 
 

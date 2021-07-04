@@ -120,7 +120,7 @@ object GravityWellManager : Iterable<GravityWell>, Listener {
     fun onDetect(event : CraftDetectEvent) {
         val gravityWellsOnCraft = getGravityWellsOnCraft(event.craft)
         for (entry in gravityWellsOnCraft) {
-            if (entry.value.allowedOnCraftTypes.contains(event.craft.type)) {
+            if (entry.value.allowedOnCraftTypes.contains(event.craft.type.craftName)) {
                 event.failMessage = COMMAND_PREFIX + ERROR + "Gravity well " + entry.value.name + " is not allowed on craft type " + event.craft.type.craftName
                 event.isCancelled = true
                 return
@@ -192,6 +192,24 @@ object GravityWellManager : Iterable<GravityWell>, Listener {
             break
         }
         return foundGravityWell
+    }
+
+    fun craftHasActiveGravityWell(craft: Craft) : Boolean {
+        for (ml in craft.hitBox) {
+            val b = ml.toBukkit(craft.w).block
+            if (!b.type.name.endsWith("WALL_SIGN"))
+                continue
+            val sign = b.state as Sign
+            if (!sign.getLine(0).equals(GRAVITY_WELL_HEADER))
+                continue
+            val gravityWell = getGravityWell(sign)
+            if (gravityWell == null)
+                continue
+            if (!sign.getLine(3).equals(GRAVITY_WELL_ACTIVE_TEXT))
+                continue
+            return true
+        }
+        return false
     }
 
     fun getActiveGravityWellAt(loc : Location, craftToExclude : Craft? = null): GravityWell? {

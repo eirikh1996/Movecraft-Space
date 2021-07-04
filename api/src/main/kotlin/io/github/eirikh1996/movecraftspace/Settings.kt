@@ -12,6 +12,7 @@ object Settings {
     val MaxMoonSpacing : Int get() { return ConfigHolder.config.getInt("MaxMoonSpacing", 3500) }
     val AllowPlayersTeleportationToPlanets : Boolean get() { return ConfigHolder.config.getBoolean("AllowPlayersTeleportationToPlanets", true) }
     var IsLegacy = false
+    var IsV1_17 = false
     val PlanetaryRotationCheckCooldown : Int get() { return ConfigHolder.config.getInt("PlanetaryRotationCheckCooldown", 10) }
     val ExplodeSinkingCraftsInWorlds : Set<String> get() { return ConfigHolder.config.getStringList("ExplodeSinkingCraftsInWorlds").toHashSet() }
     val RotatePlanets : Boolean get() { return ConfigHolder.config.getBoolean("RotatePlanets", true) }

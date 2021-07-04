@@ -14,7 +14,7 @@ import org.bukkit.block.data.type.WallSign
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
 
-data class GravityWell(val name : String, val range : Int, val allowedOnCraftTypes : Set<CraftType> = HashSet()) : Structure() {
+data class GravityWell(val name : String, val range : Int, val allowedOnCraftTypes : Set<String> = HashSet()) : Structure() {
 
     fun getStructure(sign: Sign) : List<Block> {
         val face = if (Settings.IsLegacy) {
@@ -51,7 +51,7 @@ data class GravityWell(val name : String, val range : Int, val allowedOnCraftTyp
         }
         if (!allowedOnCraftTypes.isEmpty()) {
             val list = ArrayList<String>()
-            allowedOnCraftTypes.forEach { t -> list.add(t.craftName) }
+            allowedOnCraftTypes.forEach { t -> list.add(t) }
             yaml.set("allowedOnCraftTypes", list)
         }
         yaml.set("blocks", mapList)
@@ -80,10 +80,7 @@ data class GravityWell(val name : String, val range : Int, val allowedOnCraftTyp
             for (block in blocks) {
                 blockMap.put(ImmutableVector.deserialize(block), MSBlock.deserialize(block))
             }
-            val allowedOnCraftTypes = HashSet<CraftType>()
-            if (yaml.contains("allowedOnCraftTypes")) {
-                yaml.getStringList("allowedOnCraftTypes").forEach { s -> allowedOnCraftTypes.add(CraftManager.getInstance().getCraftTypeFromString(s)) }
-            }
+            val allowedOnCraftTypes = yaml.getStringList("allowedOnCraftTypes").toSet()
             val gw = GravityWell(name, range, allowedOnCraftTypes)
             gw.blocks = blockMap
             return gw

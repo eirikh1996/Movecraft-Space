@@ -93,9 +93,9 @@ object GravityWellCommand : TabExecutor {
             }
             val gravityWell : GravityWell
             try {
-                val allowedOnCraftTypes = HashSet<CraftType>()
+                val allowedOnCraftTypes = HashSet<String>()
                 if (args.size > 4) {
-                    args.copyOfRange(4, args.size - 1).forEach { s -> allowedOnCraftTypes.add(CraftManager.getInstance().getCraftTypeFromString(s)) }
+                    allowedOnCraftTypes.addAll(args.copyOfRange(4, args.size - 1))
                 }
                 gravityWell = GravityWell(args[1], args[2].toInt(), allowedOnCraftTypes)
                 gravityWell.copy(sel, signLoc)

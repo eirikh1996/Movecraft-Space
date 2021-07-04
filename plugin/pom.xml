@@ -121,7 +121,7 @@
                             <relocations>
                                 <relocation>
                                     <pattern>kotlin</pattern>
-                                    <shadedPattern>io.github.eirikh1996.movecraftspace</shadedPattern>
+                                    <shadedPattern>io.github.eirikh1996.movecraftspace.kotlinlib</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>

@@ -5,6 +5,9 @@ import io.github.eirikh1996.movecraftspace.expansion.ExpansionManager
 import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
 import io.github.eirikh1996.movecraftspace.utils.MSUtils
+import net.countercraft.movecraft.craft.Craft
+import net.countercraft.movecraft.craft.CraftManager
+import net.countercraft.movecraft.utils.MathUtils
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.event.EventHandler
@@ -26,6 +29,15 @@ object PlayerListener : Listener {
         if (planet == null || planet.destination.equals(event.to!!.world) && event.to!!.blockY < planet.exitHeight || teleportingPlayers.contains(event.player.uniqueId) || disabledPlayers.contains(event.player.uniqueId) || !Settings.AllowPlayersTeleportationToPlanets) {
             return
         }
+        var craftPlayerIsOn : Craft? = null
+        for (craft in CraftManager.getInstance().getCraftsInWorld(event.to!!.world!!)) {
+            if (!MathUtils.locIsNearCraftFast(craft, MathUtils.bukkit2MovecraftLoc(event.to!!)))
+                continue
+            craftPlayerIsOn = craft
+            break
+        }
+        if (craftPlayerIsOn != null)
+            return
         var dest : Location? = null
         while (dest == null) {
             dest = if (planet.destination.equals(event.to!!.world)) {

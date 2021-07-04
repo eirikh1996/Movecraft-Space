@@ -5,6 +5,15 @@ api-version: 1.13
 depend:
   - Movecraft
 softdepend:
+  - dynmap
+  - Factions
+  - FactionsBlue
+  - GriefPrevention
+  - Lands
+  - RedProtect
+  - Towny
+  - WorldGuard
+  - WorldBorder
   - Multiverse-Core
   - Hyperverse
   - Multiworld
@@ -36,3 +45,6 @@ permissions:
     default: true
   movecraftspace.command.star.list:
     default: true
+
+libraries:
+- 'org.jetbrains.kotlin:kotlin-stdlib:${kotlin.version}'

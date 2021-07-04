@@ -2,9 +2,9 @@ Hyperspace world: Hyperspace
 Hyperspace travel warmup: 60
 Hyperspace travel speed: 300.0
 Beacon range: 200
-Hyperspace enter sound: ENTITY_ENDERMAN_TELEPORT
-Hyperspace exit sound: ENTITY_ENDERMAN_TELEPORT
-Hyperspace charge sound: BLOCK_STONE_BREAK
+Hyperspace enter sound: 'entity.enderman.teleport'
+Hyperspace exit sound: 'entity.enderman.teleport'
+Hyperspace charge sound: 'entity.ender_dragon.ambient'
 Max hyperdrives on craft:
   Starfighter: 1
   Starship: 2

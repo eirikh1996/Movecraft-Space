@@ -23,9 +23,9 @@ import java.io.File
 
 class HyperspaceExpansion : Expansion(), SelectionSupported {
     lateinit var hyperspaceWorld : World
-    lateinit var hyperspaceChargeSound : Sound
-    lateinit var hyperspaceEnterSound : Sound
-    lateinit var hyperspaceExitSound : Sound
+    lateinit var hyperspaceChargeSound : String
+    lateinit var hyperspaceEnterSound : String
+    lateinit var hyperspaceExitSound : String
     lateinit var hyperdriveSelectionWand : Material
     lateinit var hypermatter : Material
     lateinit var hypermatterName : String
@@ -71,9 +71,9 @@ class HyperspaceExpansion : Expansion(), SelectionSupported {
         }
         HyperspaceManager.loadFile()
         hyperspaceWorld = hsWorld
-        hyperspaceEnterSound = Sound.valueOf(config.getString("Hyperspace enter sound", "ENTITY_ENDERMAN_TELEPORT")!!)
-        hyperspaceChargeSound = Sound.valueOf(config.getString("Hyperspace charge sound", "BLOCK_STONE_BREAK")!!)
-        hyperspaceExitSound = Sound.valueOf(config.getString("Hyperspace exit sound", "ENTITY_ENDERMAN_TELEPORT")!!)
+        hyperspaceEnterSound = config.getString("Hyperspace enter sound", "entity.enderman.teleport")!!.replace("_",".").toLowerCase()
+        hyperspaceChargeSound = config.getString("Hyperspace charge sound", "entity.ender_dragon.ambient")!!.replace("_",".").toLowerCase()
+        hyperspaceExitSound = config.getString("Hyperspace exit sound", "entity.enderman.teleport")!!.replace("_",".").toLowerCase()
         hyperdriveSelectionWand = Material.getMaterial(config.getString("Hyperdrive selection wand", "STONE_HOE")!!)!!
         hypermatter = Material.getMaterial(config.getString("Hypermatter.type", "EMERALD")!!) ?: Material.EMERALD
         hypermatterName = config.getString("Hypermatter.name", "")!!
@@ -91,7 +91,6 @@ class HyperspaceExpansion : Expansion(), SelectionSupported {
         plugin.getCommand("gravitywell")!!.setExecutor(GravityWellCommand)
         HyperspaceManager.runTaskTimerAsynchronously(plugin, 0, 1)
         getPluginManager().registerEvents(HyperspaceManager, plugin)
-        logMessage(LogMessageType.INFO, Structure::class.java.classLoader.toString())
         HyperdriveManager.loadHyperdrives()
         getPluginManager().registerEvents(HyperdriveManager, plugin)
         GravityWellManager.loadGravityWells()

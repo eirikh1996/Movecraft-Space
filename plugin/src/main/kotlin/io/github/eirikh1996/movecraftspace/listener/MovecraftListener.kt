@@ -82,19 +82,24 @@ object MovecraftListener : Listener {
         } else {
             planet.destination
         }
-        if (craft.w.equals(planet.destination) && hitBox.maxY < planet.exitHeight) {
+        if (craft.w.equals(planet.destination) && hitBox.maxY + event.dy < planet.exitHeight) {
+            return
+        }
+        val notifyP = craft.notificationPlayer
+        if (notifyP == null) {
             return
         }
         if (destWorld.equals(planet.destination)) {
-            craft.notificationPlayer!!.sendMessage("Entering " + destWorld.name)
+            notifyP.sendMessage("Entering " + destWorld.name)
         } else {
-            craft.notificationPlayer!!.sendMessage("Exiting " + craft.w.name)
+            notifyP.sendMessage("Exiting " + craft.w.name)
         }
         if (craft.cruising) {
             craft.cruising = false
         }
         val midpoint = craft.hitBox.midPoint
         val displacement = if (destWorld.equals(planet.destination)) {
+            //Space craft is in space
             val y = planet.exitHeight - (hitBox.yLength / 2) - 5
             var destLoc : MovecraftLocation? = null
             while (destLoc == null) {
@@ -129,10 +134,11 @@ object MovecraftListener : Listener {
             }
             destLoc
         } else {
+            //Space craft is on a planet
             var destLoc : MovecraftLocation? = null
             while (destLoc == null) {
-                val maxY = min(planet.center.y + planet.radius + 160, 250)
-                val minY = max(planet.center.y - planet.radius - 160, 10)
+                val maxY = min(planet.center.y + planet.radius + 160, destWorld.maxHeight - 5)
+                val minY = max(planet.center.y - planet.radius - 160, if (Settings.IsV1_17) destWorld.minHeight + 5 else 10)
                 val x = Random.nextInt(planet.center.x - planet.radius - 160, planet.center.x + planet.radius + 160)
                 val y = Random.nextInt(minY, maxY)
                 val z = Random.nextInt(planet.center.z - planet.radius - 160, planet.center.z + planet.radius + 160)
@@ -140,10 +146,8 @@ object MovecraftListener : Listener {
                 if (planet.contains(test.toBukkit(destWorld))) {
                     continue
                 }
-                if (!MathUtils.withinWorldBorder(destWorld, test)) {
-                    continue
-                }
-                if (craft.notificationPlayer != null && !ExpansionManager.allowedArea(craft.notificationPlayer!!, test.toBukkit(destWorld))) {
+
+                if (!ExpansionManager.allowedArea(notifyP, test.toBukkit(destWorld))) {
                     continue
                 }
                 if (StarCollection.getStarAt(test.toBukkit(destWorld)) != null)

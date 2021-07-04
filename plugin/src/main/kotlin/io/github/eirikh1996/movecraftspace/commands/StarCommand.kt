@@ -58,16 +58,25 @@ object StarCommand : TabExecutor{
                 return true
             }
             val pLoc = sender.location.clone()
-            pLoc.y = 127.0
+            val space = pLoc.world!!
+            var height = space.maxHeight.toDouble()
+            if (Settings.IsV1_17) {
+                height -= space.minHeight.toDouble()
+            }
+            height /= 2.0
+            if (Settings.IsV1_17)
+                height += space.minHeight.toDouble()
+            height += .5
+            pLoc.y = height
             val closest = StarCollection.closestStar(pLoc, Settings.MinimumDistanceBetweenStars)
             if (closest != null) {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "Star is too close to " + closest.name + ". Move " + (Settings.MinimumDistanceBetweenStars - closest.loc.distance(ImmutableVector.fromLocation(sender.location))).toInt() + " blocks away")
                 return true
             }
-            var radius = 126
+            var radius = height.toInt() - 1
             if (args.size >= 3) {
                 try {
-                    radius = min(args[2].toInt(), 126)
+                    radius = min(args[2].toInt(), height.toInt() - 1)
                 } catch (e : NumberFormatException) {
                     sender.sendMessage(COMMAND_PREFIX + ERROR + args[2] + " is not a number")
                     return true

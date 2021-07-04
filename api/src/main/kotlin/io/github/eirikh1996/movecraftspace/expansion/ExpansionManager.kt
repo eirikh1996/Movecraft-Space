@@ -100,7 +100,7 @@ object ExpansionManager : Iterable<Expansion> {
             }
             val classLoader : ExpansionClassLoader
             try {
-                classLoader = ExpansionClassLoader(javaClass.classLoader, desc, jar.parentFile, jar, pl)
+                classLoader = ExpansionClassLoader(pl.javaClass.classLoader, desc, jar.parentFile, jar, pl)
             } catch (t : Throwable) {
                 getConsoleSender().sendMessage(COMMAND_PREFIX + ERROR + "Cannot load expansion " + name)
                 t.printStackTrace()
@@ -114,14 +114,9 @@ object ExpansionManager : Iterable<Expansion> {
             newSoftDependList.addAll(ex.depend)
             newSoftDependList.addAll(ex.softdepend)
             softDependField.set(pl.description, ImmutableList.copyOf(newSoftDependList))
-            val missingDependencies = HashSet<String>()
-            val disabledDependencies = HashSet<String>()
+            val missingDependencies = ex.depend.filter { s -> Bukkit.getPluginManager().getPlugin(s) == null }
             if (!missingDependencies.isEmpty()) {
                 ex.logMessage(Expansion.LogMessageType.ERROR, "Dependenc" + if (missingDependencies.size > 1 ) "ies " else "y " + missingDependencies.joinToString(", ") + if (missingDependencies.size > 1 ) " are " else " is " + "required, but missing")
-                continue
-            }
-            if (!disabledDependencies.isEmpty()) {
-                ex.logMessage(Expansion.LogMessageType.ERROR, "Dependenc" + if (disabledDependencies.size > 1 ) "ies " else "y " + disabledDependencies.joinToString(", ") + if (disabledDependencies.size > 1 ) " are " else " is " + "required, but disabled")
                 continue
             }
             val commandsField = PluginDescriptionFile::class.java.getDeclaredField("commands")
@@ -145,20 +140,18 @@ object ExpansionManager : Iterable<Expansion> {
     }
 
     fun enableExpansions() {
+        getConsoleSender().sendMessage("§5=========[§9Movecraft-Space Expansions§5]=========§r ")
         getConsoleSender().sendMessage(COMMAND_PREFIX + "Enabling " + expansions.size + " loaded expansions")
         val softDependExpansions = HashSet<Expansion>()
         for (ex in expansions) {
-            ex.expansionSoftDepend.forEach { s -> getConsoleSender().sendMessage(s) }
-            getConsoleSender().sendMessage(ex.expansionSoftDepend.any { s -> getExpansion(s) != null }.toString())
-
             if (ex.expansionSoftDepend.any { s -> getExpansion(s) != null }) {
                 softDependExpansions.add(ex)
                 continue
             }
-            if (ex is SelectionSupported)
-                foundSelectionSupported = true
             try {
                 ex.state = ExpansionState.ENABLED
+                if (ex is SelectionSupported)
+                    foundSelectionSupported = true
             } catch (t : Throwable) {
                 ex.logMessage(Expansion.LogMessageType.ERROR, "Failure to enable expansion " + ex.name)
                 t.printStackTrace()
@@ -182,12 +175,15 @@ object ExpansionManager : Iterable<Expansion> {
             Bukkit.getPluginManager().registerEvents(SelectionManager, pl)
 
         }
+        getConsoleSender().sendMessage("§5=========[§9Movecraft-Space Expansions§5]=========§r ")
     }
 
     fun disableExpansions() {
+        getConsoleSender().sendMessage("§5=========[§9Movecraft-Space Expansions§5]=========§r ")
         for (ex in expansions) {
             ex.state = ExpansionState.DISABLED
         }
+        getConsoleSender().sendMessage("§5=========[§9Movecraft-Space Expansions§5]=========§r ")
     }
 
     /**
