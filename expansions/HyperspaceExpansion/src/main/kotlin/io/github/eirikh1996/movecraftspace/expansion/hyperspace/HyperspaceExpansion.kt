@@ -12,13 +12,9 @@ import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.Hyperdr
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.HyperspaceManager
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.sign.HyperspaceSign
 import io.github.eirikh1996.movecraftspace.expansion.selection.SelectionSupported
-import io.github.eirikh1996.movecraftspace.expansion.selection.Structure
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
-import net.countercraft.movecraft.craft.CraftManager
-import net.countercraft.movecraft.craft.CraftType
 import org.bukkit.*
 import org.bukkit.Bukkit.getPluginManager
-import org.bukkit.inventory.ItemStack
 import java.io.File
 
 class HyperspaceExpansion : Expansion(), SelectionSupported {
@@ -71,9 +67,9 @@ class HyperspaceExpansion : Expansion(), SelectionSupported {
         }
         HyperspaceManager.loadFile()
         hyperspaceWorld = hsWorld
-        hyperspaceEnterSound = config.getString("Hyperspace enter sound", "entity.enderman.teleport")!!.replace("_",".").toLowerCase()
-        hyperspaceChargeSound = config.getString("Hyperspace charge sound", "entity.ender_dragon.ambient")!!.replace("_",".").toLowerCase()
-        hyperspaceExitSound = config.getString("Hyperspace exit sound", "entity.enderman.teleport")!!.replace("_",".").toLowerCase()
+        hyperspaceEnterSound = config.getString("Hyperspace enter sound", "entity.enderman.teleport")!!.toLowerCase()
+        hyperspaceChargeSound = config.getString("Hyperspace charge sound", "entity.ender_dragon.ambient")!!.toLowerCase()
+        hyperspaceExitSound = config.getString("Hyperspace exit sound", "entity.enderman.teleport")!!.toLowerCase()
         hyperdriveSelectionWand = Material.getMaterial(config.getString("Hyperdrive selection wand", "STONE_HOE")!!)!!
         hypermatter = Material.getMaterial(config.getString("Hypermatter.type", "EMERALD")!!) ?: Material.EMERALD
         hypermatterName = config.getString("Hypermatter.name", "")!!

@@ -117,8 +117,10 @@ abstract class Expansion {
     }
 
     fun saveDefaultConfig() {
-        saveResource("config.yml", false)
-        config.load(File(dataFolder, "config.yml"))
+        val configFile = File(dataFolder, "config.yml")
+        if (!configFile.exists())
+            saveResource("config.yml", false)
+        config.load(configFile)
     }
 
     /**

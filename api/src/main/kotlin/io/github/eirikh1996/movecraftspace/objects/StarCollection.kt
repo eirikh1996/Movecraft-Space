@@ -1,6 +1,7 @@
 package io.github.eirikh1996.movecraftspace.objects
 
 import io.github.eirikh1996.movecraftspace.Settings
+import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.plugin.Plugin
@@ -84,7 +85,7 @@ object StarCollection : Iterable<Star> {
                 )
             )
         }
-        pl.logger.info("Loaded " + stars.size + " stars")
+        pl.server.consoleSender.sendMessage(COMMAND_PREFIX + "Loaded " + stars.size + " stars")
     }
 
     private fun saveFile() {

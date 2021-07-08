@@ -54,7 +54,7 @@ object MovecraftSpaceCommand : TabExecutor {
                 sender.spigot().sendMessage(expansionList)
                 return true
             }
-            else if (args[1].equals("info")) {
+            else if (args[1].equals("info", true)) {
                 if (args.size <= 2) {
                     sender.sendMessage(COMMAND_PREFIX + ERROR + "Correct syntax is /movecraftspace expansions info <expansion>")
                     return true
@@ -72,7 +72,7 @@ object MovecraftSpaceCommand : TabExecutor {
                 sender.sendMessage("Expansion depend: " + expansion.expansionDepend.joinToString())
                 sender.sendMessage("Expansion soft depend: " + expansion.expansionSoftDepend.joinToString())
             }
-            else if (args[1].equals("reload")) {
+            else if (args[1].equals("reload", true)) {
                 ExpansionManager.reloadExpansions()
                 sender.sendMessage(COMMAND_PREFIX + "Reloaded expansions")
             }
@@ -110,12 +110,13 @@ object MovecraftSpaceCommand : TabExecutor {
                 SelectionManager.selectionsDisabled.add(sender.uniqueId)
             }
             SelectionManager.saveDisableWandList()
-        }
+        } else if (args[0].equals("wiki", true))
+            sender.sendMessage(COMMAND_PREFIX + "https://github.com/eirikh1996/Movecraft-Space/wiki")
         return true
     }
 
     override fun onTabComplete(sender : CommandSender, cmd : Command, label : String, args : Array<out String>) : List<String> {
-        var tabCompletions = listOf("expansions", "wand").sorted()
+        var tabCompletions = listOf("expansions", "wand", "disablewand", "wiki").sorted()
         if (args.size == 0)
             return tabCompletions
         else if (args[0].equals("expansions", true)) {

@@ -1,6 +1,7 @@
 package io.github.eirikh1996.movecraftspace.objects
 
 import io.github.eirikh1996.movecraftspace.event.planet.PlanetRemoveEvent
+import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import net.countercraft.movecraft.MovecraftChunk
 import org.bukkit.Bukkit
 import org.bukkit.Bukkit.broadcastMessage
@@ -127,9 +128,9 @@ object PlanetCollection : Iterable<Planet> {
             }
             if (planet.key.moons.isEmpty())
                 continue
-            pl.logger.info("Loaded " + planet.key.moons.size + " moons for planet " + planet.key.destination.name)
+            pl.server.consoleSender.sendMessage(COMMAND_PREFIX + "Loaded " + planet.key.moons.size + " moons for planet " + planet.key.destination.name)
         }
-        pl.logger.info("Loaded " + planets.size + " planets")
+        pl.server.consoleSender.sendMessage(COMMAND_PREFIX + "Loaded " + planets.size + " planets")
     }
 
     fun withinPlanetOrbit(loc : Location): Boolean {

@@ -64,7 +64,7 @@ object MSUtils {
         getConsoleSender().sendMessage(" __      __                                                ___    _            ____")
         getConsoleSender().sendMessage("|  \\    /  |                                               / __\\  | |          / __ \\ ")
         getConsoleSender().sendMessage("|   \\  /   |                                               | |    | |         / /  \\_\\ ")
-        getConsoleSender().sendMessage("|    \\/    |   __  _  _     ___    __   __  ___    ____   _| |_  _| |_   ___  | |__    _  ___   ____      __    ___")
+        getConsoleSender().sendMessage("|    \\/    |  __   _  _     ___    __   __  ___    ____   _| |_  _| |_   ___  | |__    _  ___   ____      __    ___")
         getConsoleSender().sendMessage("| |\\    /| | /  \\ | || |  / _ \\  /  \\ |  |/ _ \\  /___ \\ |_   _||_   _| |___| \\\\__ \\  | |/ _ \\ /___  \\   /  \\  / _ \\ ")
         getConsoleSender().sendMessage("| | \\  / | |/ /\\ \\| || | / /_\\_\\/ /\\_\\|    / \\_\\ ____| |  | |    | |             \\ \\ |   / \\ | ____| | / /\\_\\/ /_\\_\\ ")
         getConsoleSender().sendMessage("| |  \\/  | || || || || || |   __| | __|   /     /  __  |  | |    | |         __   | ||   | | |/  __  | | | __| |  __" )

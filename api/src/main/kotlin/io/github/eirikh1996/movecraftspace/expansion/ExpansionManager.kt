@@ -2,6 +2,7 @@ package io.github.eirikh1996.movecraftspace.expansion
 
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
+import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.expansion.selection.SelectionManager
 import io.github.eirikh1996.movecraftspace.expansion.selection.SelectionSupported
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
@@ -29,9 +30,17 @@ import kotlin.collections.HashSet
 object ExpansionManager : Iterable<Expansion> {
     val expansions = HashSet<Expansion>()
     val classCache = HashMap<String, Class<*>>()
+    val jarCache = HashMap<String, JarFile>()
     private var foundSelectionSupported = false
     val selectionsEnabled : Boolean get() = foundSelectionSupported
     lateinit var pl: JavaPlugin
+    val craftTaskClass : Class<*>
+
+    init {
+        val packageName = Bukkit.getServer().javaClass.`package`.name
+        val version = packageName.substring(packageName.lastIndexOf(".") + 1)
+        craftTaskClass = Class.forName("org.bukkit.craftbukkit." + version + ".scheduler.CraftTask")
+    }
 
     fun worldBoundrary(world: World) : IntArray {
         val lastBounds = intArrayOf(-29999984, 29999984, -29999984, 29999984)
@@ -135,6 +144,7 @@ object ExpansionManager : Iterable<Expansion> {
                 t.printStackTrace()
                 continue
             }
+            jarCache.put(name, jarFile)
 
         }
     }
@@ -202,9 +212,26 @@ object ExpansionManager : Iterable<Expansion> {
         return null
     }
 
+    private fun cancelProcessingTasks() {
+        val scheduler = Bukkit.getScheduler()
+        for (task in scheduler.pendingTasks) {
+            if (!task.owner.equals(pl))
+                continue
+            val taskField = craftTaskClass.getDeclaredField(if (Settings.IsV1_13) "rTask" else "task")
+            taskField.isAccessible = true
+            val runnable = taskField.get(task)
+            if (runnable.javaClass.classLoader !is ExpansionClassLoader)
+                continue
+            scheduler.cancelTask(task.taskId)
+        }
+    }
+
+
+
     fun reloadExpansions() {
         disableExpansions()
         expansions.clear()
+        cancelProcessingTasks()
         loadExpansions()
         enableExpansions()
     }

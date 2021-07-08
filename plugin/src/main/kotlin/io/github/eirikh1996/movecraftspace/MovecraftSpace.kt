@@ -36,6 +36,7 @@ class MovecraftSpace : JavaPlugin() {
         val ver = packageName.substring(packageName.lastIndexOf(".") + 1).split("_")[1].toInt()
         Settings.IsLegacy = ver <= 12
         Settings.IsV1_17 = ver >= 17
+        Settings.IsV1_13 = ver >= 13
 
 
 
@@ -80,8 +81,8 @@ class MovecraftSpace : JavaPlugin() {
     }
 
     override fun onLoad() {
-        instance = this
         ExpansionManager.pl = this
+        instance = this
         ExpansionManager.loadExpansions()
     }
 
