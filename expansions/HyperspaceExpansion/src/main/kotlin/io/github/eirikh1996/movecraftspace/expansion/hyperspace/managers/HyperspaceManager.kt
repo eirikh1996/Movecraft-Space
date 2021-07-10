@@ -5,29 +5,26 @@ import io.github.eirikh1996.movecraftspace.expansion.ExpansionManager
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects.HyperspaceBeacon
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.HyperspaceExpansion
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects.HyperspaceTravelEntry
-import io.github.eirikh1996.movecraftspace.expansion.hyperspace.command.HyperspaceCommand
-import io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects.Hyperdrive
+import io.github.eirikh1996.movecraftspace.expansion.hyperspace.events.HyperspaceChargeEvent
+import io.github.eirikh1996.movecraftspace.expansion.hyperspace.events.HyperspaceEnterEvent
+import io.github.eirikh1996.movecraftspace.expansion.hyperspace.events.HyperspaceExitEvent
+import io.github.eirikh1996.movecraftspace.expansion.hyperspace.events.HyperspaceTravelEvent
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
 import io.github.eirikh1996.movecraftspace.objects.StarCollection
 import io.github.eirikh1996.movecraftspace.utils.MSUtils
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
-import io.github.eirikh1996.movecraftspace.utils.MSUtils.WARNING
-import net.countercraft.movecraft.Movecraft
 import net.countercraft.movecraft.MovecraftLocation
 import net.countercraft.movecraft.craft.Craft
 import net.countercraft.movecraft.craft.CraftManager
+import net.countercraft.movecraft.events.CraftDetectEvent
 import net.countercraft.movecraft.events.CraftReleaseEvent
 import net.countercraft.movecraft.events.CraftRotateEvent
 import net.countercraft.movecraft.events.CraftTranslateEvent
-import net.countercraft.movecraft.utils.BitmapHitBox
 import net.countercraft.movecraft.utils.HitBox
-import net.countercraft.movecraft.utils.MathUtils
-import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.*
-import org.bukkit.block.Sign
 import org.bukkit.boss.BarColor
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
@@ -36,9 +33,9 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.InventoryHolder
-import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
 import java.io.File
+import java.lang.NumberFormatException
 import java.math.RoundingMode
 import java.util.*
 import kotlin.collections.ArrayList
@@ -54,7 +51,10 @@ object HyperspaceManager : BukkitRunnable(), Listener {
     val beaconLocations = HashSet<HyperspaceBeacon>()
     val craftsWithinBeaconRange = HashSet<Craft>()
     private val file = File(HyperspaceExpansion.instance.dataFolder, "beacons.yml")
-    private val hyperspaceLocationsFile = File(HyperspaceExpansion.instance.dataFolder, "hyperspaceLocations")
+    private val hyperspaceLocationsFile = File(HyperspaceExpansion.instance.dataFolder, "hyperspaceLocations.yml")
+    val targetLocations = HashMap<MovecraftLocation, Location>()
+
+
     /**
      * When an object implementing interface `Runnable` is used
      * to create a thread, starting the thread causes the object's
@@ -70,9 +70,10 @@ object HyperspaceManager : BukkitRunnable(), Listener {
     override fun run() {
         processHyperspaceTravel()
         removedFinishedEntries()
+        processTargetLocations()
     }
     fun addEntry(craft: Craft, entry: HyperspaceTravelEntry) {
-        pendingEntries.put(craft, entry)
+        pendingEntries[craft] = entry
     }
 
     private fun processHyperspaceTravel() {
@@ -89,13 +90,27 @@ object HyperspaceManager : BukkitRunnable(), Listener {
             var massShadow = false
             for (i in 1..speed.toInt()) {
                 val testLoc = entry.origin.clone().add(entry.progress)
+                targetLocations[entry.craft.hitBox.midPoint] = testLoc
                 val testUnit = unit.clone()
                 testUnit.x += i
                 testUnit.z += i
                 testLoc.add(testUnit)
-                val foundGravityWell = Bukkit.getScheduler().callSyncMethod(HyperspaceExpansion.instance.plugin, {GravityWellManager.getActiveGravityWellAt(testLoc, entry.craft)}).get()
+                val event = HyperspaceTravelEvent(entry.craft, testLoc)
+                Bukkit.getScheduler().callSyncMethod(HyperspaceExpansion.instance.plugin) {
+                    Bukkit.getPluginManager().callEvent(event)
+                }.get()
+                if (event.isCancelled) {
+                    pullOutOfHyperspace(entry, event.currentLocation, event.exitMessage)
+                    break
+                }
+                val foundGravityWell = Bukkit.getScheduler().callSyncMethod(HyperspaceExpansion.instance.plugin) {
+                    GravityWellManager.getActiveGravityWellAt(
+                        testLoc,
+                        entry.craft
+                    )
+                }.get()
                 if (PlanetCollection.getPlanetAt(testLoc, HyperspaceExpansion.instance.extraMassShadowRangeOfPlanets) != null || StarCollection.getStarAt(testLoc, HyperspaceExpansion.instance.extraMassShadowRangeOfStars) != null || foundGravityWell != null) {
-                    pullOutOfHyperspace(entry, testLoc, true)
+                    pullOutOfHyperspace(entry, testLoc, "Space craft caught in a mass shadow. Exiting hyperspace")
                     massShadow = true
                     break
                 }
@@ -110,14 +125,14 @@ object HyperspaceManager : BukkitRunnable(), Listener {
             entry.progressBar.setTitle(title + " Travel " + percent.toBigDecimal().setScale(2, RoundingMode.UP) + "%" )
             if (entry.progress.length() >= totalDistance) {
                 val destination = entry.destination
-                pullOutOfHyperspace(entry, destination)
+                pullOutOfHyperspace(entry, destination, "Space craft arived at destination. Exiting hyperspace")
             }
 
 
         }
     }
 
-    fun removedFinishedEntries() {
+    private fun removedFinishedEntries() {
         for (c in processingEntries.keys) {
             val entry = processingEntries[c]
             if (entry == null || entry.stage != HyperspaceTravelEntry.Stage.FINISHED)
@@ -126,7 +141,24 @@ object HyperspaceManager : BukkitRunnable(), Listener {
         }
     }
 
-    private fun pullOutOfHyperspace(entry: HyperspaceTravelEntry, target : Location, caughtInMassShadow : Boolean = false) {
+    private fun processTargetLocations() {
+        val yml = YamlConfiguration()
+        for (loc in targetLocations) {
+            yml.set(loc.key.toString(), loc.value)
+        }
+        yml.save(hyperspaceLocationsFile)
+    }
+
+    private fun movecraftLocationFromString(str: String) : MovecraftLocation {
+        val coords = str.replace("(", "").replace(")", "").split(",")
+        try {
+            return MovecraftLocation(coords[0].toInt(), coords[1].toInt(), coords[2].toInt());
+        } catch (e : NumberFormatException) {
+            throw IllegalArgumentException("String does not represent the toString() output of a MovecraftLocation", e)
+        }
+    }
+
+    private fun pullOutOfHyperspace(entry: HyperspaceTravelEntry, target : Location, exitMessage : String) {
         if (entry.stage == HyperspaceTravelEntry.Stage.FINISHED)
             return
         entry.stage = HyperspaceTravelEntry.Stage.FINISHED
@@ -135,7 +167,7 @@ object HyperspaceManager : BukkitRunnable(), Listener {
         val coords = randomCoords(entry.craft.notificationPlayer!!, target,
             HyperspaceExpansion.instance.config.getInt("Beacon range", 200) + if (hitbox.xLength > hitbox.zLength) hitbox.xLength else hitbox.zLength ,entry.craft.hitBox.yLength)
         val midPoint = entry.craft.hitBox.midPoint
-        entry.craft.notificationPlayer!!.sendMessage((if (caughtInMassShadow) "Space craft caught in a mass shadow" else "Space craft arrived at destination") + ". Exiting hyperspace")
+        entry.craft.notificationPlayer!!.sendMessage(exitMessage)
         entry.craft.burningFuel += entry.craft.type.getFuelBurnRate(entry.craft.w)
         entry.progressBar.isVisible = false
         val finalTarget = Location(target.world, coords[0].toDouble(), coords[1].toDouble(),
@@ -147,22 +179,14 @@ object HyperspaceManager : BukkitRunnable(), Listener {
                 hdentry.key.update()
             }
         }.get()
+        Bukkit.getPluginManager().callEvent(HyperspaceExitEvent(entry.craft))
         entry.lastTeleportTime = System.currentTimeMillis()
         entry.craft.translate(entry.destination.world, finalTarget.blockX - midPoint.x, finalTarget.blockY - midPoint.y, finalTarget.blockZ - midPoint.z)
         entry.craft.notificationPlayer!!.playSound(entry.craft.notificationPlayer!!.location, HyperspaceExpansion.instance.hyperspaceExitSound, 3f, 0f)
     }
 
-    private fun loadChunks(target: Location, hitBox: HitBox) {
-        if (hitBox.isEmpty)
-            return
-        val distance = MathUtils.bukkit2MovecraftLoc(target).subtract(hitBox.midPoint)
-        for (ml in hitBox) {
-            ml.add(distance).toBukkit(target.world).block.type
-        }
-    }
 
-
-    private fun randomCoords(p : Player , center : Location, radius : Int, heightToIgnore : Int) : IntArray {
+    internal fun randomCoords(p : Player , center : Location, radius : Int, heightToIgnore : Int) : IntArray {
         var coords = intArrayOf(
             Random.nextInt(center.blockX - radius, center.blockX + radius),
             Random.nextInt(heightToIgnore, 255 - heightToIgnore),
@@ -216,19 +240,48 @@ object HyperspaceManager : BukkitRunnable(), Listener {
             return
         }
         val entry = pendingEntries.remove(event.craft)
-        if (entry != null && event.world.equals(HyperspaceExpansion.instance.hyperspaceWorld)) {
-            processingEntries.put(event.craft, entry)
+        if (entry != null && event.world == HyperspaceExpansion.instance.hyperspaceWorld) {
+            processingEntries[event.craft] = entry
         }
         processHyperspaceBeaconDetection(event.craft, event.newHitBox, event.world)
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    fun onDetect(event : CraftDetectEvent) {
+        val craft = event.craft
+        if (craft.w != HyperspaceExpansion.instance.hyperspaceWorld)
+            return
+        if (craft.type.cruiseOnPilot) {
+            event.failMessage = "Cannot launch cruiseOnPilot crafts in hyperspace"
+            event.isCancelled
+            return
+        }
+        val midpoint = craft.hitBox.midPoint
+        val target = targetLocations[midpoint]
+        if (target == null) {
+            craft.notificationPlayer!!.sendMessage("Could not find a target location for the craft trapped in hyperspace. Please contact an administrator")
+            return
+        }
+        val coords = randomCoords(craft.notificationPlayer!!, target, 300, craft.hitBox.yLength)
+        val dx = coords[0] - midpoint.x
+        val dy = coords[1] - midpoint.y
+        val dz = coords[2] - midpoint.z
+        object : BukkitRunnable() {
+            override fun run() {
+                craft.notificationPlayer!!.sendMessage("Craft was detected in hyperspace. Pulling you out of hyperspace")
+                craft.translate(target.world, dx, dy, dz)
+                targetLocations.remove(midpoint)
+            }
+
+        }.runTaskLaterAsynchronously(HyperspaceExpansion.instance.plugin, 10)
+
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     fun onQuit(event : PlayerQuitEvent) {
         val p = event.player
-        val craft = CraftManager.getInstance().getCraftByPlayer(p)
-        if (craft == null)
-            return
-        if (!craft.w.equals(HyperspaceExpansion.instance.hyperspaceWorld))
+        val craft = CraftManager.getInstance().getCraftByPlayer(p) ?: return
+        if (craft.w != HyperspaceExpansion.instance.hyperspaceWorld)
             return
         if (!processingEntries.containsKey(craft))
             return
@@ -242,12 +295,12 @@ object HyperspaceManager : BukkitRunnable(), Listener {
         if (hitBox.isEmpty)
             return
         for (beacon in beaconLocations) {
-            if (beacon.origin.world!!.equals(world) && beacon.origin.distance(hitBox.midPoint.toBukkit(world)) <= HyperspaceExpansion.instance.config.getInt("Beacon range")) {
+            if (beacon.origin.world!! == world && beacon.origin.distance(hitBox.midPoint.toBukkit(world)) <= HyperspaceExpansion.instance.config.getInt("Beacon range")) {
                 foundLoc = beacon.origin
                 str = beacon.originName + "-" + beacon.destinationName
                 break
             }
-            if (beacon.destination.world!!.equals(world) && beacon.destination.distance(hitBox.midPoint.toBukkit(world)) <= HyperspaceExpansion.instance.config.getInt("Beacon range")) {
+            if (beacon.destination.world!! == world && beacon.destination.distance(hitBox.midPoint.toBukkit(world)) <= HyperspaceExpansion.instance.config.getInt("Beacon range")) {
                 foundLoc = beacon.destination
                 str = beacon.destinationName + "-" + beacon.originName
                 break
@@ -269,7 +322,7 @@ object HyperspaceManager : BukkitRunnable(), Listener {
             val clickText = TextComponent("§2[Accept]")
             clickText.clickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/hyperspace travel")
             craft.notificationPlayer!!.spigot().sendMessage(
-                TextComponent("Entered the range of " + str + " hyperspace beacon "),
+                TextComponent("Entered the range of $str hyperspace beacon "),
                 clickText
             )
             craftsWithinBeaconRange.add(craft)
@@ -320,12 +373,12 @@ object HyperspaceManager : BukkitRunnable(), Listener {
             if (foundFuelContainer == null)
                 continue
 
-            val stack =  if (hypermatterName.length == 0)
+            val stack =  if (hypermatterName.isEmpty())
                 foundFuelContainer.inventory.getItem(foundFuelContainer.inventory.first(hypermatter))
                         else {
                             var index = -1
                             for (e in foundFuelContainer.inventory.all(hypermatter)) {
-                                if (!e.value.itemMeta!!.displayName.equals(hypermatterName))
+                                if (e.value.itemMeta!!.displayName != hypermatterName)
                                     continue
                                 index = e.key
                             }
@@ -360,7 +413,7 @@ object HyperspaceManager : BukkitRunnable(), Listener {
         val hitBox =craft.hitBox
         val entry = HyperspaceTravelEntry(craft, origin, destination, beaconTravel)
         entry.progressBar.addPlayer(craft.notificationPlayer!!)
-        entry.progressBar.setTitle(str + " Warmup 0.0%")
+        entry.progressBar.setTitle("$str Warmup 0.0%")
         val notifyP = craft.notificationPlayer!!
         val runnable = object : BukkitRunnable() {
 
@@ -370,9 +423,14 @@ object HyperspaceManager : BukkitRunnable(), Listener {
                 val timePassed = (System.currentTimeMillis() - timeStarted) / 1000
                 val progress = min(timePassed.toDouble() / warmupTime.toDouble(), 1.0)
                 val percent = progress * 100
+                Bukkit.getPluginManager().callEvent(HyperspaceChargeEvent(craft, percent))
                 entry.progressBar.setTitle(str + " Warmup " + percent.toBigDecimal().setScale(2, RoundingMode.UP) + "%")
                 entry.progressBar.progress = progress
                 if (timePassed <= warmupTime)
+                    return
+                val event = HyperspaceEnterEvent(craft)
+                Bukkit.getPluginManager().callEvent(event)
+                if (event.isCancelled)
                     return
                 Bukkit.getScheduler().callSyncMethod(HyperspaceExpansion.instance.plugin) {
                     for (entry in HyperdriveManager.getHyperdrivesOnCraft(craft)) {
@@ -399,32 +457,28 @@ object HyperspaceManager : BukkitRunnable(), Listener {
                 var hitboxObstructed = true
                 val midpoint = hitBox.midPoint
                 while (hitboxObstructed) {
-                    hitboxObstructed = Bukkit.getScheduler().callSyncMethod(HyperspaceExpansion.instance.plugin, {
+                    hitboxObstructed = Bukkit.getScheduler().callSyncMethod(HyperspaceExpansion.instance.plugin) {
                         MSUtils.hitboxObstructed(
                             craft,
                             null,
                             hyperspaceWorld,
                             MovecraftLocation(x - midpoint.x, y - midpoint.y, z - midpoint.z)
                         )
-                    }).get()
+                    }.get()
                     if (!ExpansionManager.allowedArea(notifyP, MovecraftLocation(x, y, z).toBukkit(hyperspaceWorld)))
                         continue
                     if (!hitboxObstructed)
                         break
                     x = Random.nextInt(minX, maxX)
+                    y = Random.nextInt(minY, maxY)
                     z = Random.nextInt(minZ, maxZ)
                 }
-                Bukkit.broadcastMessage("x: " + x + ", z: " + z)
-                Bukkit.broadcastMessage("Allowed area: " + ExpansionManager.allowedArea(notifyP, MovecraftLocation(x, y, z).toBukkit(hyperspaceWorld)))
                 entry.progressBar.progress = 0.0
                 entry.progressBar.color = BarColor.BLUE
                 entry.stage = HyperspaceTravelEntry.Stage.TRAVEL
                 val dx = x - midpoint.x
                 val dz = z - midpoint.z
-                val runnable = runnableMap.remove(craft.notificationPlayer!!.uniqueId)
-                if (runnable != null) {
-                    runnable.cancel()
-                }
+                runnableMap.remove(craft.notificationPlayer!!.uniqueId)?.cancel()
                 craftsWithinBeaconRange.remove(craft)
                 craft.burningFuel += craft.type.getFuelBurnRate(craft.w)
                 craft.translate(hyperspaceWorld, dx, 0, dz)
@@ -433,20 +487,27 @@ object HyperspaceManager : BukkitRunnable(), Listener {
             }
 
         }
-        runnableMap.put(craft.notificationPlayer!!.uniqueId, runnable)
+        runnableMap[craft.notificationPlayer!!.uniqueId] = runnable
         runnable.runTaskTimerAsynchronously(HyperspaceExpansion.instance.plugin, 0, 1)
     }
     fun loadFile() {
-        if (!file.exists())
-            return
-        val config = YamlConfiguration()
-        config.load(file)
-        val list = config.getMapList("beacons") as List<Map<String, Map<String, Any>>>
-        for (map in list) {
-            val originData = map["origin"]
-            val destinationData = map["destination"]
-            beaconLocations.add(HyperspaceBeacon(originData!!["name"] as String, Location.deserialize(originData["location"] as MutableMap<String, Any>),destinationData!!["name"] as String, Location.deserialize(destinationData["location"]!! as Map<String, Any>)))
+        if (file.exists()) {
+            val config = YamlConfiguration()
+            config.load(file)
+            val list = config.getMapList("beacons") as List<Map<String, Map<String, Any>>>
+            for (map in list) {
+                val originData = map["origin"]
+                val destinationData = map["destination"]
+                beaconLocations.add(HyperspaceBeacon(originData!!["name"] as String, Location.deserialize(originData["location"] as MutableMap<String, Any>),destinationData!!["name"] as String, Location.deserialize(destinationData["location"]!! as Map<String, Any>)))
+            }
         }
+         if (hyperspaceLocationsFile.exists()) {
+             val yml = YamlConfiguration()
+             yml.load(hyperspaceLocationsFile)
+             yml.getKeys(true).forEach { key -> targetLocations[movecraftLocationFromString(key)] =
+                 yml.getSerializable(key, Location::class.java)!! }
+         }
+
 
     }
 

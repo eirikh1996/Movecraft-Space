@@ -17,6 +17,7 @@ import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.hitboxObstructed
 import net.countercraft.movecraft.MovecraftLocation
 import net.countercraft.movecraft.craft.CraftManager
+import org.bukkit.Bukkit
 import org.bukkit.Bukkit.getScheduler
 import org.bukkit.Location
 import org.bukkit.Material
@@ -50,43 +51,47 @@ object HyperspaceCommand : TabExecutor {
             val yml = YamlConfiguration.loadConfiguration(file)
             val mapList = yml.getMapList("blocks") as List<Map<String, Any>>
             for (map in mapList) {
-                beaconStructure.put(ImmutableVector.deserialize(map), MSBlock.deserialize(map))
+                beaconStructure[ImmutableVector.deserialize(map)] = MSBlock.deserialize(map)
             }
         }
     }
-    override fun onTabComplete(p0: CommandSender, p1: Command, p2: String, p3: Array<out String>): List<String> {
-        var tabCompletions = listOf("travel", "beacon", "sethypermatter")
-        if (p3.size == 0)
+    override fun onTabComplete(sender: CommandSender, command: Command, label: String, args: Array<out String>): List<String> {
+        var tabCompletions = listOf("travel", "beacon", "pullout")
+        if (args.isEmpty())
             return tabCompletions
-        if (p3[0].equals("beacon", true)) {
+        if (args[0].equals("beacon", true)) {
             tabCompletions = listOf("remove", "create", "save", "paste")
-            if (p3.size == 1) {
+            if (args.size == 1) {
                 return tabCompletions
-            } else if (p3[1].equals("remove", true)) {
+            } else if (args[1].equals("remove", true)) {
                 val links = ArrayList<String>()
                 HyperspaceManager.beaconLocations.forEach { b -> links.add(b.originName + "-" + b.destinationName) }
                 tabCompletions = links
             }
 
+        } else if (args[0].equals("pullout", true)) {
+            val players = ArrayList<String>()
+            CraftManager.getInstance().getCraftsInWorld(HyperspaceExpansion.instance.hyperspaceWorld).forEach { craft -> players.add(craft.notificationPlayer?.name!!) }
+            tabCompletions = players
         }
-        return tabCompletions.filter { s -> s.startsWith(p3[p3.size - 1]) }
+        return tabCompletions.filter { s -> s.startsWith(args[args.size - 1]) }.sorted()
     }
 
-    override fun onCommand(p0: CommandSender, p1: Command, p2: String, p3: Array<out String>): Boolean {
-        if (!p1.name.equals("HyperSpace", true)) {
+    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
+        if (!command.name.equals("HyperSpace", true)) {
             return false
         }
-        if (p0 !is Player) {
-            p0.sendMessage(COMMAND_PREFIX + ERROR + "You must be player to use this command")
+        if (sender !is Player) {
+            sender.sendMessage(COMMAND_PREFIX + ERROR + "You must be player to use this command")
             return true
         }
-        if (p3.size == 0) {
+        if (args.isEmpty()) {
             return true
         }
-        if (p3[0].equals("travel", true)) {
-            val craft = CraftManager.getInstance().getCraftByPlayer(p0)
+        if (args[0].equals("travel", true)) {
+            val craft = CraftManager.getInstance().getCraftByPlayer(sender)
             if (craft == null) {
-                p0.sendMessage(COMMAND_PREFIX + ERROR + "You are not commanding a space craft")
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "You are not commanding a space craft")
                 return true
             }
             val hitBox = craft.hitBox
@@ -94,7 +99,7 @@ object HyperspaceCommand : TabExecutor {
             var destination : Location? = null
             var str = ""
             for (beacon in HyperspaceManager.beaconLocations) {
-                if (beacon.origin.world!!.equals(craft.w) && beacon.origin.distance(hitBox.midPoint.toBukkit(craft.w)) <= HyperspaceExpansion.instance.config.getInt("Beacon range")) {
+                if (beacon.origin.world!! == craft.w && beacon.origin.distance(hitBox.midPoint.toBukkit(craft.w)) <= HyperspaceExpansion.instance.config.getInt("Beacon range")) {
                     foundLoc = beacon.origin
                     destination = beacon.destination
                     str = beacon.originName + "-" + beacon.destinationName
@@ -108,26 +113,26 @@ object HyperspaceCommand : TabExecutor {
                 }
             }
             if (foundLoc == null) {
-                p0.sendMessage(COMMAND_PREFIX + ERROR + "You are not within the range of a hyperspace beacon")
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "You are not within the range of a hyperspace beacon")
                 return true
             }
             HyperspaceManager.scheduleHyperspaceTravel(craft, foundLoc, destination!!, str, true)
 
-        } else if (p3[0].equals("beacon", true)) {
-            if (!p0.hasPermission("movecraftspace.command.hyperspace.beacon")) {
-                p0.sendMessage(COMMAND_PREFIX + ERROR + COMMAND_NO_PERMISSION)
+        } else if (args[0].equals("beacon", true)) {
+            if (!sender.hasPermission("movecraftspace.command.hyperspace.beacon")) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + COMMAND_NO_PERMISSION)
                 return true
             }
-            if (p3.size < 2) {
-                p0.sendMessage(COMMAND_PREFIX + ERROR + "Correct syntax is /hyperspace beacon <create|remove|save|paste>")
+            if (args.size < 2) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "Correct syntax is /hyperspace beacon <create|remove|save|paste>")
                 return true
             }
-            if (p3[1].equals("create", true)) {
-                if (!PlanetCollection.any { p -> p.space.equals(p0.world) } && !StarCollection.any { s -> s.space.equals(p0.world) }) {
-                    p0.sendMessage(COMMAND_PREFIX + ERROR + "Beacons can only be created in space worlds")
+            if (args[1].equals("create", true)) {
+                if (!PlanetCollection.any { p -> p.space.equals(sender.world) } && !StarCollection.any { s -> s.space.equals(sender.world) }) {
+                    sender.sendMessage(COMMAND_PREFIX + ERROR + "Beacons can only be created in space worlds")
                     return true
                 }
-                val space = p0.world
+                val space = sender.world
                 var height = space.maxHeight.toDouble()
                 if (Settings.IsV1_17) {
                     height -= space.minHeight.toDouble()
@@ -136,48 +141,48 @@ object HyperspaceCommand : TabExecutor {
                 if (Settings.IsV1_17)
                     height += space.minHeight.toDouble()
                 height += .5
-                if (locationMap.containsKey(p0.uniqueId)) {
-                    val origin = locationMap.remove(p0.uniqueId)!!
-                    val second = p0.location.clone()
+                if (locationMap.containsKey(sender.uniqueId)) {
+                    val origin = locationMap.remove(sender.uniqueId)!!
+                    val second = sender.location.clone()
                     second.y = height
                     val originStar = StarCollection.closestStar(origin)!!
                     val destinationStar = StarCollection.closestStar(second)
                     val maxDistance = HyperspaceExpansion.instance.config.getInt("Max distance from star systems", 3000)
                     if (destinationStar == null) {
-                        p0.sendMessage(COMMAND_PREFIX + ERROR + "No stars are present in this space world")
+                        sender.sendMessage(COMMAND_PREFIX + ERROR + "No stars are present in this space world")
                         return true
                     }
                     if (destinationStar.loc.distance(ImmutableVector.fromLocation(second)) > destinationStar.radius() + maxDistance) {
-                        p0.sendMessage(COMMAND_PREFIX + ERROR + "Beacon placement is too far from the nearest star system " + destinationStar.name)
+                        sender.sendMessage(COMMAND_PREFIX + ERROR + "Beacon placement is too far from the nearest star system " + destinationStar.name)
                         return true
                     }
-                    p0.sendMessage(COMMAND_PREFIX + "Successfully created hyperspace link between " + originStar.name + " and " + destinationStar.name)
+                    sender.sendMessage(COMMAND_PREFIX + "Successfully created hyperspace link between " + originStar.name + " and " + destinationStar.name)
                     createBeacon(origin)
                     createBeacon(second)
                     HyperspaceManager.beaconLocations.add(HyperspaceBeacon(originStar.name, origin, destinationStar.name, second))
                     HyperspaceManager.saveFile()
                     return true
                 }
-                val origin = p0.location.clone()
+                val origin = sender.location.clone()
                 origin.y = height
                 val originStar = StarCollection.closestStar(origin)
                 if (originStar == null) {
-                    p0.sendMessage(COMMAND_PREFIX + ERROR + "No stars are present in this space world")
+                    sender.sendMessage(COMMAND_PREFIX + ERROR + "No stars are present in this space world")
                     return true
                 }
                 val maxDistance = HyperspaceExpansion.instance.config.getInt("Max distance from star systems", 3000)
                 if (originStar.loc.distance(ImmutableVector.fromLocation(origin)) > originStar.radius() + maxDistance) {
-                    p0.sendMessage(COMMAND_PREFIX + ERROR + "Beacon placement is too far from the nearest star system " + originStar.name)
+                    sender.sendMessage(COMMAND_PREFIX + ERROR + "Beacon placement is too far from the nearest star system " + originStar.name)
                     return true
                 }
-                p0.sendMessage(COMMAND_PREFIX + "Set the first location for the hyperspace beacon. Select a second location in a different start system")
-                locationMap.put(p0.uniqueId, origin)
-            } else if (p3[1].equals("remove", true)) {
-                if (p3.size < 3) {
-                    p0.sendMessage(COMMAND_PREFIX + ERROR + "You must specify a beacon link")
+                sender.sendMessage(COMMAND_PREFIX + "Set the first location for the hyperspace beacon. Select a second location in a different start system")
+                locationMap[sender.uniqueId] = origin
+            } else if (args[1].equals("remove", true)) {
+                if (args.size < 3) {
+                    sender.sendMessage(COMMAND_PREFIX + ERROR + "You must specify a beacon link")
                     return true
                 }
-                val split = p3[2].split("-")
+                val split = args[2].split("-")
                 var foundBeacon : HyperspaceBeacon? = null
                 for (b in HyperspaceManager.beaconLocations) {
                     if (!split[0].equals(b.originName, true) || !split[1].equals(b.destinationName, true))
@@ -186,7 +191,7 @@ object HyperspaceCommand : TabExecutor {
                     break
                 }
                 if (foundBeacon == null) {
-                    p0.sendMessage(COMMAND_PREFIX + ERROR + "No such beacon link exists: " + p3[1])
+                    sender.sendMessage(COMMAND_PREFIX + ERROR + "No such beacon link exists: " + args[1])
                     return true
                 }
                 val queue = LinkedList<ImmutableVector>()
@@ -219,18 +224,18 @@ object HyperspaceCommand : TabExecutor {
                     }
                 }
                 visited.forEach { l -> l.toLocation(foundBeacon.destination.world!!).block.type = Material.AIR }
-                p0.sendMessage(COMMAND_PREFIX + "Sucessfully removed beacon link " + foundBeacon.originName + "-" + foundBeacon.destinationName)
+                sender.sendMessage(COMMAND_PREFIX + "Sucessfully removed beacon link " + foundBeacon.originName + "-" + foundBeacon.destinationName)
                 HyperspaceManager.beaconLocations.remove(foundBeacon)
                 HyperspaceManager.saveFile()
-            } else if (p3[1].equals("save", true)) {
-                val selection = SelectionManager.selections[p0.uniqueId]
+            } else if (args[1].equals("save", true)) {
+                val selection = SelectionManager.selections[sender.uniqueId]
                 if (selection == null) {
-                    p0.sendMessage(COMMAND_PREFIX + ERROR + "You have no selection. Make one with your selection wand, which is a " + Settings.SelectionWand)
+                    sender.sendMessage(COMMAND_PREFIX + ERROR + "You have no selection. Make one with your selection wand, which is a " + Settings.SelectionWand)
                     return true
                 }
                 val center = selection.center
                 for (vec in selection) {
-                    val block = vec.toLocation(p0.world).block
+                    val block = vec.toLocation(sender.world).block
                     if (block.type.name.endsWith("AIR"))
                         continue
                     beaconStructure.put(vec.subtract(center), MSBlock.fromBlock(block))
@@ -250,13 +255,43 @@ object HyperspaceCommand : TabExecutor {
                 if (!file.exists())
                     file.createNewFile()
                 yml.save(file)
-            } else if (p3[1].equals("paste", true)) {
+            } else if (args[1].equals("paste", true)) {
                 var dz = 0
                 beaconStructure.keys.forEach { vec -> if ( vec.z < dz) dz = vec.z }
-                val center = ImmutableVector.fromLocation(p0.location).add(0, dz, 0)
-                createBeacon(center.toLocation(p0.world))
+                val center = ImmutableVector.fromLocation(sender.location).add(0, dz, 0)
+                createBeacon(center.toLocation(sender.world))
             }
 
+        } else if (args[0].equals("pullout", true)) {
+            if (args.size < 3) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "You must specify a player")
+                return true
+            }
+            val player = Bukkit.getPlayer(args[1])
+            if (player == null) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "Player " + args[1] + " has either not joined or is offline")
+                return true
+            }
+            val craft = CraftManager.getInstance().getCraftByPlayer(player)
+            if (craft == null) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "Player " + player.name + " is not piloting a craft")
+                return true
+            }
+            if (craft.w != HyperspaceExpansion.instance.hyperspaceWorld) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "Player " + player.name + "'s craft is not in hyperspace")
+                return true
+            }
+            val midpoint = craft.hitBox.midPoint
+            var target = HyperspaceManager.targetLocations[midpoint]
+            if (target == null) {
+                target = sender.location
+            }
+            val coords = HyperspaceManager.randomCoords(sender, target, 100, craft.hitBox.yLength)
+            val dx = coords[0] - midpoint.x
+            val dy = coords[1] - midpoint.y
+            val dz = coords[2] - midpoint.z
+            sender.sendMessage(COMMAND_PREFIX + "Pulling " + player.name + "'s craft out of hyperspace")
+            craft.translate(target.world, dx, dy, dz)
         }
         return true
     }

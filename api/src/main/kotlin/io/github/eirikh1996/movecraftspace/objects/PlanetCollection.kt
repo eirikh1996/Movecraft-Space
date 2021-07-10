@@ -188,7 +188,7 @@ object PlanetCollection : Iterable<Planet> {
             val minDistance = distance - pl.radius
             val maxDistance = distance + pl.radius
             val planetDistance = pl.orbitCenter.distance(planet.orbitCenter)
-            if (planetDistance >= minDistance && planetDistance <= maxDistance)
+            if (planetDistance in minDistance..maxDistance)
                 return pl
 
 
