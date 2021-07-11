@@ -33,7 +33,7 @@ object HyperdriveCommand : TabExecutor {
 
         }
         if (args[0].equals("paste", true)) {
-           HyperdriveManager.forEach( { hd -> tabCompletions.add(hd.name) })
+           HyperdriveManager.forEach { hd -> tabCompletions.add(hd.name) }
         }
         if (args[0].equals("save", true) && args.size >= 4) {
             CraftManager.getInstance().craftTypes.forEach { type -> tabCompletions.add(type.craftName) }
@@ -97,17 +97,27 @@ object HyperdriveCommand : TabExecutor {
                 return true
             }
             val hyperdrive : Hyperdrive
+            val maxRange : Int
+            val warmupTime : Int
             try {
-                val allowedOnCraftTypes = HashSet<String>()
-                if (args.size > 4) {
-                    allowedOnCraftTypes.addAll(args.copyOfRange(4, args.size - 1))
-                }
-                hyperdrive = Hyperdrive(args[1], args[2].toInt(), args[3].toInt(), allowedOnCraftTypes)
-                hyperdrive.copy(sel, signLoc)
+                maxRange = args[2].toInt()
             } catch (e : NumberFormatException) {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + args[2] + " is not a number")
                 return true
             }
+            try {
+                warmupTime = args[3].toInt()
+            } catch (e : NumberFormatException) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + args[3] + " is not a number")
+                return true
+            }
+            val allowedOnCraftTypes = HashSet<String>()
+            if (args.size > 4) {
+                allowedOnCraftTypes.addAll(args.copyOfRange(4, args.size - 1))
+            }
+            hyperdrive = Hyperdrive(args[1], maxRange, warmupTime, allowedOnCraftTypes)
+            hyperdrive.copy(sel, signLoc)
+
             val iterator = HyperdriveManager.hyperdrives.iterator()
             while (iterator.hasNext()) {
                 val next = iterator.next()
