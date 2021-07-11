@@ -58,6 +58,10 @@ object HyperdriveCommand : TabExecutor {
             sender.sendMessage(COMMAND_PREFIX + ERROR + MUST_BE_PLAYER)
             return true
         }
+        if (!sender.hasPermission("movecraftspace.command.hyperdrive")) {
+            sender.sendMessage(COMMAND_PREFIX + ERROR + COMMAND_NO_PERMISSION)
+            return true
+        }
         if (args[0].equals("save", true)) {
             if (args.size < 4) {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "Invalid syntax. Correct syntax is /hyperdrive save <name> <range> <warmupTime> [allowed craft types, separated by space]")

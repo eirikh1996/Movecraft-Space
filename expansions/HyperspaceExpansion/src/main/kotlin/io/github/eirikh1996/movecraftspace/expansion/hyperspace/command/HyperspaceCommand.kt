@@ -263,6 +263,10 @@ object HyperspaceCommand : TabExecutor {
             }
 
         } else if (args[0].equals("pullout", true)) {
+            if (!sender.hasPermission("movecraftspace.command.hyperspace.pullout")) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + COMMAND_NO_PERMISSION)
+                return true
+            }
             if (args.size < 2) {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "You must specify a player")
                 return true

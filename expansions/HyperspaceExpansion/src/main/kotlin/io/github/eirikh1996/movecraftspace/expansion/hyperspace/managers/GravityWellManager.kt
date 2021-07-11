@@ -46,6 +46,10 @@ object GravityWellManager : Iterable<GravityWell>, Listener {
             event.isCancelled = true
             return
         }
+        if (!event.player.hasPermission("movecraftspace.hyperdrive." + gravityWell.name + ".create")) {
+            event.player.sendMessage(COMMAND_PREFIX + ERROR + "You don't have permission to create gravity well " + gravityWell.name)
+            return
+        }
         val sign = event.block.state as Sign
         val face = if (Settings.IsLegacy) {
             val signData = sign.data as org.bukkit.material.Sign

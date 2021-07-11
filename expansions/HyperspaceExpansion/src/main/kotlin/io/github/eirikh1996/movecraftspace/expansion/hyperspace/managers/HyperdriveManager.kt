@@ -44,6 +44,10 @@ object HyperdriveManager : Listener, Iterable<Hyperdrive> {
             event.isCancelled = true
             return
         }
+        if (!event.player.hasPermission("movecraftspace.hyperdrive." + hyperdrive.name + ".create")) {
+            event.player.sendMessage(COMMAND_PREFIX + ERROR + "You don't have permission to create hyperdrive " + hyperdrive.name)
+            return
+        }
         val sign = event.block.state as Sign
         val face = if (Settings.IsLegacy) {
             val signData = sign.data as org.bukkit.material.Sign
@@ -74,6 +78,7 @@ object HyperdriveManager : Listener, Iterable<Hyperdrive> {
                 }
             }
         }
+
         event.setLine(0, ChatColor.AQUA.toString() + "Hyperdrive")
         event.setLine(1, ChatColor.RED.toString() + hyperdrive.name)
         event.setLine(3, ChatColor.GOLD.toString() + "Standby")
