@@ -58,13 +58,7 @@ object GravityWellCommand : TabExecutor {
             sender.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + MSUtils.MUST_BE_PLAYER)
             return true
         }
-        if (args[0].equals("wand", true)) {
-            if (!sender.hasPermission("movecraftspace.hyperspace.wand")) {
-                sender.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + MSUtils.COMMAND_NO_PERMISSION)
-                return true
-            }
-            sender.inventory.addItem(ItemStack(HyperspaceExpansion.instance.hyperdriveSelectionWand))
-        } else if (args[0].equals("save", true)) {
+        if (args[0].equals("save", true)) {
             if (args.size < 3) {
                 sender.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Invalid syntax. Correct syntax is /gravitywell save <name> <range> [allowed craft types, separated by space]")
                 return true
