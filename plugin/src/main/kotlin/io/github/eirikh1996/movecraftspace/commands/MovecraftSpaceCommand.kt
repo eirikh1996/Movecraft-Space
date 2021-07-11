@@ -91,12 +91,12 @@ object MovecraftSpaceCommand : TabExecutor {
                 return true
             }
             sender.inventory.addItem(ItemStack(Settings.SelectionWand))
-        } else if (args[0].equals("disablewand", true)) {
+        } else if (args[0].equals("togglewand", true)) {
             if (sender !is Player) {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + MSUtils.MUST_BE_PLAYER)
                 return true
             }
-            if (!sender.hasPermission("movecraftspace.disablewand")) {
+            if (!sender.hasPermission("movecraftspace.togglewand")) {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + MSUtils.COMMAND_NO_PERMISSION)
                 return true
             }
@@ -104,11 +104,15 @@ object MovecraftSpaceCommand : TabExecutor {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "Selections are not enabled as no selection supported expansions are installed")
                 return true
             }
+            var message = COMMAND_PREFIX + "Selection wand "
             if (SelectionManager.selectionsDisabled.contains(sender.uniqueId)) {
                 SelectionManager.selectionsDisabled.remove(sender.uniqueId)
+                message += "disabled "
             } else {
                 SelectionManager.selectionsDisabled.add(sender.uniqueId)
+                message += "enabled "
             }
+            message += "for " + sender.name
             SelectionManager.saveDisableWandList()
         } else if (args[0].equals("wiki", true))
             sender.sendMessage(COMMAND_PREFIX + "https://github.com/eirikh1996/Movecraft-Space/wiki")
@@ -116,8 +120,8 @@ object MovecraftSpaceCommand : TabExecutor {
     }
 
     override fun onTabComplete(sender : CommandSender, cmd : Command, label : String, args : Array<out String>) : List<String> {
-        var tabCompletions = listOf("expansions", "wand", "disablewand", "wiki").sorted()
-        if (args.size == 0)
+        var tabCompletions = listOf("expansions", "wand", "togglewand", "wiki").sorted()
+        if (args.isEmpty())
             return tabCompletions
         else if (args[0].equals("expansions", true)) {
             val list = ArrayList<String>()
