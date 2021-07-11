@@ -21,5 +21,5 @@ object Settings {
     val ExplodeSinkingCraftsInWorlds : Set<String> get() { return ConfigHolder.config.getStringList("ExplodeSinkingCraftsInWorlds").toHashSet() }
     val RotatePlanets : Boolean get() { return ConfigHolder.config.getBoolean("RotatePlanets", true) }
     val DisableReleaseInPlanetaryOrbits : Boolean get() = ConfigHolder.config.getBoolean("DisableReleaseInPlanetaryOrbits", true)
-    val SelectionWand : Material get() { return Material.getMaterial(ConfigHolder.config.getString("SelectionTool","STONE_HOE")!!)!!}
+    val SelectionWand : Material get() { return Material.getMaterial(ConfigHolder.config.getString("SelectionTool","STONE_HOE")!!.toUpperCase())!!}
 }

@@ -12,3 +12,4 @@ ExplodeSinkingCraftsInWorlds:
   - Space
 SinkExplosionSize: 3.0
 DisableReleaseInPlanetaryOrbits: true
+SelectionTool: STONE_HOE
