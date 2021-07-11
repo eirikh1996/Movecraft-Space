@@ -84,6 +84,7 @@ class MovecraftSpace : JavaPlugin() {
         ExpansionManager.pl = this
         instance = this
         ExpansionManager.loadExpansions()
+        MSUtils.plugin = this
     }
 
     override fun onDisable() {

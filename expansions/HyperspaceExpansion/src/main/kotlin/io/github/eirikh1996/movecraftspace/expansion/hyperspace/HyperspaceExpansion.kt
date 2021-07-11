@@ -22,7 +22,6 @@ class HyperspaceExpansion : Expansion(), SelectionSupported {
     lateinit var hyperspaceChargeSound : String
     lateinit var hyperspaceEnterSound : String
     lateinit var hyperspaceExitSound : String
-    lateinit var hyperdriveSelectionWand : Material
     lateinit var hypermatter : Material
     lateinit var hypermatterName : String
     lateinit var allowedCraftTypesForHyperspaceSign : Set<String>
@@ -70,7 +69,6 @@ class HyperspaceExpansion : Expansion(), SelectionSupported {
         hyperspaceEnterSound = config.getString("Hyperspace enter sound", "entity.enderman.teleport")!!.toLowerCase()
         hyperspaceChargeSound = config.getString("Hyperspace charge sound", "entity.ender_dragon.ambient")!!.toLowerCase()
         hyperspaceExitSound = config.getString("Hyperspace exit sound", "entity.enderman.teleport")!!.toLowerCase()
-        hyperdriveSelectionWand = Material.getMaterial(config.getString("Hyperdrive selection wand", "STONE_HOE")!!)!!
         hypermatter = Material.getMaterial(config.getString("Hypermatter.type", "EMERALD")!!) ?: Material.EMERALD
         hypermatterName = config.getString("Hypermatter.name", "")!!
         if (config.contains("Max hyperdrives on craft"))
@@ -79,8 +77,8 @@ class HyperspaceExpansion : Expansion(), SelectionSupported {
             config.getConfigurationSection("Max gravity wells on craft")!!.getValues(false).forEach { t, u -> maxGravityWellsOnCraft.put(t, u as Int) }
         allowedCraftTypesForHyperspaceSign = config.getStringList("Allowed craft types for hyperspace sign").toSet()
         allowedCraftTypesForJumpCommand = config.getStringList("Allowed craft types for jump command").toSet()
-        extraMassShadowRangeOfPlanets = config.getInt("Extra mass shadow range of planets", 0)
-        extraMassShadowRangeOfStars = config.getInt("Extra mass shadow range of stars", 0)
+        extraMassShadowRangeOfPlanets = config.getInt("Extra mass shadow range.planets", 0)
+        extraMassShadowRangeOfStars = config.getInt("Extra mass shadow range.stars", 0)
         plugin.getCommand("hyperspace")!!.setExecutor(HyperspaceCommand)
         plugin.getCommand("hyperdrive")!!.setExecutor(HyperdriveCommand)
         plugin.getCommand("jump")!!.setExecutor(JumpCommand)

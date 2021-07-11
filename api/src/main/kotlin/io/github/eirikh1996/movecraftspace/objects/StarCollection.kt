@@ -41,7 +41,7 @@ object StarCollection : Iterable<Star> {
         var lastDistance = if (maxDistance <= -1) Double.MAX_VALUE else maxDistance.toDouble()
         for (s in StarCollection) {
             val distance = s.loc.distance(ImmutableVector.fromLocation(loc)) - s.radius()
-            if (s.space.equals(loc.world) && distance <= lastDistance) {
+            if (s.space == loc.world && distance <= lastDistance) {
                 star = s
                 lastDistance = distance
             }

@@ -13,6 +13,7 @@ import net.countercraft.movecraft.utils.MathUtils
 import org.bukkit.*
 import org.bukkit.Bukkit.getConsoleSender
 import org.bukkit.block.BlockFace
+import org.bukkit.plugin.Plugin
 import org.bukkit.scheduler.BukkitRunnable
 import java.io.File
 import java.lang.Exception
@@ -26,6 +27,7 @@ import kotlin.random.Random
 
 object MSUtils {
     private var setBlockFast : Method? = null
+    lateinit var plugin : Plugin
     init {
         try {
             setBlockFast = WorldHandler::class.java.getDeclaredMethod("setBlockFast", Location::class.java, Material::class.java, Any::class.java)
@@ -61,9 +63,10 @@ object MSUtils {
     }
 
     fun displayTitle() {
-        getConsoleSender().sendMessage(" __      __                                                ___    _            ____")
+        val version = plugin.description.version
+        getConsoleSender().sendMessage(" __      __                                                  ___    _            ____")
         getConsoleSender().sendMessage("|  \\    /  |                                               / __\\  | |          / __ \\ ")
-        getConsoleSender().sendMessage("|   \\  /   |                                               | |    | |         / /  \\_\\ ")
+        getConsoleSender().sendMessage("|   \\  /   |   $version                                     | |    | |         / /  \\_\\ ")
         getConsoleSender().sendMessage("|    \\/    |  __   _  _     ___    __   __  ___    ____   _| |_  _| |_   ___  | |__    _  ___   ____      __    ___")
         getConsoleSender().sendMessage("| |\\    /| | /  \\ | || |  / _ \\  /  \\ |  |/ _ \\  /___ \\ |_   _||_   _| |___| \\\\__ \\  | |/ _ \\ /___  \\   /  \\  / _ \\ ")
         getConsoleSender().sendMessage("| | \\  / | |/ /\\ \\| || | / /_\\_\\/ /\\_\\|    / \\_\\ ____| |  | |    | |             \\ \\ |   / \\ | ____| | / /\\_\\/ /_\\_\\ ")

@@ -49,9 +49,9 @@ object PlanetCollection : Iterable<Planet> {
         return foundPlanet
     }
 
-    fun getPlanetAt(loc : Location, extraRadius : Int = 0) : Planet? {
+    fun getPlanetAt(loc : Location, extraRadius : Int = 0, searchSpaceOnly : Boolean = false) : Planet? {
         for (planet in planets) {
-            if (planet.isPlanet(loc.world!!) || planet.contains(loc, extraRadius)) {
+            if ((searchSpaceOnly && planet.isPlanet(loc.world!!)) || planet.contains(loc, extraRadius)) {
                 return planet;
             }
         }

@@ -263,7 +263,7 @@ object HyperspaceCommand : TabExecutor {
             }
 
         } else if (args[0].equals("pullout", true)) {
-            if (args.size < 3) {
+            if (args.size < 2) {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "You must specify a player")
                 return true
             }
@@ -282,16 +282,18 @@ object HyperspaceCommand : TabExecutor {
                 return true
             }
             val midpoint = craft.hitBox.midPoint
-            var target = HyperspaceManager.targetLocations[midpoint]
+            var target = HyperspaceManager.targetLocations.remove(midpoint)
             if (target == null) {
-                target = sender.location
+                target = sender.location.clone()
+                target.add(craft.hitBox.xLength.toDouble(), 0.0, craft.hitBox.zLength.toDouble())
             }
-            val coords = HyperspaceManager.randomCoords(sender, target, 100, craft.hitBox.yLength)
-            val dx = coords[0] - midpoint.x
-            val dy = coords[1] - midpoint.y
-            val dz = coords[2] - midpoint.z
+            target = HyperspaceManager.nearestUnobstructedLoc(target, craft)
+            val dx = target.blockX - midpoint.x
+            val dy = target.blockY - midpoint.y
+            val dz = target.blockZ - midpoint.z
             sender.sendMessage(COMMAND_PREFIX + "Pulling " + player.name + "'s craft out of hyperspace")
             craft.translate(target.world, dx, dy, dz)
+
         }
         return true
     }
