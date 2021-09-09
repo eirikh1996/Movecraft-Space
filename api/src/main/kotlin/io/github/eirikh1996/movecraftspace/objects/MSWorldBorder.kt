@@ -5,6 +5,7 @@ import org.bukkit.Location
 import org.bukkit.WorldBorder
 import org.bukkit.util.Vector
 import kotlin.math.abs
+import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
@@ -70,6 +71,6 @@ data class MSWorldBorder(val center : Immutable2dVector, val xRadius : Double, v
         return dx <= xRadius && dz <= zRadius
     }
     companion object {
-        fun fromBukkit(worldBorder : WorldBorder) = MSWorldBorder(Immutable2dVector.fromLocation(worldBorder.center), worldBorder.size, worldBorder.size)
+        fun fromBukkit(worldBorder : WorldBorder) = MSWorldBorder(Immutable2dVector.fromLocation(worldBorder.center), min(worldBorder.size, 29999983.7), min(worldBorder.size, 29999983.7))
     }
 }
