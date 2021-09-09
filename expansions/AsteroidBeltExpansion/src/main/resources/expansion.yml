@@ -1,0 +1,11 @@
+name: AsteroidBeltExpansion
+main: io.github.eirikh1996.expansion.asteroidbelt.AsteroidBeltExpansion
+version: '${project.version}'
+commands:
+  asteroidbelt:
+    aliases:
+      - abelt
+      - ab
+    usage: /asteroidbelt
+  asteroid:
+    usage: /asteroid

@@ -9,14 +9,16 @@ import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.FileInputStream
 import java.io.PrintWriter
+import java.util.concurrent.ConcurrentHashMap
 
 
 object StarCollection : Iterable<Star> {
-    val stars = HashSet<Star>()
+    val stars : MutableSet<Star> = ConcurrentHashMap.newKeySet()
     lateinit var pl : Plugin
     override fun iterator(): Iterator<Star> {
         return stars.iterator()
     }
+
 
     /**
      * @param loc The location from which to calculate from
@@ -27,7 +29,7 @@ object StarCollection : Iterable<Star> {
         var lastDistance = if (maxDistance <= -1) Double.MAX_VALUE else maxDistance.toDouble()
         for (s in StarCollection) {
             val distance = s.loc.distance(ImmutableVector.fromLocation(loc))
-            if (s.space.equals(loc.world) && distance <= lastDistance) {
+            if (s.space == loc.world && distance <= lastDistance) {
                 star = s
                 lastDistance = distance
             }

@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="movecraft-space-api" />
+        <module name="AsteroidBeltExpansion" />
       </profile>
       <profile name="Annotation profile for DynmapExpansion" enabled="true">
         <sourceOutputDir name="../../target/expansions/dynmap/generated-sources/annotations" />
@@ -82,6 +83,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="AsteroidExpansion" target="1.5" />
       <module name="movecraft-space-movecraft-8" target="1.5" />
       <module name="Movecraft-Space-Parent" target="1.5" />
       <module name="movecraft-space-WE6" target="1.5" />

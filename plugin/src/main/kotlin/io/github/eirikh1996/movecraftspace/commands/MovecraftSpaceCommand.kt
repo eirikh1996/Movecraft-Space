@@ -105,14 +105,15 @@ object MovecraftSpaceCommand : TabExecutor {
                 return true
             }
             var message = COMMAND_PREFIX + "Selection wand "
-            if (SelectionManager.selectionsDisabled.contains(sender.uniqueId)) {
+            message += if (SelectionManager.selectionsDisabled.contains(sender.uniqueId)) {
                 SelectionManager.selectionsDisabled.remove(sender.uniqueId)
-                message += "disabled "
+                "disabled "
             } else {
                 SelectionManager.selectionsDisabled.add(sender.uniqueId)
-                message += "enabled "
+                "enabled "
             }
             message += "for " + sender.name
+            sender.sendMessage(message)
             SelectionManager.saveDisableWandList()
         } else if (args[0].equals("wiki", true))
             sender.sendMessage(COMMAND_PREFIX + "https://github.com/eirikh1996/Movecraft-Space/wiki")

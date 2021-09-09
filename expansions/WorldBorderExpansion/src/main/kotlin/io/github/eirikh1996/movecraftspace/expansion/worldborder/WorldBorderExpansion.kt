@@ -1,8 +1,12 @@
 package io.github.eirikh1996.movecraftspace.expansion.worldborder
 
+import com.wimbli.WorldBorder.Config
 import com.wimbli.WorldBorder.WorldBorder
 import io.github.eirikh1996.movecraftspace.expansion.Expansion
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionState
+import io.github.eirikh1996.movecraftspace.objects.Immutable2dVector
+import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
+import io.github.eirikh1996.movecraftspace.objects.MSWorldBorder
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.World
@@ -21,13 +25,11 @@ class WorldBorderExpansion : Expansion() {
         worldBorder = wb
     }
 
-    override fun worldBoundrary(world: World): IntArray {
-        val borderData = worldBorder.getWorldBorder(world.name)
-        if (borderData == null) {
-            return super.worldBoundrary(world)
-        }
-
-        return intArrayOf((borderData.x - borderData.radiusX).toInt(), (borderData.x + borderData.radiusX).toInt(), (borderData.z - borderData.radiusZ).toInt(), (borderData.z + borderData.radiusZ).toInt())
+    override fun worldBoundrary(world: World): MSWorldBorder {
+        val borderData = worldBorder.getWorldBorder(world.name) ?: return super.worldBoundrary(world)
+        val shape = Config::class.java.getDeclaredField("shapeRound")
+        shape.isAccessible = true
+        return MSWorldBorder(Immutable2dVector(borderData.x.toInt(), borderData.z.toInt()), borderData.radiusX.toDouble(), borderData.radiusZ.toDouble(), borderData.shape ?: shape.getBoolean(null))
     }
 
     override fun allowedArea(p: Player, loc: Location) : Boolean {

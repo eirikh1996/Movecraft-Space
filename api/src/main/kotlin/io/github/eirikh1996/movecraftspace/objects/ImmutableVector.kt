@@ -3,6 +3,7 @@ package io.github.eirikh1996.movecraftspace.objects
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.configuration.serialization.ConfigurationSerializable
+import org.bukkit.util.Vector
 import kotlin.math.*
 
 data class ImmutableVector constructor(val x : Int, val y : Int, val z : Int) : ConfigurationSerializable{
@@ -34,13 +35,39 @@ data class ImmutableVector constructor(val x : Int, val y : Int, val z : Int) : 
 
     val length = sqrt((x * x + y * y + z * z).toDouble())
 
-    fun rotate(angle : Double, origin : ImmutableVector) : ImmutableVector {
+
+    val bukkitVector : Vector get() = Vector(x, y, z)
+
+    enum class Axis {
+        X, Y, Z
+    }
+
+    fun rotate(angle : Double, origin : ImmutableVector, axis: Axis = Axis.Y) : ImmutableVector {
         val toRotate = subtract(origin)
         val cos = cos(angle)
         val sin = sin(angle)
-        val x = round(toRotate.x * cos + toRotate.z * -sin).toInt()
-        val z = round(toRotate.x * sin + toRotate.z * cos).toInt()
-        return ImmutableVector(x, 0, z).add(origin)
+        val x : Int
+        val y : Int
+        val z : Int
+        when (axis) {
+            Axis.X -> {
+                x = 0
+                y = round(toRotate.y * cos + toRotate.y * sin).toInt()
+                z = round(toRotate.x * -sin + toRotate.z * cos).toInt()
+            }
+            Axis.Y -> {
+                x = round(toRotate.x * cos + toRotate.z * -sin).toInt()
+                y = 0
+                z = round(toRotate.x * sin + toRotate.z * cos).toInt()
+            }
+            Axis.Z -> {
+                x = round(toRotate.x * cos + toRotate.y * -sin).toInt()
+                y = round(toRotate.x * sin + toRotate.y * cos).toInt()
+                z = 0
+            }
+        }
+
+        return ImmutableVector(x, y, z).add(origin)
     }
 
     fun normalize(): ImmutableVector {
@@ -53,18 +80,26 @@ data class ImmutableVector constructor(val x : Int, val y : Int, val z : Int) : 
 
     override fun serialize(): MutableMap<String, Any> {
         val map = HashMap<String, Any>()
-        map.put("x", x)
-        map.put("y", y)
-        map.put("z", z)
+        map["x"] = x
+        map["y"] = y
+        map["z"] = z
         return map
     }
 
     override fun toString(): String {
-        return "( " + x + ", " + y + ", " + z + ")"
+        return "( $x, $y, $z)"
     }
 
-    fun times(other: ImmutableVector) : Int{
-        return x * other.x + y * other.y + z * other.z
+    fun dot(other: Immutable2dVector) : Int{
+        return x * other.x + z * other.z
+    }
+
+    fun multiply(value : Int): Immutable2dVector {
+        return Immutable2dVector(x * value, z * value)
+    }
+
+    fun divide(value : Int): Immutable2dVector {
+        return Immutable2dVector(x / value, z / value)
     }
 
     companion object {

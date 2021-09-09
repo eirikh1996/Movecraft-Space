@@ -14,7 +14,6 @@ import org.bukkit.scheduler.BukkitRunnable
 import org.dynmap.DynmapCommonAPI
 import org.dynmap.markers.CircleMarker
 import org.dynmap.markers.Marker
-import org.dynmap.markers.MarkerAPI
 
 class DynmapExpansion : Expansion() {
     val orbitMarkerByID = HashMap<String, CircleMarker>()
@@ -40,18 +39,20 @@ class DynmapExpansion : Expansion() {
         }
 
         object : BukkitRunnable() {
-            val pMarkers = dynmap.markerAPI.getMarkerSet("planets")
-            val planetMarkers = if (pMarkers == null) {
-                dynmap.markerAPI.createMarkerSet("planets", "Planets", dynmap.markerAPI.markerIcons, false)
-            } else {
-                pMarkers
-            }
-            val oMarkers = dynmap.markerAPI.getMarkerSet("orbits")
-            val orbitMarkers = if (oMarkers == null) {
-                dynmap.markerAPI.createMarkerSet("orbits", "Orbits", dynmap.markerAPI.markerIcons, false)
-            } else {
-                oMarkers
-            }
+            val planetMarkers =
+                dynmap.markerAPI.getMarkerSet("planets") ?: dynmap.markerAPI.createMarkerSet(
+                    "planets",
+                    "Planets",
+                    dynmap.markerAPI.markerIcons,
+                    false
+                )
+            val orbitMarkers =
+                dynmap.markerAPI.getMarkerSet("orbits") ?: dynmap.markerAPI.createMarkerSet(
+                    "orbits",
+                    "Orbits",
+                    dynmap.markerAPI.markerIcons,
+                    false
+                )
             val sMarkers = dynmap.markerAPI.getMarkerSet("stars")
             val starMarkers = if (sMarkers == null) {
                 dynmap.markerAPI.createMarkerSet("stars", "Stars", dynmap.markerAPI.markerIcons, false)
@@ -60,10 +61,16 @@ class DynmapExpansion : Expansion() {
             }
             val bMarkers = dynmap.markerAPI.getMarkerSet("hyperspace beacons")
             val beaconMarkers = if (bMarkers == null) {
-                dynmap.markerAPI.createMarkerSet("hyperspace beacons", "Hyperspace beacons", dynmap.markerAPI.markerIcons, false)
+                dynmap.markerAPI.createMarkerSet(
+                    "hyperspace beacons",
+                    "Hyperspace beacons",
+                    dynmap.markerAPI.markerIcons,
+                    false
+                )
             } else {
                 bMarkers
             }
+
             override fun run() {
                 for (planet in PlanetCollection) {
                     val star = StarCollection.closestStar(planet.orbitCenter.toLocation(planet.space))!!
@@ -72,36 +79,47 @@ class DynmapExpansion : Expansion() {
                     val orbitMarker = if (!orbitMarkerByID.containsKey(orbitMarkerID)) {
                         val tempOrbitMarker = orbitMarkers.findCircleMarker(orbitMarkerID)
                         if (tempOrbitMarker == null) {
-                            orbitMarkers.createCircleMarker(orbitMarkerID, orbitMarkerID, false, planet.space.name,
+                            orbitMarkers.createCircleMarker(
+                                orbitMarkerID, orbitMarkerID, false, planet.space.name,
                                 planet.orbitCenter.x.toDouble(),
                                 planet.orbitCenter.y.toDouble(),
-                                planet.orbitCenter.z.toDouble(), orbitRadius, orbitRadius, false)
+                                planet.orbitCenter.z.toDouble(), orbitRadius, orbitRadius, false
+                            )
                         } else {
-                            tempOrbitMarker.setCenter(planet.space.name,
-                                planet.orbitCenter.x.toDouble(), planet.orbitCenter.y.toDouble(), planet.orbitCenter.z.toDouble()
+                            tempOrbitMarker.setCenter(
+                                planet.space.name,
+                                planet.orbitCenter.x.toDouble(),
+                                planet.orbitCenter.y.toDouble(),
+                                planet.orbitCenter.z.toDouble()
                             )
                             tempOrbitMarker.setRadius(orbitRadius, orbitRadius)
                             tempOrbitMarker
                         }
                     } else {
-                        val tempOrbitMarker = orbitMarkerByID.get(orbitMarkerID)!!
-                        tempOrbitMarker.setCenter(planet.space.name,
-                            planet.orbitCenter.x.toDouble(), planet.orbitCenter.y.toDouble(), planet.orbitCenter.z.toDouble()
+                        val tempOrbitMarker = orbitMarkerByID[orbitMarkerID]!!
+                        tempOrbitMarker.setCenter(
+                            planet.space.name,
+                            planet.orbitCenter.x.toDouble(),
+                            planet.orbitCenter.y.toDouble(),
+                            planet.orbitCenter.z.toDouble()
                         )
                         tempOrbitMarker.setRadius(orbitRadius, orbitRadius)
                         tempOrbitMarker
                     }
                     orbitMarker.setFillStyle(0.0, 16711680)
-                    val planetMarkerID =  planet.destination.name + "_planet_" + planet.space.name
+                    val planetMarkerID = planet.destination.name + "_planet_" + planet.space.name
                     val markerIcon = dynmap.markerAPI.getMarkerIcon("world")
                     val planetMarker = if (!planetMarkerByID.containsKey(planetMarkerID)) {
                         val tempPlanetMarker = planetMarkers.findMarker(planetMarkerID)
                         if (tempPlanetMarker == null) {
-                            planetMarkers.createMarker(planetMarkerID, planet.destination.name, planet.space.name,
+                            planetMarkers.createMarker(
+                                planetMarkerID, planet.destination.name, planet.space.name,
                                 planet.center.x.toDouble(),
-                                planet.center.y.toDouble(), planet.center.z.toDouble(), markerIcon, false)
+                                planet.center.y.toDouble(), planet.center.z.toDouble(), markerIcon, false
+                            )
                         } else {
-                            tempPlanetMarker.setLocation(planet.space.name,
+                            tempPlanetMarker.setLocation(
+                                planet.space.name,
                                 planet.center.x.toDouble(), planet.center.y.toDouble(), planet.center.z.toDouble()
                             )
                             tempPlanetMarker.setMarkerIcon(markerIcon)
@@ -109,31 +127,36 @@ class DynmapExpansion : Expansion() {
                         }
                     } else {
                         val tempPlanetMarker = planetMarkerByID.get(planetMarkerID)!!
-                        tempPlanetMarker.setLocation(planet.space.name,
+                        tempPlanetMarker.setLocation(
+                            planet.space.name,
                             planet.center.x.toDouble(), planet.center.y.toDouble(), planet.center.z.toDouble()
                         )
-                        tempPlanetMarker.setMarkerIcon(markerIcon)
+                        tempPlanetMarker.markerIcon = markerIcon
                         tempPlanetMarker
                     }
                     if (planetMarker != null && !planetMarkerByID.containsKey(planetMarkerID)) {
-                        planetMarkerByID.put(planetMarkerID, planetMarker)
+                        planetMarkerByID[planetMarkerID] = planetMarker
                     }
                     if (orbitMarker != null && !orbitMarkerByID.containsKey(orbitMarkerID)) {
-                        orbitMarkerByID.put(orbitMarkerID, orbitMarker)
+                        orbitMarkerByID[orbitMarkerID] = orbitMarker
                     }
+                    dynmap.triggerRenderOfVolume(planet.space.name, planet.minX, planet.minY, planet.minZ, planet.maxX, planet.minY, planet.maxz)
                 }
                 for (star in StarCollection) {
 
-                    val starMarkerID =  star.name + "_" + star.space.name
+                    val starMarkerID = star.name + "_" + star.space.name
                     val starMarkerIcon = dynmap.markerAPI.getMarkerIcon("sun")
                     val starMarker = if (!starMarkerByID.containsKey(starMarkerID)) {
                         val tempStarMarker = starMarkers.findMarker(starMarkerID)
                         if (tempStarMarker == null) {
-                            starMarkers.createMarker(starMarkerID, star.name, star.space.name,
+                            starMarkers.createMarker(
+                                starMarkerID, star.name, star.space.name,
                                 star.loc.x.toDouble(), star.loc.y.toDouble(),
-                                star.loc.z.toDouble(), starMarkerIcon, false)
+                                star.loc.z.toDouble(), starMarkerIcon, false
+                            )
                         } else {
-                            tempStarMarker.setLocation(star.space.name, star.loc.x.toDouble(),
+                            tempStarMarker.setLocation(
+                                star.space.name, star.loc.x.toDouble(),
                                 star.loc.y.toDouble(), star.loc.z.toDouble()
                             )
                             tempStarMarker.setMarkerIcon(starMarkerIcon)
@@ -141,7 +164,8 @@ class DynmapExpansion : Expansion() {
                         }
                     } else {
                         val tempStarMarker = starMarkerByID.get(starMarkerID)!!
-                        tempStarMarker.setLocation(star.space.name, star.loc.x.toDouble(), star.loc.y.toDouble(),
+                        tempStarMarker.setLocation(
+                            star.space.name, star.loc.x.toDouble(), star.loc.y.toDouble(),
                             star.loc.z.toDouble()
                         )
                         tempStarMarker.setMarkerIcon(starMarkerIcon)
@@ -190,7 +214,8 @@ class DynmapExpansion : Expansion() {
                                 hsBeacon.origin.y,
                                 hsBeacon.origin.z,
                                 beaconMarker,
-                                false)
+                                false
+                            )
                         } else {
                             tempOriginBeaconMarker.setLocation(
                                 hsBeacon.origin.world!!.name,
@@ -227,7 +252,8 @@ class DynmapExpansion : Expansion() {
                                 hsBeacon.destination.y,
                                 hsBeacon.destination.z,
                                 beaconMarker,
-                                false)
+                                false
+                            )
                         } else {
                             tempDestinationBeaconMarker.setLocation(
                                 hsBeacon.destination.world!!.name,

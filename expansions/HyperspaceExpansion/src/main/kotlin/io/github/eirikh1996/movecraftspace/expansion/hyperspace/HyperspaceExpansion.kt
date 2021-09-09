@@ -16,6 +16,7 @@ import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
 import org.bukkit.*
 import org.bukkit.Bukkit.getPluginManager
 import java.io.File
+import kotlin.math.max
 
 class HyperspaceExpansion : Expansion(), SelectionSupported {
     lateinit var hyperspaceWorld : World
@@ -72,13 +73,13 @@ class HyperspaceExpansion : Expansion(), SelectionSupported {
         hypermatter = Material.getMaterial(config.getString("Hypermatter.type", "EMERALD")!!) ?: Material.EMERALD
         hypermatterName = config.getString("Hypermatter.name", "")!!
         if (config.contains("Max hyperdrives on craft"))
-            config.getConfigurationSection("Max hyperdrives on craft")!!.getValues(false).forEach { t, u -> maxHyperdrivesOnCraft.put(t, u as Int) }
+            config.getConfigurationSection("Max hyperdrives on craft")!!.getValues(false).forEach { (t, u) -> maxHyperdrivesOnCraft.put(t, u as Int) }
         if (config.contains("Max gravity wells on craft"))
-            config.getConfigurationSection("Max gravity wells on craft")!!.getValues(false).forEach { t, u -> maxGravityWellsOnCraft.put(t, u as Int) }
+            config.getConfigurationSection("Max gravity wells on craft")!!.getValues(false).forEach { (t, u) -> maxGravityWellsOnCraft.put(t, u as Int) }
         allowedCraftTypesForHyperspaceSign = config.getStringList("Allowed craft types for hyperspace sign").toSet()
         allowedCraftTypesForJumpCommand = config.getStringList("Allowed craft types for jump command").toSet()
-        extraMassShadowRangeOfPlanets = config.getInt("Extra mass shadow range.planets", 0)
-        extraMassShadowRangeOfStars = config.getInt("Extra mass shadow range.stars", 0)
+        extraMassShadowRangeOfPlanets = max(config.getInt("Extra mass shadow range.planets", 0), 0)
+        extraMassShadowRangeOfStars = max(config.getInt("Extra mass shadow range.stars", 0), 0)
         plugin.getCommand("hyperspace")!!.setExecutor(HyperspaceCommand)
         plugin.getCommand("hyperdrive")!!.setExecutor(HyperdriveCommand)
         plugin.getCommand("jump")!!.setExecutor(JumpCommand)

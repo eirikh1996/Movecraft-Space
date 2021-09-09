@@ -46,7 +46,7 @@ object GravityWellManager : Iterable<GravityWell>, Listener {
             event.isCancelled = true
             return
         }
-        if (!event.player.hasPermission("movecraftspace.hyperdrive." + gravityWell.name + ".create")) {
+        if (!event.player.hasPermission("movecraftspace.gravitywell." + gravityWell.name + ".create")) {
             event.player.sendMessage(COMMAND_PREFIX + ERROR + "You don't have permission to create gravity well " + gravityWell.name)
             return
         }
@@ -68,7 +68,7 @@ object GravityWellManager : Iterable<GravityWell>, Listener {
         for (vec in locs) {
             for (shift in SHIFTS) {
                 val test = vec.add(shift)
-                if (locs.contains(test) || test.equals(ImmutableVector.fromLocation(event.block.location)))
+                if (locs.contains(test) || test == ImmutableVector.fromLocation(event.block.location))
                     continue
                 if (test.toLocation(event.block.world).block.state !is Sign)
                     continue

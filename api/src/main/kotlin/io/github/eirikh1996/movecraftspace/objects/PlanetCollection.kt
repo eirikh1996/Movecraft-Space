@@ -14,19 +14,20 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.PrintWriter
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 import kotlin.math.abs
 
 object PlanetCollection : Iterable<Planet> {
-    private val planets = HashSet<Planet>()
+    private val planets : MutableSet<Planet> = ConcurrentHashMap.newKeySet()
     lateinit var pl : Plugin
 
     fun getPlanetsWithOrbitPoint(orbitPoint : ImmutableVector) : Set<Planet> {
         val returnSet = HashSet<Planet>()
         for (p in PlanetCollection) {
-            if (!p.orbitCenter.equals(orbitPoint))
+            if (p.orbitCenter != orbitPoint)
                 continue
             returnSet.add(p)
         }
@@ -51,7 +52,7 @@ object PlanetCollection : Iterable<Planet> {
 
     fun getPlanetAt(loc : Location, extraRadius : Int = 0, searchSpaceOnly : Boolean = false) : Planet? {
         for (planet in planets) {
-            if ((searchSpaceOnly && planet.isPlanet(loc.world!!)) || planet.contains(loc, extraRadius)) {
+            if ((!searchSpaceOnly && planet.destination == loc.world!!) || planet.contains(loc, extraRadius)) {
                 return planet;
             }
         }

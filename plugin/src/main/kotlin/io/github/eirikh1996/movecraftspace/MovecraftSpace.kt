@@ -68,9 +68,9 @@ class MovecraftSpace : JavaPlugin() {
         object : BukkitRunnable() {
             override fun run() {
                 ExpansionManager.enableExpansions()
+                server.pluginManager.registerEvents(UpdateManager, instance)
             }
         }.runTaskLater(this, 10)
-        server.pluginManager.registerEvents(UpdateManager, this)
     }
 
     fun averageTicks() : Double {

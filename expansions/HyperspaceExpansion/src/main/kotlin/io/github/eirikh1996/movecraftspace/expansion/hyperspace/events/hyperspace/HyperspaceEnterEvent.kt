@@ -1,4 +1,4 @@
-package io.github.eirikh1996.movecraftspace.expansion.hyperspace.events
+package io.github.eirikh1996.movecraftspace.expansion.hyperspace.events.hyperspace
 
 import net.countercraft.movecraft.craft.Craft
 import org.bukkit.event.Cancellable

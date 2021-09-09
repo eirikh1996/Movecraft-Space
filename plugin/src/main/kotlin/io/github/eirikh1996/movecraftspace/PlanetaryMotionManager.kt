@@ -129,10 +129,10 @@ object PlanetaryMotionManager : BukkitRunnable() {
             var destLoc : MovecraftLocation? = null
             while (destLoc == null) {
                 val bounds = ExpansionManager.worldBoundrary(planet.destination)
-                val minX = (bounds[0] + (hitBox.xLength / 2)) + 10
-                val maxX = (bounds[1] - (hitBox.xLength / 2)) - 10
-                val minZ = (bounds[2] + (hitBox.zLength / 2)) + 10
-                val maxZ = (bounds[3] - (hitBox.zLength / 2)) - 10
+                val minX = (bounds.minPoint.x + (hitBox.xLength / 2)) + 10
+                val maxX = (bounds.maxPoint.x - (hitBox.xLength / 2)) - 10
+                val minZ = (bounds.minPoint.z + (hitBox.zLength / 2)) + 10
+                val maxZ = (bounds.maxPoint.z - (hitBox.zLength / 2)) - 10
                 val x = Random.nextInt(minX, maxX)
                 val z = Random.nextInt(minZ, maxZ)
                 val test = MovecraftLocation(x, y, z)

@@ -11,7 +11,7 @@ import org.bukkit.block.data.BlockData
 import org.bukkit.configuration.serialization.ConfigurationSerializable
 import org.bukkit.material.Directional
 
-data class MSBlock(val type : Material, val data : Any, val facing : BlockFace = BlockFace.SELF) : ConfigurationSerializable {
+data class MSBlock(val type : Material, val data : Any = if (Settings.IsLegacy) 0 else Bukkit.createBlockData(type), val facing : BlockFace = BlockFace.SELF) : ConfigurationSerializable {
 
     override fun serialize(): MutableMap<String, Any> {
         val map = HashMap<String, Any>()
@@ -97,5 +97,9 @@ data class MSBlock(val type : Material, val data : Any, val facing : BlockFace =
             }
             return MSBlock(block.type, data, face)
         }
+    }
+
+    override fun toString(): String {
+        return "(${type.name}, $data, $facing)"
     }
 }

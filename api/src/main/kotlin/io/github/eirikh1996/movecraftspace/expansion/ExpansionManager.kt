@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap
 import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.expansion.selection.SelectionManager
 import io.github.eirikh1996.movecraftspace.expansion.selection.SelectionSupported
+import io.github.eirikh1996.movecraftspace.objects.MSWorldBorder
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
 import io.github.eirikh1996.movecraftspace.objects.StarCollection
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
@@ -42,25 +43,19 @@ object ExpansionManager : Iterable<Expansion> {
         craftTaskClass = Class.forName("org.bukkit.craftbukkit." + version + ".scheduler.CraftTask")
     }
 
-    fun worldBoundrary(world: World) : IntArray {
-        val lastBounds = intArrayOf(-29999984, 29999984, -29999984, 29999984)
+    fun worldBoundrary(world: World) : MSWorldBorder {
+        var lastBounds = MSWorldBorder.fromBukkit(world.worldBorder)
         for (ex in getExpansions(ExpansionState.ENABLED)) {
             val bounds = ex.worldBoundrary(world)
-            if (bounds[0] > lastBounds[0])
-                lastBounds[0] = bounds[0]
-            if (bounds[1] < lastBounds[1])
-                lastBounds[1] = bounds[1]
-            if (bounds[2] > lastBounds[2])
-                lastBounds[2] = bounds[2]
-            if (bounds[3] < lastBounds[3])
-                lastBounds[3] = bounds[3]
+            if (bounds.xRadius < lastBounds.xRadius || bounds.zRadius < lastBounds.zRadius)
+                lastBounds = bounds
         }
         return lastBounds
     }
 
     fun allowedArea(p : Player, loc : Location) : Boolean {
         val coords = worldBoundrary(loc.world!!)
-        if (coords[0] > loc.blockX || coords[1] < loc.blockX || coords[2] > loc.blockZ || coords[3] < loc.blockZ)
+        if (!coords.withinBorder(loc))
             return false
         for (ex in getExpansions(ExpansionState.ENABLED)) {
             val allowed = ex.allowedArea(p, loc)

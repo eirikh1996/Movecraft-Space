@@ -26,21 +26,15 @@ object PlayerListener : Listener {
     @EventHandler
     fun onPlayerMove(event : PlayerMoveEvent) {
         val planet = PlanetCollection.getPlanetAt(event.to!!)
-        if (planet == null || planet.destination.equals(event.to!!.world) && event.to!!.blockY < planet.exitHeight || teleportingPlayers.contains(event.player.uniqueId) || disabledPlayers.contains(event.player.uniqueId) || !Settings.AllowPlayersTeleportationToPlanets) {
+        if (planet == null || planet.destination == event.to!!.world && event.to!!.blockY < planet.exitHeight || teleportingPlayers.contains(event.player.uniqueId) || disabledPlayers.contains(event.player.uniqueId) || !Settings.AllowPlayersTeleportationToPlanets) {
             return
         }
-        var craftPlayerIsOn : Craft? = null
-        for (craft in CraftManager.getInstance().getCraftsInWorld(event.to!!.world!!)) {
-            if (!MathUtils.locIsNearCraftFast(craft, MathUtils.bukkit2MovecraftLoc(event.to!!)))
-                continue
-            craftPlayerIsOn = craft
-            break
-        }
+        val craftPlayerIsOn = CraftManager.getInstance().getCraftsInWorld(event.to?.world!!).firstOrNull { craft -> MathUtils.locIsNearCraftFast(craft, MathUtils.bukkit2MovecraftLoc(event.to!!)) }
         if (craftPlayerIsOn != null)
             return
         var dest : Location? = null
         while (dest == null) {
-            dest = if (planet.destination.equals(event.to!!.world)) {
+            dest = if (planet.destination == event.to!!.world) {
                 val coordArray = MSUtils.randomCoords(planet.minX - 50, planet.maxX + 50, 0, 255, planet.minZ - 50, planet.maxz + 50)
                 val test = Location(planet.space, coordArray[0].toDouble(), coordArray[1].toDouble(), coordArray[2].toDouble())
                 if (planet.contains(test)) {
@@ -51,7 +45,7 @@ object PlayerListener : Listener {
                 val coordArray = ExpansionManager.worldBoundrary(planet.destination)
                 var test : Location? = null
                 while (test == null || !ExpansionManager.allowedArea(event.player, test)) {
-                    test = Location(planet.destination, Random.nextDouble(coordArray[0].toDouble(), coordArray[1].toDouble()), (planet.exitHeight - 5).toDouble(), Random.nextDouble(coordArray[2].toDouble(), coordArray[3].toDouble()))
+                    test = Location(planet.destination, Random.nextDouble(coordArray.minPoint.x.toDouble(), coordArray.maxPoint.x.toDouble()), (planet.exitHeight - 5).toDouble(), Random.nextDouble(coordArray.minPoint.z.toDouble(), coordArray.maxPoint.z.toDouble()))
                 }
                 test
 

@@ -39,16 +39,16 @@ data class Planet(
     var moving = false
     val name : String get() { return destination.name }
     val moons = HashSet<Planet>()
-    val id = UUID.randomUUID()
+    val id: UUID = UUID.randomUUID()
     fun contains(location: Location, extraRadius : Int = 0) : Boolean {
-        if (!space.equals(location.world)) {
+        if (space != location.world) {
             return false
         }
         return center.distance(ImmutableVector.fromLocation(location)) <= radius + extraRadius
     }
 
     fun isPlanet(world: World) : Boolean {
-        return destination.equals(world)
+        return destination == world
     }
 
     fun moonOrbitRadius(): Int {
@@ -85,7 +85,7 @@ data class Planet(
         if (other !is Planet) {
             return false
         }
-        return destination.equals(other.destination) && space.equals(other.space) && id.equals(other.id)
+        return destination == other.destination && space == other.space && id.equals(other.id)
     }
 
     fun move(displacement : ImmutableVector, moon : Boolean = false, newSpace : World = space) {
@@ -125,7 +125,7 @@ data class Planet(
         for (loc in newLocMap.keys) {
             val pair = newLocMap[loc]!!
             val b = loc.toLocation(space).block
-            b.setType(pair.first)
+            b.type = pair.first
             setBlock(b.location, pair.first, pair.second)
         }
         for (loc in visited.filter { vec -> !newLocMap.containsKey(vec) }) {

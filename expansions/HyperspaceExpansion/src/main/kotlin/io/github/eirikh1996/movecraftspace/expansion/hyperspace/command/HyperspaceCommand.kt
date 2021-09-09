@@ -33,10 +33,12 @@ import org.bukkit.inventory.InventoryHolder
 import org.bukkit.scheduler.BukkitRunnable
 import java.io.File
 import java.lang.System.currentTimeMillis
+import java.lang.UnsupportedOperationException
 import java.math.RoundingMode
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import kotlin.collections.HashSet
 import kotlin.math.abs
 import kotlin.math.min
 import kotlin.random.Random
@@ -44,15 +46,39 @@ import kotlin.random.Random
 object HyperspaceCommand : TabExecutor {
     val locationMap = HashMap<UUID, Location>()
     val beaconStructure = HashMap<ImmutableVector, MSBlock>()
+    internal lateinit var beaconMinPoint : ImmutableVector
+    internal lateinit var beaconMaxPoint : ImmutableVector
 
     init {
         val file = File(HyperspaceExpansion.instance.dataFolder, "beaconstructure.yml")
         if (file.exists()) {
             val yml = YamlConfiguration.loadConfiguration(file)
             val mapList = yml.getMapList("blocks") as List<Map<String, Any>>
+            var minX = 0
+            var maxX = 0
+            var minY = 0
+            var maxY = 0
+            var minZ = 0
+            var maxZ = 0
             for (map in mapList) {
-                beaconStructure[ImmutableVector.deserialize(map)] = MSBlock.deserialize(map)
+                val vector = ImmutableVector.deserialize(map)
+                beaconStructure[vector] = MSBlock.deserialize(map)
+                if (vector.x < minX)
+                    minX = vector.x
+                if (vector.x > maxX)
+                    maxX = vector.x
+                if (vector.y < minY)
+                    minY = vector.y
+                if (vector.y > maxY)
+                    maxY = vector.y
+                if (vector.z < minZ)
+                    minZ = vector.z
+                if (vector.z > maxZ)
+                    maxZ = vector.z
+
             }
+            beaconMinPoint = ImmutableVector(minX, minY, minZ)
+            beaconMaxPoint = ImmutableVector(maxX, maxY, maxZ)
         }
     }
     override fun onTabComplete(sender: CommandSender, command: Command, label: String, args: Array<out String>): List<String> {
@@ -128,11 +154,11 @@ object HyperspaceCommand : TabExecutor {
                 return true
             }
             if (args[1].equals("create", true)) {
-                if (!PlanetCollection.any { p -> p.space.equals(sender.world) } && !StarCollection.any { s -> s.space.equals(sender.world) }) {
+                val space = sender.world
+                if (!PlanetCollection.any { p -> p.space == space } && !StarCollection.any { s -> s.space == space }) {
                     sender.sendMessage(COMMAND_PREFIX + ERROR + "Beacons can only be created in space worlds")
                     return true
                 }
-                val space = sender.world
                 var height = space.maxHeight.toDouble()
                 if (Settings.IsV1_17) {
                     height -= space.minHeight.toDouble()
@@ -141,13 +167,37 @@ object HyperspaceCommand : TabExecutor {
                 if (Settings.IsV1_17)
                     height += space.minHeight.toDouble()
                 height += .5
+                var foundLoc : Location? = null
+                var str = ""
+                val range =  HyperspaceExpansion.instance.config.getInt("Beacon range") * 2
+                for (beacon in HyperspaceManager.beaconLocations) {
+                    if (beacon.origin.world!! == space && beacon.origin.distance(sender.location) <= range) {
+                        foundLoc = beacon.origin
+                        str = beacon.originName + "-" + beacon.destinationName
+                        break
+                    }
+                    if (beacon.destination.world!! == space && beacon.destination.distance(sender.location) <= range) {
+                        foundLoc = beacon.destination
+                        str = beacon.destinationName + "-" + beacon.originName
+                        break
+                    }
+                }
+                if (foundLoc != null) {
+                    val senderLoc = sender.location.clone()
+                    senderLoc.y = foundLoc.y
+                    val distance = foundLoc.distance(senderLoc)
+                    val remainingDistance = range - distance
+                    sender.sendMessage(COMMAND_PREFIX + ERROR + "Location is too close to the range of the $str hyperspace beacon. Move $remainingDistance awy from it")
+                    return true
+                }
+                val maxDistance = HyperspaceExpansion.instance.config.getInt("Max distance from star systems", 3000)
+                val minDistance = HyperspaceExpansion.instance.config.getInt("Min distance from star systems", 1000)
                 if (locationMap.containsKey(sender.uniqueId)) {
-                    val origin = locationMap.remove(sender.uniqueId)!!
+                    val origin = locationMap[sender.uniqueId]!!
                     val second = sender.location.clone()
                     second.y = height
                     val originStar = StarCollection.closestStar(origin)!!
                     val destinationStar = StarCollection.closestStar(second)
-                    val maxDistance = HyperspaceExpansion.instance.config.getInt("Max distance from star systems", 3000)
                     if (destinationStar == null) {
                         sender.sendMessage(COMMAND_PREFIX + ERROR + "No stars are present in this space world")
                         return true
@@ -156,7 +206,28 @@ object HyperspaceCommand : TabExecutor {
                         sender.sendMessage(COMMAND_PREFIX + ERROR + "Beacon placement is too far from the nearest star system " + destinationStar.name)
                         return true
                     }
+                    if (destinationStar.loc.distance(ImmutableVector.fromLocation(second)) < destinationStar.radius() + minDistance) {
+                        sender.sendMessage(COMMAND_PREFIX + ERROR + "Beacon placement is too close to the nearest star system " + destinationStar.name)
+                        return true
+                    }
+                    if (origin.world == second.world) {
+                        val distance = second.toVector().subtract(origin.toVector())
+                        val start = origin.toVector()
+                        val normal = distance.clone().normalize()
+                        var currentDistance = 0.0
+                        while (currentDistance < distance.length()) {
+                            start.add(normal)
+                            currentDistance = start.distance(origin.toVector())
+                            val foundStarSystem = StarCollection.closestStarSystem(start.toLocation(origin.world!!), 0)
+                            if (foundStarSystem != null) {
+                                sender.sendMessage(COMMAND_PREFIX + ERROR + "Cannot create hyperspace link as beacon path crosses the ${foundStarSystem.name} star system")
+                                return true
+                            }
+                        }
+
+                    }
                     sender.sendMessage(COMMAND_PREFIX + "Successfully created hyperspace link between " + originStar.name + " and " + destinationStar.name)
+                    locationMap.remove(sender.uniqueId)
                     createBeacon(origin)
                     createBeacon(second)
                     HyperspaceManager.beaconLocations.add(HyperspaceBeacon(originStar.name, origin, destinationStar.name, second))
@@ -170,7 +241,6 @@ object HyperspaceCommand : TabExecutor {
                     sender.sendMessage(COMMAND_PREFIX + ERROR + "No stars are present in this space world")
                     return true
                 }
-                val maxDistance = HyperspaceExpansion.instance.config.getInt("Max distance from star systems", 3000)
                 if (originStar.loc.distance(ImmutableVector.fromLocation(origin)) > originStar.radius() + maxDistance) {
                     sender.sendMessage(COMMAND_PREFIX + ERROR + "Beacon placement is too far from the nearest star system " + originStar.name)
                     return true
@@ -185,45 +255,18 @@ object HyperspaceCommand : TabExecutor {
                 val split = args[2].split("-")
                 var foundBeacon : HyperspaceBeacon? = null
                 for (b in HyperspaceManager.beaconLocations) {
-                    if (!split[0].equals(b.originName, true) || !split[1].equals(b.destinationName, true))
+                    if (!(split[0].equals(b.originName, true) && split[1].equals(b.destinationName, true)) &&
+                        !(split[1].equals(b.originName, true) && split[0].equals(b.destinationName, true)))
                         continue
                     foundBeacon = b
                     break
                 }
                 if (foundBeacon == null) {
-                    sender.sendMessage(COMMAND_PREFIX + ERROR + "No such beacon link exists: " + args[1])
+                    sender.sendMessage(COMMAND_PREFIX + ERROR + "No such beacon link exists: " + args[2])
                     return true
                 }
-                val queue = LinkedList<ImmutableVector>()
-                val visited = HashSet<ImmutableVector>()
-                queue.add(ImmutableVector.fromLocation(foundBeacon.origin))
-                while (!queue.isEmpty()) {
-                    val node = queue.poll()
-                    if (visited.contains(node))
-                        continue
-                    visited.add(node)
-                    for (shift in SHIFTS) {
-                        val test = node.add(shift)
-                        if (test.toLocation(foundBeacon.origin.world!!).block.type.name.endsWith("AIR"))
-                            continue
-                        queue.add(test)
-                    }
-                }
-                visited.forEach { l -> l.toLocation(foundBeacon.origin.world!!).block.type = Material.AIR }
-                queue.add(ImmutableVector.fromLocation(foundBeacon.destination))
-                while (!queue.isEmpty()) {
-                    val node = queue.poll()
-                    if (visited.contains(node))
-                        continue
-                    visited.add(node)
-                    for (shift in SHIFTS) {
-                        val test = node.add(shift)
-                        if (test.toLocation(foundBeacon.destination.world!!).block.type.name.endsWith("AIR"))
-                            continue
-                        queue.add(test)
-                    }
-                }
-                visited.forEach { l -> l.toLocation(foundBeacon.destination.world!!).block.type = Material.AIR }
+                removeBeacon(foundBeacon.origin)
+                removeBeacon(foundBeacon.destination)
                 sender.sendMessage(COMMAND_PREFIX + "Sucessfully removed beacon link " + foundBeacon.originName + "-" + foundBeacon.destinationName)
                 HyperspaceManager.beaconLocations.remove(foundBeacon)
                 HyperspaceManager.saveFile()
@@ -234,11 +277,12 @@ object HyperspaceCommand : TabExecutor {
                     return true
                 }
                 val center = selection.center
+                beaconStructure.clear()
                 for (vec in selection) {
                     val block = vec.toLocation(sender.world).block
                     if (block.type.name.endsWith("AIR"))
                         continue
-                    beaconStructure.put(vec.subtract(center), MSBlock.fromBlock(block))
+                    beaconStructure[vec.subtract(center)] = MSBlock.fromBlock(block)
 
 
                 }
@@ -291,6 +335,7 @@ object HyperspaceCommand : TabExecutor {
                 target = sender.location.clone()
                 target.add(craft.hitBox.xLength.toDouble(), 0.0, craft.hitBox.zLength.toDouble())
             }
+            HyperspaceManager.processingEntries.remove(craft)
             target = HyperspaceManager.nearestUnobstructedLoc(target, craft)
             val dx = target.blockX - midpoint.x
             val dy = target.blockY - midpoint.y
@@ -300,6 +345,42 @@ object HyperspaceCommand : TabExecutor {
 
         }
         return true
+    }
+
+    private fun removeBeacon(loc : Location) {
+        val queue = LinkedList<ImmutableVector>()
+        val visited = HashSet<ImmutableVector>()
+        queue.add(ImmutableVector.fromLocation(loc))
+        while (!queue.isEmpty()) {
+            val poll = queue.poll()
+            visited.add(poll)
+            for (shift in SHIFTS) {
+                val test = poll.add(shift)
+                if (visited.contains(test)) {
+                    continue
+                }
+                queue.add(test)
+            }
+
+            if (poll.toLocation(loc.world!!).block.type.name.endsWith("AIR"))
+                continue
+            queue.clear()
+            queue.add(poll)
+            break
+        }
+        while (!queue.isEmpty()) {
+            val node = queue.poll()
+            if (visited.contains(node))
+                continue
+            visited.add(node)
+            for (shift in SHIFTS) {
+                val test = node.add(shift)
+                if (test.toLocation(loc.world!!).block.type.name.endsWith("AIR"))
+                    continue
+                queue.add(test)
+            }
+        }
+        visited.forEach { l -> l.toLocation(loc.world!!).block.type = Material.AIR }
     }
 
     private fun createBeacon(loc : Location) {

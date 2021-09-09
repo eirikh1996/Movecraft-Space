@@ -3,6 +3,7 @@ package io.github.eirikh1996.movecraftspace.expansion
 import io.github.eirikh1996.movecraftspace.event.expansion.ExpansionDisableEvent
 import io.github.eirikh1996.movecraftspace.event.expansion.ExpansionEnableEvent
 import io.github.eirikh1996.movecraftspace.event.expansion.ExpansionLoadEvent
+import io.github.eirikh1996.movecraftspace.objects.MSWorldBorder
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -91,14 +92,8 @@ abstract class Expansion {
             }
         }
     }
-    open fun worldBoundrary(world : World) : IntArray {
-        val wb = world.worldBorder;
-        val wbRadius = min((wb.size.toInt() / 2), 29999984)
-        val minX = (wb.center.blockX - wbRadius)
-        val maxX = (wb.center.blockX + wbRadius)
-        val minZ = (wb.center.blockZ - wbRadius)
-        val maxZ = (wb.center.blockZ + wbRadius)
-        return intArrayOf(minX, maxX, minZ, maxZ)
+    open fun worldBoundrary(world : World) : MSWorldBorder {
+        return MSWorldBorder.fromBukkit(world.worldBorder)
     }
 
     /**
@@ -112,6 +107,15 @@ abstract class Expansion {
     open fun allowedArea(p : Player, loc : Location) : Boolean {
         return true
     }
+
+    fun logMessages(type: LogMessageType, messages : List<String>) {
+        messages.forEach { s -> logMessage(type, s) }
+    }
+
+    fun logMessages(type: LogMessageType, vararg messages: String) {
+        messages.forEach { s -> logMessage(type, s) }
+    }
+
     fun logMessage(type : LogMessageType, message: String) {
         Bukkit.getConsoleSender().sendMessage(COMMAND_PREFIX + "§5[§3" + name + "§5]§r" + type.message + ": " + message)
     }

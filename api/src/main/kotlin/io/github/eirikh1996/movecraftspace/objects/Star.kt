@@ -5,16 +5,10 @@ import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World
 
-data class Star constructor(val name : String, val space : World,val loc : ImmutableVector, val radius : Int) {
+data class Star constructor(val name : String, val space : World, val loc : ImmutableVector, val radius : Int) {
 
     fun radius() : Int {
-        var y = loc.y
-        var test = Material.AIR
-        while (test == Material.AIR) {
-            y++
-            test = space.getBlockAt(loc.x, y, loc.z).type
-        }
-        var radius = y - loc.y
+        var radius = this.radius
         for (p in PlanetCollection.getPlanetsWithOrbitPoint(loc)) {
             if (p.orbitRadius <= radius)
                 continue

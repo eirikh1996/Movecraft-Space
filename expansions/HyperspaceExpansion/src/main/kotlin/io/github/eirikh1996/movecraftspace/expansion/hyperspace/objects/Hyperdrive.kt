@@ -1,6 +1,7 @@
 package io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects
 
 import io.github.eirikh1996.movecraftspace.Settings
+import io.github.eirikh1996.movecraftspace.expansion.Expansion
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.HyperspaceExpansion
 import io.github.eirikh1996.movecraftspace.expansion.selection.Structure
 import io.github.eirikh1996.movecraftspace.objects.MSBlock
@@ -16,7 +17,7 @@ import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.inventory.InventoryHolder
 import java.io.File
 
-data class Hyperdrive(val name : String, val maxRange : Int, val warmupTime : Int, val allowedOnCraftTypes : Set<String> = HashSet()) : Structure() {
+class Hyperdrive(name : String, val maxRange : Int, val warmupTime : Int, val allowedOnCraftTypes : Set<String> = HashSet()) : Structure(name) {
 
     fun getInventoryBlocks(sign: Sign) : List<InventoryHolder> {
         val inventoryBlocks = ArrayList<InventoryHolder>()
@@ -48,7 +49,7 @@ data class Hyperdrive(val name : String, val maxRange : Int, val warmupTime : In
         return true
     }
 
-    private fun getStructure(sign: Sign) : List<Block> {
+    fun getStructure(sign: Sign) : List<Block> {
         val face = if (Settings.IsLegacy) {
             val signData = sign.data as org.bukkit.material.Sign
             signData.facing
@@ -65,7 +66,15 @@ data class Hyperdrive(val name : String, val maxRange : Int, val warmupTime : In
         return blockList
     }
 
-    fun save() {
+    override fun serialize(): MutableMap<String, Any> {
+        val data = super.serialize()
+        data["maxRange"] = maxRange
+        data["warmupTime"] = warmupTime
+        data["allowedOnCraftTypes"] = allowedOnCraftTypes
+        return data
+    }
+
+    override fun save() {
         val hyperdriveDir = File(HyperspaceExpansion.instance.dataFolder, "hyperdrives")
         if (!hyperdriveDir.exists())
             hyperdriveDir.mkdirs()
@@ -94,15 +103,18 @@ data class Hyperdrive(val name : String, val maxRange : Int, val warmupTime : In
         fun loadFromFile(file: File) : Hyperdrive {
             val yaml = YamlConfiguration()
             yaml.load(file)
-            val blocks = yaml.getMapList("blocks") as List<Map<String, Any>>
-            val name = yaml.getString("name")!!
-            val range = yaml.getInt("maxRange")
-            val warmupTime = yaml.getInt("warmupTime", 60)
+            return deserialize(yaml.getValues(true))
+        }
+        @JvmStatic fun deserialize(data : Map<String, Any>) : Hyperdrive {
+            val blocks = data["blocks"] as List<Map<String, Any>>
+            val name = data["name"] as String
+            val range = data["maxRange"] as Int
+            val warmupTime = data.getOrDefault("warmupTime", 60) as Int
             val blockMap = HashMap<ImmutableVector, MSBlock>()
             for (block in blocks) {
-                blockMap.put(ImmutableVector.deserialize(block), MSBlock.deserialize(block))
+                blockMap[ImmutableVector.deserialize(block)] = MSBlock.deserialize(block)
             }
-            val allowedOnCraftTypes = yaml.getStringList("allowedOnCraftTypes").toSet()
+            val allowedOnCraftTypes = ((data["allowedOnCraftTypes"] as Iterable<String>?)?:ArrayList()).toSet()
 
             val hd =  Hyperdrive(name, range, warmupTime, allowedOnCraftTypes)
             hd.blocks = blockMap

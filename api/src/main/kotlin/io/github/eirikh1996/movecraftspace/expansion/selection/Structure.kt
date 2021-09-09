@@ -7,16 +7,81 @@ import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.block.data.BlockData
 import org.bukkit.configuration.serialization.ConfigurationSerializable
+import kotlin.math.abs
 
-abstract class Structure : ConfigurationSerializable {
+abstract class Structure(val name : String) : ConfigurationSerializable {
     var blocks : MutableMap<ImmutableVector, MSBlock> = HashMap()
+
+    val minX : Int get() {
+        var lastX = Int.MAX_VALUE
+        for (vec in blocks.keys) {
+            if (lastX <= vec.x)
+                continue
+            lastX = vec.x
+        }
+        return lastX
+    }
+
+    val maxX : Int get() {
+        var lastX = Int.MIN_VALUE
+        for (vec in blocks.keys) {
+            if (lastX >= vec.x)
+                continue
+            lastX = vec.x
+        }
+        return lastX
+    }
+
+    val minY : Int get() {
+        var lastY = Int.MAX_VALUE
+        for (vec in blocks.keys) {
+            if (lastY <= vec.y)
+                continue
+            lastY = vec.y
+        }
+        return lastY
+    }
+
+    val maxY : Int get() {
+        var lastY = Int.MIN_VALUE
+        for (vec in blocks.keys) {
+            if (lastY >= vec.y)
+                continue
+            lastY = vec.y
+        }
+        return lastY
+    }
+
+    val minZ : Int get() {
+        var lastZ = Int.MAX_VALUE
+        for (vec in blocks.keys) {
+            if (lastZ <= vec.z)
+                continue
+            lastZ = vec.z
+        }
+        return lastZ
+    }
+
+    val maxZ : Int get() {
+        var lastZ = Int.MIN_VALUE
+        for (vec in blocks.keys) {
+            if (lastZ >= vec.z)
+                continue
+            lastZ = vec.z
+        }
+        return lastZ
+    }
+
+    val xLength : Int get() = abs(maxX - minX)
+    val yLength : Int get() = abs(maxY - minY)
+    val zLength : Int get() = abs(maxZ - minZ)
 
     fun copy(selection: Selection, origin : ImmutableVector = selection.center) {
         for (loc in selection) {
             val block = loc.toLocation(selection.world).block
             if (block.type.name.endsWith("AIR"))
                 continue
-            blocks.put(loc.subtract(origin), MSBlock.fromBlock(block))
+            blocks[loc.subtract(origin)] = MSBlock.fromBlock(block)
 
         }
     }
@@ -34,9 +99,23 @@ abstract class Structure : ConfigurationSerializable {
         }
     }
 
+    abstract fun save()
+
     override fun serialize(): MutableMap<String, Any> {
-        TODO("Not yet implemented")
+        val data = HashMap<String, Any>()
+        data["name"] = name
+        val mapList = ArrayList<Map<String, Any>>()
+        blocks.forEach { (t, u) ->
+            val blockData = HashMap<String, Any>()
+            blockData.putAll(t.serialize())
+            blockData.putAll(u.serialize())
+            mapList.add(blockData)
+        }
+        data["blocks"] = mapList
+        return data
     }
+
+
 
 
 }
