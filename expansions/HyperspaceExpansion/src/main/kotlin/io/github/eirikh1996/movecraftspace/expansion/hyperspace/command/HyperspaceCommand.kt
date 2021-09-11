@@ -335,14 +335,12 @@ object HyperspaceCommand : TabExecutor {
                 target = sender.location.clone()
                 target.add(craft.hitBox.xLength.toDouble(), 0.0, craft.hitBox.zLength.toDouble())
             }
-            HyperspaceManager.processingEntries.remove(craft)
             target = HyperspaceManager.nearestUnobstructedLoc(target, craft)
-            val dx = target.blockX - midpoint.x
-            val dy = target.blockY - midpoint.y
-            val dz = target.blockZ - midpoint.z
-            sender.sendMessage(COMMAND_PREFIX + "Pulling " + player.name + "'s craft out of hyperspace")
-            craft.translate(target.world, dx, dy, dz)
-
+            object : BukkitRunnable() {
+                override fun run() {
+                    HyperspaceManager.pullOutOfHyperspace(HyperspaceManager.processingEntries[craft]!!, target, COMMAND_PREFIX + "Pulling " + player.name + "'s craft out of hyperspace")
+                }
+            }.runTaskAsynchronously(HyperspaceExpansion.instance.plugin)
         }
         return true
     }

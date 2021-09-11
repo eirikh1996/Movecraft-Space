@@ -97,14 +97,11 @@ object HyperspaceManager : BukkitRunnable(), Listener {
             val unit = distance.clone().normalize()
             unit.y = 0.0
             val speed = HyperspaceExpansion.instance.config.getDouble("Hyperspace travel speed", 1.0)
-            unit.x *= speed
-            unit.z *= speed
+            unit.multiply(speed)
             var massShadow = false
+            val testLoc = entry.origin.clone().add(entry.progress)
             for (i in 1..speed.toInt()) {
-                val testLoc = entry.origin.clone().add(entry.progress)
-                val testUnit = unit.clone()
-                testUnit.multiply(i)
-                testLoc.add(testUnit)
+                testLoc.add(unit.clone().normalize())
                 targetLocations[entry.craft.hitBox.midPoint] = testLoc
                 val event = HyperspaceTravelEvent(entry.craft, testLoc)
                 Bukkit.getScheduler().callSyncMethod(HyperspaceExpansion.instance.plugin) {
@@ -136,7 +133,22 @@ object HyperspaceManager : BukkitRunnable(), Listener {
             val title = entry.progressBar.title.substring(0, entry.progressBar.title.indexOf(" "))
             entry.progressBar.setTitle(title + " Travel " + percent.toBigDecimal().setScale(2, RoundingMode.UP) + "%" )
             if (currentDistance >= totalDistance - 2) {
-                val destination = entry.destination
+                var destination = entry.destination
+                if (entry.beaconTravel) {
+                    while (true) {
+                        if (PlanetCollection.getPlanetAt(destination, 0, true) != null || StarCollection.getStarAt(destination) != null) {
+                            val hitbox = entry.craft.hitBox
+                            val bufferedRange = beaconRange + max(hitbox.xLength, hitbox.zLength)
+                            val perimeter = 2 * PI *beaconRange
+                            val arcLength = Random.nextDouble(0.0, perimeter)
+                            val theta = arcLength / bufferedRange
+                            destination = entry.destination.clone().add(cos(theta) * bufferedRange, 0.0, sin(theta) * bufferedRange)
+                            continue
+                        }
+                        break
+                    }
+                }
+
                 pullOutOfHyperspace(entry, destination, "Space craft arived at destination. Exiting hyperspace")
             }
 
@@ -163,7 +175,7 @@ object HyperspaceManager : BukkitRunnable(), Listener {
         }
     }
 
-    private fun pullOutOfHyperspace(entry: HyperspaceTravelEntry, target : Location, exitMessage : String) {
+    internal fun pullOutOfHyperspace(entry: HyperspaceTravelEntry, target : Location, exitMessage : String) {
         if (entry.stage == HyperspaceTravelEntry.Stage.FINISHED)
             return
         entry.stage = HyperspaceTravelEntry.Stage.FINISHED
