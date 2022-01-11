@@ -91,7 +91,7 @@ object MSUtils {
 
     }
 
-    fun createSphere(radius : Int, center : ImmutableVector, imageFile : File? = null) : Set<ImmutableVector> {
+    fun createSphere(radius : Int, center : ImmutableVector) : Set<ImmutableVector> {
         val minX = center.x - radius
         val maxX = center.x + radius
         val minZ = center.z - radius

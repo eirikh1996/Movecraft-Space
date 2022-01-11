@@ -14,8 +14,6 @@
     <file url="file://$PROJECT_DIR$/expansions/FactionsUUIDExpansion/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/expansions/GriefPreventionExpansion/src/main/kotlin" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/expansions/GriefPreventionExpansion/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/expansions/LandsExpansion/src/main/kotlin" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/expansions/LandsExpansion/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/expansions/RedProtectExpansion/src/main/kotlin" charset="UTF-8" />
@@ -26,6 +24,11 @@
     <file url="file://$PROJECT_DIR$/expansions/WorldBorderExpansion/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/expansions/WorldGuardExpansion/src/main/kotlin" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/expansions/WorldGuardExpansion/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/expansions/hyperspace/HyperspaceExpansion-API/src/main/kotlin" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/expansions/hyperspace/HyperspaceExpansion-Movecraft8/src/main/kotlin" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/expansions/hyperspace/HyperspaceExpansion/src/main/kotlin" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/expansions/hyperspace/HyperspaceExpansion/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/movecraft8/src/main/kotlin" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/plugin/src" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/plugin/src/main/kotlin" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/plugin/src/main/resources" charset="UTF-8" />

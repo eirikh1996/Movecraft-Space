@@ -5,10 +5,7 @@ import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.event.planet.PlanetCreateEvent
 import io.github.eirikh1996.movecraftspace.event.planet.PlanetRemoveEvent
 import io.github.eirikh1996.movecraftspace.listener.PlayerListener
-import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
-import io.github.eirikh1996.movecraftspace.objects.Planet
-import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
-import io.github.eirikh1996.movecraftspace.objects.StarCollection
+import io.github.eirikh1996.movecraftspace.objects.*
 import io.github.eirikh1996.movecraftspace.utils.MSUtils
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_NO_PERMISSION
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
@@ -16,6 +13,7 @@ import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.WARNING
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.setBlock
 import io.github.eirikh1996.movecraftspace.utils.Paginator
+import io.github.eirikh1996.movecraftspace.utils.image.RGBBlockColor
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.HoverEvent
@@ -31,6 +29,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.command.TabExecutor
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
+import java.io.File
 import java.lang.NumberFormatException
 import java.lang.System.currentTimeMillis
 import java.util.*
@@ -56,7 +55,7 @@ object PlanetCommand : TabExecutor {
             return true
         }
 
-        if (args.size == 0) {
+        if (args.isEmpty()) {
             sender.sendMessage("Usage: /planet <create|remove|list> <radius> <destination> [exitheight:numValue orbittime:numValue] ")
             return true
         }
@@ -87,7 +86,7 @@ object PlanetCommand : TabExecutor {
             if (destination == null) {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "World " + args[1] + " does not exist!")
                 return true
-            } else if (sender.world.equals(destination)) {
+            } else if (sender.world == destination) {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "Space world and planet world cannot be the same!")
                 return true
             } else if (PlanetCollection.worldIsPlanet(sender.world)) {
@@ -120,10 +119,10 @@ object PlanetCommand : TabExecutor {
                         val str = arg.replace("surfacematerial:", "", true)
                         if (str.contains(":")) {
                             val pts = str.split(":")
-                            surface = Material.getMaterial(pts[0].toUpperCase())
+                            surface = Material.getMaterial(pts[0].uppercase())
                             data = pts[1].toByte()
                         } else {
-                            surface = Material.getMaterial(str.toUpperCase())
+                            surface = Material.getMaterial(str.uppercase())
                         }
                     }
                     if (arg.startsWith("isMoon:", true)) {
@@ -145,7 +144,7 @@ object PlanetCommand : TabExecutor {
 
             val pLoc = sender.location.clone()
             var nearestPlanet : Planet? = null
-            if (isMoon.length == 0 || isMoon.toBoolean())
+            if (isMoon.isEmpty() || isMoon.toBoolean())
                 nearestPlanet = PlanetCollection.nearestPlanet(pLoc.world!!, ImmutableVector.fromLocation(pLoc), Settings.MaxMoonSpacing, true)
 
             val orbitCenter = if (nearestPlanet != null) {
@@ -213,13 +212,16 @@ object PlanetCommand : TabExecutor {
             sender.sendMessage(COMMAND_PREFIX + "Successfully created planet " + planet.name + "!")
             val structureRadius = planet.radius - 30
             val sphere = LinkedList(MSUtils.createSphere(structureRadius, planet.center))
+
             object : BukkitRunnable() {
+
                 override fun run() {
                     val size = min(sphere.size, 20000)
                     if (sphere.isEmpty())
                         cancel()
                     for (i in 0..size) {
-                        val loc = sphere.pop().toLocation(planet.space)
+                        val pop = sphere.pop()
+                        val loc = pop.toLocation(planet.space)
                         val b = loc.block
                         b.type = surface!!
                         if (Settings.IsLegacy)
@@ -494,11 +496,12 @@ object PlanetCommand : TabExecutor {
     }
 
     override fun onTabComplete(sender: CommandSender, cmd: Command, label: String, args: Array<out String>) : List<String> {
+        Bukkit.broadcastMessage(args.size.toString())
         var tabCompletions = listOf("create", "remove", "move", "list", "toggleplayerteleport", "regensphere", "tp").filter { str -> sender.hasPermission("movecraftspace.command.planet." + str) }
         tabCompletions = tabCompletions.sorted()
-        if (args.size == 0) {
+        if (args.isEmpty()) {
             return tabCompletions
-        } else if (args[0].equals("create", true) && args.size >= 2 && args.size <= 3) {
+        } else if (args[0].equals("create", true) && args.size >= 2 && args.size <= 4) {
             val worlds = ArrayList<String>()
             for (world in Bukkit.getWorlds()) {
                 if (PlanetCollection.getPlanetByName(world.name) != null) {
@@ -507,8 +510,23 @@ object PlanetCommand : TabExecutor {
                 worlds.add(world.name)
             }
             tabCompletions = worlds
-            if (args.size >= 3) {
+            if (args.size == 3) {
+                tabCompletions = emptyList()
+            }
+            if (args.size >= 4) {
                 tabCompletions = listOf("exitheight:", "surfacematerial:", "isMoon:", "orbitTime:")
+                for (arg in args.drop(3)) {
+                    if (arg.startsWith("exitheight:", true) || arg.startsWith("orbitTime:", true)) {
+                        tabCompletions = emptyList()
+                    }
+                    if (arg.startsWith("surfacematerial:", true)) {
+                        tabCompletions = ArrayList()
+                        Material.values().forEach { type -> (tabCompletions as ArrayList<String>).add(type.name.lowercase()) }
+                    }
+                    if (arg.startsWith("isMoon:", true)) {
+                        tabCompletions = listOf("true", "false")
+                    }
+                }
             }
         } else if (args[0].equals("remove", true) ||
             args[0].equals("move", true) ||

@@ -1,28 +1,29 @@
 package io.github.eirikh1996.movecraftspace
 
+import io.github.eirikh1996.Movecraft8Handler
+import io.github.eirikh1996.listener.Movecraft8Listener
 import io.github.eirikh1996.movecraftspace.commands.MovecraftSpaceCommand
 import io.github.eirikh1996.movecraftspace.commands.PlanetCommand
 import io.github.eirikh1996.movecraftspace.commands.StarCommand
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionManager
 import io.github.eirikh1996.movecraftspace.listener.BlockListener
 import io.github.eirikh1996.movecraftspace.listener.ExplosionListener
-import io.github.eirikh1996.movecraftspace.listener.MovecraftListener
+import io.github.eirikh1996.movecraftspace.listener.Movecraft7Listener
 import io.github.eirikh1996.movecraftspace.listener.PlayerListener
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
 import io.github.eirikh1996.movecraftspace.objects.StarCollection
 import io.github.eirikh1996.movecraftspace.utils.MSUtils
-import net.countercraft.movecraft.WorldHandler
-import org.bukkit.Location
-import org.bukkit.Material
+import io.github.eirikh1996.movecraftspace.utils.MovecraftHandler
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitRunnable
-import java.lang.Exception
+import java.io.File
 import java.lang.System.currentTimeMillis
-import java.lang.reflect.Method
 
 class MovecraftSpace : JavaPlugin() {
     private var ticks = 0
     private var tickTimeStamp = 0L
+    internal lateinit var imageDir : File
+    lateinit var movecraftHandler : MovecraftHandler<*>
 
     companion object {
         lateinit var instance : MovecraftSpace
@@ -31,9 +32,22 @@ class MovecraftSpace : JavaPlugin() {
     override fun onEnable() {
         MSUtils.displayTitle()
         saveDefaultConfig()
+        imageDir = File(dataFolder, "images")
+        if (!imageDir.exists())
+            imageDir.mkdirs()
         ConfigHolder.config = config
         val packageName = server.javaClass.`package`.name
         val ver = packageName.substring(packageName.lastIndexOf(".") + 1).split("_")[1].toInt()
+        try {
+            Class.forName("net.countercraft.movecraft.craft.BaseCraft")
+            Settings.IsMovecraft8 = true
+        } catch ( e : ClassNotFoundException) {
+            Settings.IsMovecraft8 = false
+        }
+        if (Settings.IsMovecraft8)
+            movecraftHandler = Movecraft8Handler()
+        else
+            movecraftHandler = Movecraft7Handler()
         Settings.IsLegacy = ver <= 12
         Settings.IsV1_17 = ver >= 17
         Settings.IsV1_13 = ver >= 13
@@ -44,7 +58,7 @@ class MovecraftSpace : JavaPlugin() {
         PlanetCollection.loadPlanets()
         StarCollection.pl = this
         StarCollection.loadStars()
-        server.pluginManager.registerEvents(MovecraftListener, this)
+        server.pluginManager.registerEvents(if (Settings.IsMovecraft8) Movecraft8Listener else Movecraft7Listener, this)
         server.pluginManager.registerEvents(PlayerListener, this)
         server.pluginManager.registerEvents(ExplosionListener, this)
         server.pluginManager.registerEvents(BlockListener, this)

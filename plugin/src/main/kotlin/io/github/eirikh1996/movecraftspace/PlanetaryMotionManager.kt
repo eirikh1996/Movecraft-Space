@@ -1,7 +1,6 @@
 package io.github.eirikh1996.movecraftspace
 
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionManager
-import io.github.eirikh1996.movecraftspace.listener.MovecraftListener
 import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
 import io.github.eirikh1996.movecraftspace.objects.Planet
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
@@ -14,9 +13,7 @@ import net.countercraft.movecraft.mapUpdater.MapUpdateManager
 import net.countercraft.movecraft.mapUpdater.update.UpdateCommand
 import net.countercraft.movecraft.utils.MathUtils
 import org.bukkit.Bukkit
-import org.bukkit.World
 import org.bukkit.scheduler.BukkitRunnable
-import org.bukkit.util.Vector
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet

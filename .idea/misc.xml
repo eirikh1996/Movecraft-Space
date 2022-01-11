@@ -13,6 +13,7 @@
         <option value="$PROJECT_DIR$/api/pom.xml" />
         <option value="$PROJECT_DIR$/expansions/WorldGuardExpansion/pom.xml" />
         <option value="$PROJECT_DIR$/expansions/AsteroidExpansion/pom.xml" />
+        <option value="$PROJECT_DIR$/expansions/hyperspace/HyperspaceExpansion/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

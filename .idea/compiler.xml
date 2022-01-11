@@ -7,7 +7,9 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="movecraft-space-api" />
-        <module name="AsteroidBeltExpansion" />
+        <module name="HyperspaceExpansion-API" />
+        <module name="movecraft8" />
+        <module name="HyperspaceExpansion-Movecraft8" />
       </profile>
       <profile name="Annotation profile for DynmapExpansion" enabled="true">
         <sourceOutputDir name="../../target/expansions/dynmap/generated-sources/annotations" />
@@ -64,8 +66,8 @@
         <module name="TownyExpansion" />
       </profile>
       <profile name="Annotation profile for HyperspaceExpansion" enabled="true">
-        <sourceOutputDir name="../../target/expansions/hyperspace/generated-sources/annotations" />
-        <sourceTestOutputDir name="../../target/expansions/hyperspace/generated-test-sources/test-annotations" />
+        <sourceOutputDir name="../../../target/expansions/hyperspace/generated-sources/annotations" />
+        <sourceTestOutputDir name="../../../target/expansions/hyperspace/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="HyperspaceExpansion" />
       </profile>
@@ -74,6 +76,12 @@
         <sourceTestOutputDir name="../../target/expansions/factionsblue/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="FactionsBlueExpansion" />
+      </profile>
+      <profile name="Annotation profile for AsteroidBeltExpansion" enabled="true">
+        <sourceOutputDir name="../../target/expansions/asteroidbelt/generated-sources/annotations" />
+        <sourceTestOutputDir name="../../target/expansions/asteroidbelt/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="AsteroidBeltExpansion" />
       </profile>
       <profile name="Annotation profile for Movecraft-Space-Parent" enabled="true">
         <sourceOutputDir name="../target/generated-sources/annotations" />

@@ -6,6 +6,7 @@ import java.lang.UnsupportedOperationException
 
 object Settings {
     var IsV1_13 = true
+    var IsMovecraft8 = false
     val MinimumTickRate : Double get() { return ConfigHolder.config.getDouble("MinimumTickRate", 13.0) }
     val MinimumDistanceBetweenOrbits : Int get() { return ConfigHolder.config.getInt("MinimumDistanceBetweenOrbits", 3000) }
     val MaximumDistanceBetweenOrbits : Int get() { return ConfigHolder.config.getInt("MaximumDistanceBetweenOrbits", 15000) }
