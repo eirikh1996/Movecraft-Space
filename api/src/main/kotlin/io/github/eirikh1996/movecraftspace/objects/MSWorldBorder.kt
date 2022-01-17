@@ -40,17 +40,19 @@ data class MSWorldBorder(val center : Immutable2dVector, val xRadius : Double, v
             newZ = (center.z + dz * f)
 
         } else {
-            if (dx <= xRadius && dz <= zRadius)
+            val bufferedXRadius = xRadius - buffer
+            val bufferedZRadius = zRadius - buffer
+            if (dx <= bufferedXRadius && dz <= bufferedZRadius)
                 return loc
-            if (dx > xRadius) {
-                val corr = dx - xRadius
+            if (dx > bufferedXRadius) {
+                val corr = dx - bufferedXRadius
                 newX = if (vec.x < center.x)
                     (vec.x + corr)
                 else
                     (vec.x - corr)
             }
-            if (dz > zRadius) {
-                val corr = dz - xRadius
+            if (dz > bufferedZRadius) {
+                val corr = dz - bufferedZRadius
                 newZ = if (vec.z < center.z)
                     (vec.z + corr)
                 else
@@ -62,15 +64,15 @@ data class MSWorldBorder(val center : Immutable2dVector, val xRadius : Double, v
 
     }
 
-    fun withinBorder(loc : Location) : Boolean {
+    fun withinBorder(loc : Location, buffer: Int = 0) : Boolean {
         val dx = abs(center.x - loc.blockX).toDouble()
         val dz = abs(center.z - loc.blockZ).toDouble()
         if (ellipsoid) {
-            return sqrt((dx * dx + dz * dz)) * radiusQuotient <= xRadius
+            return sqrt((dx * dx + dz * dz)) * radiusQuotient <= xRadius - buffer
         }
-        return dx <= xRadius && dz <= zRadius
+        return dx <= xRadius - buffer && dz <= zRadius - buffer
     }
     companion object {
-        fun fromBukkit(worldBorder : WorldBorder) = MSWorldBorder(Immutable2dVector.fromLocation(worldBorder.center), min(worldBorder.size, 29999983.7), min(worldBorder.size, 29999983.7))
+        fun fromBukkit(worldBorder : WorldBorder) = MSWorldBorder(Immutable2dVector.fromLocation(worldBorder.center), min(worldBorder.size / 2, 29999983.7), min(worldBorder.size / 2, 29999983.7))
     }
 }

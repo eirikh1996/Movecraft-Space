@@ -140,10 +140,11 @@ object HyperspaceManager : BukkitRunnable(), Listener {
     )
 
     abstract class HyperspaceProcessor<C> : Listener {
+        protected val ex = ExpansionManager.getExpansion("HyperspaceExpansion")!!
         abstract val progressBars : MutableMap<C, BossBar>
         protected val craftsSunkInHyperspace = HashSet<C>()
         abstract fun scheduleHyperspaceTravel(craft : C, origin : Location, destination : Location, str : String = "", beaconTravel : Boolean = false)
-        internal abstract fun processHyperspaceTravel()
+        abstract fun processHyperspaceTravel()
         abstract fun pullOutOfHyperspace(entry: HyperspaceTravelEntry<C>, target : Location, exitMessage : String)
         abstract fun addEntry(craft: C, entry: HyperspaceTravelEntry<C>)
         abstract val pendingEntries : Map<Craft, HyperspaceTravelEntry<C>>

@@ -23,6 +23,7 @@ import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
 import io.github.eirikh1996.movecraftspace.objects.StarCollection
 import io.github.eirikh1996.movecraftspace.utils.MSUtils
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.plugin
+import net.countercraft.movecraft.Movecraft
 import net.countercraft.movecraft.MovecraftLocation
 import net.countercraft.movecraft.craft.Craft
 import net.countercraft.movecraft.craft.CraftManager
@@ -156,7 +157,12 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
         val hitBox =craft.hitBox
         warmupTime += (hitBox.size() * config.getDouble("Hyperspace warmup ship size multiplier", 0.0)).toInt()
         var dest = destination
-        dest = ExpansionManager.worldBoundrary(dest.world!!).nearestLocWithin(dest)
+        val buffer = if (hitBox.xLength > hitBox.zLength) {//Craft is facing east-west
+            (hitBox.xLength / 2) + 1
+        } else {//Craft is facing north-south
+            (hitBox.zLength / 2) + 1
+        }
+        dest = ExpansionManager.worldBoundrary(dest.world!!).nearestLocWithin(dest, buffer)
         if (dest != destination) {
             craft.audience.sendMessage(Component.text().content(MSUtils.COMMAND_PREFIX + MSUtils.WARNING + "Destination location ${destination.toVector()} in world ${destination.world?.name} is outside of the world boundary. New adjusted target location is now ${dest.toVector()}"))
         }
@@ -238,7 +244,7 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
         runnable.runTaskTimerAsynchronously(plugin, 0, 1)
     }
 
-    private fun processHyperspaceTravel() {
+    override fun processHyperspaceTravel() {
         for (entry in processingEntries.values) {
             if (System.currentTimeMillis() - entry.lastTeleportTime < 500 || entry.stage != HyperspaceTravelEntry.Stage.TRAVEL)
                 continue
@@ -246,7 +252,7 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
             val totalDistance = distance.length()
             val unit = distance.clone().normalize()
             unit.y = 0.0
-            val speed = config.getDouble("Hyperspace travel speed", 1.0)
+            val speed = ex.config.getDouble("Hyperspace travel speed", 1.0)
             unit.multiply(speed)
             var massShadow = false
             val testLoc = entry.origin.clone().add(entry.progress)
@@ -386,7 +392,6 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
         val hitBox = BitmapHitBox(craft.hitBox)
         if (hitBox.isEmpty)
             return loc
-        val queue = LinkedList<Location>()
         val minHeight = min(craft.type.getMinHeightLimit(loc.world!!), (if (Settings.IsV1_17) loc.world!!.minHeight else 0)) + (hitBox.yLength / 2)
         val maxHeight = max(craft.type.getMaxHeightLimit(loc.world!!), loc.world!!.maxHeight) - (hitBox.yLength / 2)
         var foundLoc = loc.clone()
@@ -394,7 +399,7 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
         foundLoc.y = max(foundLoc.y, ((if (Settings.IsV1_17) foundLoc.world!!.minHeight else 0) + 1 + craft.hitBox.yLength / 2).toDouble())
         val bound = ExpansionManager.worldBoundrary(loc.world!!)
         val extraLength = ((if (hitBox.xLength > hitBox.zLength) hitBox.xLength else hitBox.zLength) / 2) + 1
-        foundLoc = bound.nearestLocWithin(foundLoc, extraLength * 2)
+        foundLoc = bound.nearestLocWithin(foundLoc, extraLength)
 
         var planet = PlanetCollection.getPlanetAt(foundLoc, ExpansionSettings.extraMassShadowRangeOfPlanets + extraLength, true)
         var star = StarCollection.getStarAt(foundLoc, ExpansionSettings.extraMassShadowRangeOfStars + extraLength)
@@ -478,7 +483,13 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
     @EventHandler(priority = EventPriority.MONITOR)
     fun onDetect(event : CraftDetectEvent) {
         val craft = event.craft
-        if (craft.w != ExpansionSettings.hyperspaceWorld)
+        val result = HyperdriveManager.onCraftDetect(craft.notificationPlayer!!, craft.type.craftName, craft.hitBox.asSet(), craft.w)
+        if (result.isNotEmpty()) {
+            event.failMessage = result
+            event.isCancelled = true
+            return
+        }
+        if (craft.w != hyperspaceWorld)
             return
         if (craft.type.cruiseOnPilot) {
             event.failMessage = "Cannot launch cruiseOnPilot crafts in hyperspace"
@@ -561,16 +572,17 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
     fun onDetectHyperspaceSign(e : CraftDetectEvent) {
         val craft = e.craft
         var range = 0
-        HyperdriveManager.getHyperdrivesOnCraft(craft.hitBox.asSet(), craft.world).forEach { t, u -> range += u.maxRange }
+        HyperdriveManager.getHyperdrivesOnCraft(craft.hitBox.asSet(), craft.world).forEach { (t, u) -> range += u.maxRange }
         for (ml in craft.hitBox) {
             val b = ml.toBukkit(craft.w).block
             if (!b.type.name.endsWith("WALL_SIGN"))
                 continue
             val sign = b.state as Sign
-            if (!sign.getLine(0).equals("§bHyperspace")) {
+            if (sign.getLine(0) != "§bHyperspace") {
                 continue
             }
-            sign.setLine(1, "§9Range: §6" + range)
+            sign.setLine(1, "§9Range: §6$range")
+            sign.update()
         }
     }
     @EventHandler

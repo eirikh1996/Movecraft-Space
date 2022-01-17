@@ -351,7 +351,7 @@ object HyperspaceCommand : TabExecutor {
             }
 
         } else if (args[0].equals("pullout", true)) {
-
+            processor.executePulloutCommand(sender, args)
         }
         return true
     }

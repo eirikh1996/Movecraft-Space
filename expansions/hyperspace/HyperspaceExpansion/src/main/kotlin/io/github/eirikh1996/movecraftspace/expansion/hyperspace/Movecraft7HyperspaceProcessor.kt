@@ -57,6 +57,7 @@ class Movecraft7HyperspaceProcessor (plugin: Plugin) : HyperspaceManager.Hypersp
     override val pendingEntries = WeakHashMap<Craft, HyperspaceTravelEntry<Craft>>()
     override val processingEntries = WeakHashMap<Craft, HyperspaceTravelEntry<Craft>>()
 
+
     override fun scheduleHyperspaceTravel(
         craft: Craft,
         origin: Location,
@@ -151,7 +152,12 @@ class Movecraft7HyperspaceProcessor (plugin: Plugin) : HyperspaceManager.Hypersp
         val hitBox =craft.hitBox
         warmupTime += (hitBox.size() * ConfigHolder.config.getDouble("Hyperspace warmup ship size multiplier", 0.0)).toInt()
         var dest = destination
-        dest = ExpansionManager.worldBoundrary(dest.world!!).nearestLocWithin(dest)
+        val buffer = if (hitBox.xLength > hitBox.zLength) {//Craft is facing east-west
+            (hitBox.xLength / 2) + 1
+        } else {//Craft is facing north-south
+            (hitBox.zLength / 2) + 1
+        }
+        dest = ExpansionManager.worldBoundrary(dest.world!!).nearestLocWithin(dest, buffer)
         if (dest != destination) {
             craft.notificationPlayer!!.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.WARNING + "Destination location ${destination.toVector()} in world ${destination.world?.name} is outside of the world boundary. New adjusted target location is now ${dest.toVector()}")
         }
@@ -233,7 +239,7 @@ class Movecraft7HyperspaceProcessor (plugin: Plugin) : HyperspaceManager.Hypersp
         runnable.runTaskTimerAsynchronously(MSUtils.plugin, 0, 1)
     }
 
-    private fun processHyperspaceTravel() {
+    override fun processHyperspaceTravel() {
         for (entry in processingEntries.values) {
             if (System.currentTimeMillis() - entry.lastTeleportTime < 500 || entry.stage != HyperspaceTravelEntry.Stage.TRAVEL)
                 continue
@@ -241,7 +247,7 @@ class Movecraft7HyperspaceProcessor (plugin: Plugin) : HyperspaceManager.Hypersp
             val totalDistance = distance.length()
             val unit = distance.clone().normalize()
             unit.y = 0.0
-            val speed = ConfigHolder.config.getDouble("Hyperspace travel speed", 1.0)
+            val speed = ex.config.getDouble("Hyperspace travel speed", 1.0)
             unit.multiply(speed)
             var massShadow = false
             val testLoc = entry.origin.clone().add(entry.progress)
@@ -476,6 +482,12 @@ class Movecraft7HyperspaceProcessor (plugin: Plugin) : HyperspaceManager.Hypersp
     @EventHandler(priority = EventPriority.MONITOR)
     fun onDetect(event : CraftDetectEvent) {
         val craft = event.craft
+        val result = HyperdriveManager.onCraftDetect(craft.notificationPlayer!!, craft.type.craftName, craft.hitBox.asSet(), craft.w)
+        if (result.isNotEmpty()) {
+            event.failMessage = result
+            event.isCancelled = true
+            return
+        }
         if (craft.w != ExpansionSettings.hyperspaceWorld)
             return
         if (craft.type.cruiseOnPilot) {
@@ -555,20 +567,21 @@ class Movecraft7HyperspaceProcessor (plugin: Plugin) : HyperspaceManager.Hypersp
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW)
     fun onDetectHyperspaceSign(e : CraftDetectEvent) {
         val craft = e.craft
         var range = 0
-        HyperdriveManager.getHyperdrivesOnCraft(craft.hitBox.asSet(), craft.w).forEach { t, u -> range += u.maxRange }
+        HyperdriveManager.getHyperdrivesOnCraft(craft.hitBox.asSet(), craft.w).forEach { (t, u) -> range += u.maxRange }
         for (ml in craft.hitBox) {
             val b = ml.toBukkit(craft.w).block
             if (!b.type.name.endsWith("WALL_SIGN"))
                 continue
             val sign = b.state as Sign
-            if (!sign.getLine(0).equals("§bHyperspace")) {
+            if (sign.getLine(0) != "§bHyperspace") {
                 continue
             }
-            sign.setLine(1, "§9Range: §6" + range)
+            sign.setLine(1, "§9Range: §6$range")
+            sign.update()
         }
     }
     @EventHandler

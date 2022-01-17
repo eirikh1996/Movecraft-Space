@@ -71,7 +71,7 @@ class Hyperdrive(name : String, val maxRange : Int, val warmupTime : Int, val al
     }
 
     override fun save() {
-        val hyperdriveDir = File(ExpansionManager.getExpansion("HyperspaceExpasion")!!.dataFolder, "hyperdrives")
+        val hyperdriveDir = File(ExpansionManager.getExpansion("HyperspaceExpansion")!!.dataFolder, "hyperdrives")
         if (!hyperdriveDir.exists())
             hyperdriveDir.mkdirs()
         val hyperdriveFile = File(hyperdriveDir, name + ".yml")

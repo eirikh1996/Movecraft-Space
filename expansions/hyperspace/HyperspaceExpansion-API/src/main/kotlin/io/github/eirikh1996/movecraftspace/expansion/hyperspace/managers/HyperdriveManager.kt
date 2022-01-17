@@ -110,6 +110,8 @@ object HyperdriveManager : Listener, Iterable<Hyperdrive> {
             if (!block.type.name.endsWith("WALL_SIGN"))
                 continue
             val sign = block.state as Sign
+            if (sign.getLine(0) != "§bHyperdrive")
+                continue
             val hyperdrive = getHyperdrive(sign) ?: continue
             returnMap[sign] = hyperdrive
         }

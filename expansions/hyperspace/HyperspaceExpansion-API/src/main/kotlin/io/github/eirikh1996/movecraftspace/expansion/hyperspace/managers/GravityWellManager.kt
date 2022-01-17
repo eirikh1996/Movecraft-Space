@@ -250,7 +250,7 @@ object GravityWellManager : Iterable<GravityWell>, Listener {
 
     fun loadGravityWells() {
 
-        val gravityWellDir = File(ExpansionManager.getExpansion("HyperspaceExpasion")!!.dataFolder, "gravitywells")
+        val gravityWellDir = File(ExpansionManager.getExpansion("HyperspaceExpansion")!!.dataFolder, "gravitywells")
         if (gravityWellDir.exists()) {
             for (hdFile in gravityWellDir.listFiles { dir, name -> name.endsWith(".yml", true) }) {
                 if (hdFile == null)
@@ -262,7 +262,7 @@ object GravityWellManager : Iterable<GravityWell>, Listener {
             }
         }
 
-        ExpansionManager.getExpansion("HyperspaceExpasion")!!.logMessage(Expansion.LogMessageType.INFO, "Loaded " + gravityWells.size + " gravity wells")
+        ExpansionManager.getExpansion("HyperspaceExpansion")!!.logMessage(Expansion.LogMessageType.INFO, "Loaded " + gravityWells.size + " gravity wells")
     }
     /**
      * Returns an iterator over the elements of this object.

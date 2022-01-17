@@ -1,5 +1,5 @@
 name: HyperspaceExpansion
-main: HyperspaceExpansion
+main:  io.github.eirikh1996.movecraftspace.expansion.hyperspace.HyperspaceExpansion
 version: '${project.version}'
 commands:
   hyperspace:

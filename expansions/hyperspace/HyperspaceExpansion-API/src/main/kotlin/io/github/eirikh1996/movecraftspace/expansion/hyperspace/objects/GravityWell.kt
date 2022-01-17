@@ -32,7 +32,7 @@ class GravityWell(name : String, val range : Int, val allowedOnCraftTypes : Set<
     }
 
     override fun save() {
-        val gravityWellDir = File(ExpansionManager.getExpansion("HyperspaceExpasion")!!.dataFolder, "gravitywells")
+        val gravityWellDir = File(ExpansionManager.getExpansion("HyperspaceExpansion")!!.dataFolder, "gravitywells")
         if (!gravityWellDir.exists())
             gravityWellDir.mkdirs()
         val gravityWellFile = File(gravityWellDir, "$name.yml")
