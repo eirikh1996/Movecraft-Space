@@ -70,13 +70,13 @@ object ExpansionManager : Iterable<Expansion> {
     }
 
     fun loadExpansions() {
-        if (!expansions.isEmpty())
+        if (expansions.isNotEmpty())
             expansions.clear()
         val hookFolder = File(pl.dataFolder, "expansions")
         if (!hookFolder.exists())
             hookFolder.mkdirs()
-        val jars = hookFolder.listFiles({ dir, name -> name.endsWith(".jar") })
-        if (jars == null || jars.size == 0) {
+        val jars = hookFolder.listFiles { dir, name -> name.endsWith(".jar") }
+        if (jars == null || jars.isEmpty()) {
             pl.logger.info("No expansions to load")
             return
         }

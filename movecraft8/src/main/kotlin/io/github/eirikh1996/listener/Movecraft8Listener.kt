@@ -12,9 +12,13 @@ import net.countercraft.movecraft.MovecraftLocation
 import net.countercraft.movecraft.craft.ChunkManager
 import net.countercraft.movecraft.craft.Craft
 import net.countercraft.movecraft.craft.CraftManager
+import net.countercraft.movecraft.craft.PlayerCraft
+import net.countercraft.movecraft.craft.type.CraftType
 import net.countercraft.movecraft.events.CraftPreTranslateEvent
 import net.countercraft.movecraft.events.CraftReleaseEvent
 import net.countercraft.movecraft.events.CraftSinkEvent
+import net.countercraft.movecraft.libs.net.kyori.adventure.text.Component
+import net.countercraft.movecraft.libs.net.kyori.adventure.text.TextComponent
 import net.countercraft.movecraft.mapUpdater.MapUpdateManager
 import net.countercraft.movecraft.mapUpdater.update.ExplosionUpdateCommand
 import net.countercraft.movecraft.mapUpdater.update.UpdateCommand
@@ -57,11 +61,11 @@ object Movecraft8Listener : Listener {
     @EventHandler
     fun onCraftPreTranslate (event : CraftPreTranslateEvent) {
         val craft = event.craft
-        if (!craft.type.canSwitchWorld) {
+        if (!craft.type.getBoolProperty(CraftType.CAN_SWITCH_WORLD) || craft !is PlayerCraft) {
             return
         }
         val hitBox = craft.hitBox
-        var planet : Planet? = PlanetCollection.getCorrespondingPlanet(craft.w)
+        var planet : Planet? = PlanetCollection.getCorrespondingPlanet(craft.world)
         if (planet == null) {
             for (ml in hitBox) {
                 val destination = ml.translate(event.dx, event.dy, event.dz)
@@ -86,11 +90,11 @@ object Movecraft8Listener : Listener {
         if (craft.w == planet.destination && hitBox.maxY + event.dy < planet.exitHeight) {
             return
         }
-        val notifyP = craft.notificationPlayer ?: return
+        val audience = craft.audience ?: return
         if (destWorld == planet.destination) {
-            notifyP.sendMessage("Entering " + destWorld.name)
+            audience.sendMessage(Component.text().content("Entering " + destWorld.name).asComponent())
         } else {
-            notifyP.sendMessage("Exiting " + craft.w.name)
+            audience.sendMessage(Component.text().content("Exiting " + craft.world.name).asComponent())
         }
         if (craft.cruising) {
             craft.cruising = false
@@ -114,7 +118,7 @@ object Movecraft8Listener : Listener {
                     continue
                 }
 
-                if (craft.notificationPlayer != null && !ExpansionManager.allowedArea(craft.notificationPlayer!!, test.toBukkit(destWorld))) {
+                if (!ExpansionManager.allowedArea(craft.pilot, test.toBukkit(destWorld))) {
                     continue
                 }
                 val diff = test.subtract(midpoint)
@@ -122,17 +126,10 @@ object Movecraft8Listener : Listener {
                 MovecraftChunk.addSurroundingChunks(chunks, 3)
                 ChunkManager.syncLoadChunks(chunks)
                 val testType = test.toBukkit(destWorld).block.type
-                if (!testType.name.endsWith("AIR") && !craft.type.passthroughBlocks.contains(testType)) {
+                if (!testType.name.endsWith("AIR") && !craft.type.getMaterialSetProperty(CraftType.PASSTHROUGH_BLOCKS).contains(testType)) {
                     continue
                 }
-                val obstructed = getScheduler().callSyncMethod(plugin) {
-                    hitboxObstructed(
-                        craft,
-                        planet,
-                        destWorld,
-                        diff
-                    )
-                }.get()
+                val obstructed = hitboxObstructed(craft.hitBox.asSet(), craft.type.getMaterialSetProperty(CraftType.PASSTHROUGH_BLOCKS), planet, destWorld, diff)
                 if (obstructed)
                     continue
                 destLoc = diff
@@ -152,7 +149,7 @@ object Movecraft8Listener : Listener {
                     continue
                 }
 
-                if (!ExpansionManager.allowedArea(notifyP, test.toBukkit(destWorld))) {
+                if (!ExpansionManager.allowedArea(craft.pilot, test.toBukkit(destWorld))) {
                     continue
                 }
                 if (StarCollection.getStarAt(test.toBukkit(destWorld)) != null)
@@ -161,14 +158,7 @@ object Movecraft8Listener : Listener {
                 val chunks = ChunkManager.getChunks(craft.hitBox, destWorld, diff.x, diff.y, diff.z)
                 MovecraftChunk.addSurroundingChunks(chunks, 3)
                 ChunkManager.syncLoadChunks(chunks)
-                val obstructed = getScheduler().callSyncMethod(plugin) {
-                    hitboxObstructed(
-                        craft,
-                        planet,
-                        destWorld,
-                        diff
-                    )
-                }.get()
+                val obstructed = hitboxObstructed(craft.hitBox.asSet(), craft.type.getMaterialSetProperty(CraftType.PASSTHROUGH_BLOCKS), planet, destWorld, diff)
                 if (obstructed)
                     continue
                 destLoc = diff

@@ -496,7 +496,6 @@ object PlanetCommand : TabExecutor {
     }
 
     override fun onTabComplete(sender: CommandSender, cmd: Command, label: String, args: Array<out String>) : List<String> {
-        Bukkit.broadcastMessage(args.size.toString())
         var tabCompletions = listOf("create", "remove", "move", "list", "toggleplayerteleport", "regensphere", "tp").filter { str -> sender.hasPermission("movecraftspace.command.planet." + str) }
         tabCompletions = tabCompletions.sorted()
         if (args.isEmpty()) {

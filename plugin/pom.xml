@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>Movecraft-Space</artifactId>
-    <version>1.5</version>
+    <version>1.6</version>
 
     <dependencies>
         <dependency>

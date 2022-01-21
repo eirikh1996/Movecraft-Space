@@ -2,6 +2,7 @@ package io.github.eirikh1996.movecraftspace.utils
 
 import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
+import io.github.eirikh1996.movecraftspace.objects.MSWorldBorder
 import io.github.eirikh1996.movecraftspace.objects.Planet
 import net.countercraft.movecraft.Movecraft
 import net.countercraft.movecraft.MovecraftLocation
@@ -40,20 +41,21 @@ object MSUtils {
         return intArrayOf(Random.nextInt(minX, maxX), Random.nextInt(minY, maxY), Random.nextInt(minZ, maxZ))
     }
 
-    fun hitboxObstructed(craft: Craft, planet: Planet?, destWorld : World, diff : MovecraftLocation) : Boolean {
+    fun hitboxObstructed(hitbox : Set<MovecraftLocation>, passthroughBlocks : Set<Material>, planet: Planet?, destWorld : World, diff : MovecraftLocation) : Boolean {
         var obstructed = false;
-        for (ml in craft.hitBox) {
+        val wb = MSWorldBorder.fromBukkit(destWorld.worldBorder)
+        for (ml in hitbox) {
             val destHitBoxLoc = ml.add(diff)
             val destHitBoxLocType = destHitBoxLoc.toBukkit(destWorld).block.type
             if (planet != null && planet.space.equals(destWorld) && planet.contains(ml.toBukkit(destWorld))) {
                 obstructed = true
                 break
             }
-            if (!destHitBoxLocType.name.endsWith("AIR") && !craft.type.passthroughBlocks.contains(destHitBoxLocType)) {
+            if (!destHitBoxLocType.name.endsWith("AIR") && !passthroughBlocks.contains(destHitBoxLocType)) {
                 obstructed = true
                 break
             }
-            if (!MathUtils.withinWorldBorder(destWorld, destHitBoxLoc)) {
+            if (!wb.withinBorder(destHitBoxLoc.toBukkit(destWorld))) {
                 obstructed = true
                 break
             }
@@ -84,7 +86,7 @@ object MSUtils {
     fun setBlock(loc : Location, type : Material, data : Any) {
         val wh = Movecraft.getInstance().worldHandler
         if (setBlockFast == null) {
-            wh.setBlockFast(loc, type, data as Byte)
+            wh.setBlockFast(loc, type, if (Settings.IsMovecraft8) 0 else data as Byte)
         } else {
             setBlockFast!!.invoke(wh, loc, type, data)
         }

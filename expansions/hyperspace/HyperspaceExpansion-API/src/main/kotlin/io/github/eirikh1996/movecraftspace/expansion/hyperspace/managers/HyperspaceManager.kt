@@ -147,8 +147,8 @@ object HyperspaceManager : BukkitRunnable(), Listener {
         abstract fun processHyperspaceTravel()
         abstract fun pullOutOfHyperspace(entry: HyperspaceTravelEntry<C>, target : Location, exitMessage : String)
         abstract fun addEntry(craft: C, entry: HyperspaceTravelEntry<C>)
-        abstract val pendingEntries : Map<Craft, HyperspaceTravelEntry<C>>
-        abstract val processingEntries : WeakHashMap<Craft, HyperspaceTravelEntry<C>>
+        abstract val pendingEntries : Map<C, HyperspaceTravelEntry<C>>
+        abstract val processingEntries : WeakHashMap<C, HyperspaceTravelEntry<C>>
         abstract fun nearestUnobstructedLoc(loc: Location, craft: C): Location
     }
 }

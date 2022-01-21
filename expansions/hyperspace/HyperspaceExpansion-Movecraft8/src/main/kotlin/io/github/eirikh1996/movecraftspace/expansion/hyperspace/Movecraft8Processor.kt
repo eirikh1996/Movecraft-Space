@@ -7,12 +7,13 @@ import io.github.eirikh1996.movecraftspace.utils.MSUtils
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.plugin
 import net.countercraft.movecraft.craft.Craft
 import net.countercraft.movecraft.craft.CraftManager
+import net.countercraft.movecraft.craft.PlayerCraft
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
 
-class Movecraft8Processor : MovecraftProcessor<Craft>() {
+class Movecraft8Processor : MovecraftProcessor<PlayerCraft>() {
     private val ex = ExpansionManager.getExpansion("HyperspaceExpansion")!!
 
     override fun executePulloutCommand(sender: Player, args: Array<out String>) {
@@ -64,13 +65,13 @@ class Movecraft8Processor : MovecraftProcessor<Craft>() {
         var destination : Location? = null
         var str = ""
         for (beacon in HyperspaceManager.beaconLocations) {
-            if (beacon.origin.world!! == craft.w && beacon.origin.distance(hitBox.midPoint.toBukkit(craft.world)) <= ex.config.getInt("Beacon range")) {
+            if (beacon.origin.world!! == craft.world && beacon.origin.distance(hitBox.midPoint.toBukkit(craft.world)) <= ex.config.getInt("Beacon range")) {
                 foundLoc = beacon.origin
                 destination = beacon.destination
                 str = beacon.originName + "-" + beacon.destinationName
                 break
             }
-            if (beacon.destination.world!! == craft.w && beacon.destination.distance(hitBox.midPoint.toBukkit(craft.world)) <= ex.config.getInt("Beacon range")) {
+            if (beacon.destination.world!! == craft.world && beacon.destination.distance(hitBox.midPoint.toBukkit(craft.world)) <= ex.config.getInt("Beacon range")) {
                 foundLoc = beacon.destination
                 destination = beacon.origin
                 str = beacon.destinationName + "-" + beacon.originName

@@ -84,7 +84,7 @@ class MovecraftSpace : JavaPlugin() {
                 ExpansionManager.enableExpansions()
                 server.pluginManager.registerEvents(UpdateManager, instance)
             }
-        }.runTaskLater(this, 10)
+        }.runTaskLater(this, 20)
     }
 
     fun averageTicks() : Double {

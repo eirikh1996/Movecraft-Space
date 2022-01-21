@@ -52,6 +52,11 @@
       <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="github" />
+      <option name="name" value="GitHub APDevTeam/Movecraft Apache Maven Packages" />
+      <option name="url" value="https://maven.pkg.github.com/APDevTeam/Movecraft" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="sk89q-repo" />
       <option name="name" value="sk89q-repo" />
       <option name="url" value="https://maven.enginehub.org/repo/" />

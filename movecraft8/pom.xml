@@ -16,6 +16,19 @@
         <kotlin.code.style>official</kotlin.code.style>
         <junit.version>4.12</junit.version>
     </properties>
+    <repositories>
+        <repository>
+            <id>github</id>
+            <name>GitHub APDevTeam/Movecraft Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/APDevTeam/Movecraft</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
@@ -37,17 +50,22 @@
         </dependency>
 
         <dependency>
+            <groupId>net.countercraft</groupId>
+            <artifactId>movecraft</artifactId>
+            <version>8.0.0-a.6</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>io.github.eirikh1996</groupId>
             <artifactId>movecraft-space-api</artifactId>
             <version>API</version>
             <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>net.countercraft</groupId>
-            <artifactId>Movecraft</artifactId>
-            <version>8.0.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/../libs/Movecraft-8.jar</systemPath>
+            <exclusions>
+                <exclusion>
+                    <groupId>net.countercraft</groupId>
+                    <artifactId>Movecraft</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 

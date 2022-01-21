@@ -10,6 +10,7 @@ import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.MUST_BE_PLAYER
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.WARNING
 import net.countercraft.movecraft.craft.CraftManager
+import net.countercraft.movecraft.craft.type.CraftType
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -38,12 +39,12 @@ object Movecraft8JumpCommand : CommandExecutor {
             sender.sendMessage(COMMAND_PREFIX + ERROR + "There are no hyperdrives on this craft")
             return true
         }
-
-        if (!ExpansionSettings.allowedCraftTypesForJumpCommand.contains(craft.type.craftName)) {
-            sender.sendMessage(COMMAND_PREFIX + ERROR + "Craft type " + craft.type.craftName + " is not allowed for hyperspace travel using jump command")
+        val craftTypeName = craft.type.getStringProperty(CraftType.NAME)
+        if (!ExpansionSettings.allowedCraftTypesForJumpCommand.contains(craftTypeName)) {
+            sender.sendMessage(COMMAND_PREFIX + ERROR + "Craft type " + craftTypeName + " is not allowed for hyperspace travel using jump command")
             return true
         }
-        if (!PlanetCollection.any { p -> p.space.equals(craft.w) }) {
+        if (!PlanetCollection.any { p -> p.space == craft.world }) {
             sender.sendMessage(COMMAND_PREFIX + ERROR + "You can only use hyperspace travel in a space world")
             return true
         }

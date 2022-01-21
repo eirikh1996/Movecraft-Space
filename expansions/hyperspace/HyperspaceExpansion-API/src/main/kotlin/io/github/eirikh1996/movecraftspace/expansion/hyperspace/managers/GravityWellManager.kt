@@ -10,13 +10,17 @@ import io.github.eirikh1996.movecraftspace.utils.BlockUtils
 import io.github.eirikh1996.movecraftspace.utils.MSUtils
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
+import io.github.eirikh1996.movecraftspace.utils.MSUtils.plugin
+import net.countercraft.movecraft.MovecraftLocation
 import net.countercraft.movecraft.craft.Craft
 import net.countercraft.movecraft.craft.CraftManager
 import net.countercraft.movecraft.events.CraftDetectEvent
 import net.countercraft.movecraft.events.CraftReleaseEvent
 import net.countercraft.movecraft.utils.MathUtils
+import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Location
+import org.bukkit.World
 import org.bukkit.block.Sign
 import org.bukkit.block.data.type.WallSign
 import org.bukkit.event.EventHandler
@@ -34,6 +38,19 @@ object GravityWellManager : Iterable<GravityWell>, Listener {
     val GRAVITY_WELL_HEADER = ChatColor.AQUA.toString() + "Gravity well"
     val GRAVITY_WELL_ACTIVE_TEXT = ChatColor.GREEN.toString() + "Active"
     val GRAVITY_WELL_STANDBY_TEXT = ChatColor.DARK_RED.toString() + "Standby"
+    val processor : GravityWellProcessor<*>
+
+    init {
+        val movecraftVersion = if (Settings.IsMovecraft8){ 8 }else{ 7 }
+        val clazz = Class.forName("io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.Movecraft" + movecraftVersion + "GravityWellProcessor")
+        processor = clazz.getConstructor().newInstance() as GravityWellProcessor<*>
+        Bukkit.getPluginManager().registerEvents(processor, plugin)
+    }
+
+    abstract class GravityWellProcessor<Craft>() : Listener {
+        abstract fun craftHasActiveGravityWell(craft: Craft) : Boolean
+        abstract fun getActiveGravityWellAt(loc : Location, craftToExclude : Craft? = null): GravityWell?
+    }
 
     @EventHandler
     fun onSignChange(event: SignChangeEvent) {
@@ -119,45 +136,19 @@ object GravityWellManager : Iterable<GravityWell>, Listener {
 
     }
 
-    @EventHandler
-    fun onDetect(event : CraftDetectEvent) {
-        val gravityWellsOnCraft = getGravityWellsOnCraft(event.craft)
-        for (entry in gravityWellsOnCraft) {
-            if (entry.value.allowedOnCraftTypes.contains(event.craft.type.craftName)) {
-                event.failMessage = COMMAND_PREFIX + ERROR + "Gravity well " + entry.value.name + " is not allowed on craft type " + event.craft.type.craftName
-                event.isCancelled = true
-                return
-            }
-        }
-        if (ExpansionSettings.maxGravityWellsOnCraft.contains(event.craft.type.craftName) && gravityWellsOnCraft.size > ExpansionSettings.maxGravityWellsOnCraft[event.craft.type.craftName]!!) {
-            event.failMessage = COMMAND_PREFIX + ERROR + "Craft type " + event.craft.type.craftName + " can have maximum of " + ExpansionSettings.maxGravityWellsOnCraft[event.craft.type.craftName]!! + " hyperdrives on it"
-            event.isCancelled = true
-            return
-        }
 
-    }
 
-    @EventHandler
-    fun onRelease(event :CraftReleaseEvent) {
-        for (entry in getGravityWellsOnCraft(event.craft)) {
-            entry.key.setLine(3, GRAVITY_WELL_STANDBY_TEXT)
-            entry.key.update()
-        }
-    }
-
-    fun getGravityWellsOnCraft(craft: Craft) : Map<Sign, GravityWell> {
+    fun getGravityWellsOnCraft(hitBox : Set<MovecraftLocation>, world: World) : Map<Sign, GravityWell> {
         val returnMap = HashMap<Sign, GravityWell>()
-        if (craft.hitBox.isEmpty)
+        if (hitBox.isEmpty())
             return returnMap
-        for (ml in craft.hitBox) {
-            val block = ml.toBukkit(craft.w).block
+        for (ml in hitBox) {
+            val block = ml.toBukkit(world).block
             if (!block.type.name.endsWith("WALL_SIGN"))
                 continue
             val sign = block.state as Sign
-            val gravityWell = getGravityWell(sign)
-            if (gravityWell == null)
-                continue
-            returnMap.put(sign, gravityWell)
+            val gravityWell = getGravityWell(sign) ?: continue
+            returnMap[sign] = gravityWell
         }
         return returnMap
     }
@@ -197,47 +188,7 @@ object GravityWellManager : Iterable<GravityWell>, Listener {
         return foundGravityWell
     }
 
-    fun craftHasActiveGravityWell(craft: Craft) : Boolean {
-        for (ml in craft.hitBox) {
-            val b = ml.toBukkit(craft.w).block
-            if (!b.type.name.endsWith("WALL_SIGN"))
-                continue
-            val sign = b.state as Sign
-            if (!sign.getLine(0).equals(GRAVITY_WELL_HEADER))
-                continue
-            val gravityWell = getGravityWell(sign)
-            if (gravityWell == null)
-                continue
-            if (!sign.getLine(3).equals(GRAVITY_WELL_ACTIVE_TEXT))
-                continue
-            return true
-        }
-        return false
-    }
 
-    fun getActiveGravityWellAt(loc : Location, craftToExclude : Craft? = null): GravityWell? {
-        for (craft in CraftManager.getInstance().getCraftsInWorld(loc.world!!)) {
-            if (craft == null || craftToExclude == craft)
-                continue
-            for (ml in craft.hitBox) {
-                val b = ml.toBukkit(loc.world).block
-                if (!b.type.name.endsWith("WALL_SIGN"))
-                    continue
-                val sign = b.state as Sign
-                if (!sign.getLine(0).equals(GRAVITY_WELL_HEADER))
-                    continue
-                val gravityWell = getGravityWell(sign)
-                if (gravityWell == null)
-                    continue
-                if (sign.location.distance(loc) > gravityWell.range)
-                    continue
-                if (!sign.getLine(3).equals(GRAVITY_WELL_ACTIVE_TEXT))
-                    continue
-                return gravityWell
-            }
-        }
-        return null
-    }
 
     fun getGravityWell(name : String) : GravityWell? {
         return gravityWells.find { gw -> gw.name.equals(name, true) }

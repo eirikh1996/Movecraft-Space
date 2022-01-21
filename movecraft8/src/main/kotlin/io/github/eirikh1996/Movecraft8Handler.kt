@@ -4,6 +4,7 @@ import io.github.eirikh1996.movecraftspace.utils.MovecraftHandler
 import net.countercraft.movecraft.MovecraftLocation
 import net.countercraft.movecraft.craft.Craft
 import net.countercraft.movecraft.craft.CraftManager
+import net.countercraft.movecraft.craft.type.CraftType
 import org.bukkit.World
 import org.bukkit.entity.Player
 
@@ -20,7 +21,7 @@ class Movecraft8Handler() : MovecraftHandler<Craft>() {
 
     override fun getCraftTypeName(player: Player): String {
         val pCraft = CraftManager.getInstance().getCraftByPlayer(player) ?: return ""
-        return pCraft.type.craftName
+        return pCraft.type.getStringProperty(CraftType.NAME)
     }
 
     override fun getMidpointOnCraft(player: Player): MovecraftLocation {

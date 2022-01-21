@@ -17,6 +17,7 @@ import io.github.eirikh1996.movecraftspace.expansion.hyperspace.events.Hyperspac
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.GravityWellManager
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.HyperdriveManager
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.HyperspaceManager
+import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.Movecraft8GravityWellProcessor
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects.HyperspaceBeacon
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects.HyperspaceTravelEntry
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
@@ -27,11 +28,13 @@ import net.countercraft.movecraft.Movecraft
 import net.countercraft.movecraft.MovecraftLocation
 import net.countercraft.movecraft.craft.Craft
 import net.countercraft.movecraft.craft.CraftManager
+import net.countercraft.movecraft.craft.PlayerCraft
+import net.countercraft.movecraft.craft.type.CraftType
 import net.countercraft.movecraft.events.*
+import net.countercraft.movecraft.libs.net.kyori.adventure.text.Component
 import net.countercraft.movecraft.util.MathUtils
 import net.countercraft.movecraft.util.hitboxes.BitmapHitBox
 import net.countercraft.movecraft.util.hitboxes.HitBox
-import net.kyori.adventure.text.Component
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.Bukkit
@@ -61,14 +64,14 @@ import kotlin.collections.HashMap
 import kotlin.math.*
 import kotlin.random.Random
 
-class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.HyperspaceProcessor<Craft>() {
+class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.HyperspaceProcessor<PlayerCraft>() {
 
-    override val progressBars = HashMap<Craft, BossBar>()
-    override val pendingEntries = WeakHashMap<Craft, HyperspaceTravelEntry<Craft>>()
-    override val processingEntries = WeakHashMap<Craft, HyperspaceTravelEntry<Craft>>()
+    override val progressBars = HashMap<PlayerCraft, BossBar>()
+    override val pendingEntries = WeakHashMap<PlayerCraft, HyperspaceTravelEntry<PlayerCraft>>()
+    override val processingEntries = WeakHashMap<PlayerCraft, HyperspaceTravelEntry<PlayerCraft>>()
 
     override fun scheduleHyperspaceTravel(
-        craft: Craft,
+        craft: PlayerCraft,
         origin: Location,
         destination: Location,
         str: String,
@@ -76,29 +79,29 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
     ) {
         val hyperdrivesOnCraft = HyperdriveManager.getHyperdrivesOnCraft(craft.hitBox.asSet(), craft.world)
         if (hyperdrivesOnCraft.isEmpty()) {
-            craft.notificationPlayer!!.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "There are no hyperdrives on this craft")
+            craft.pilot.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "There are no hyperdrives on this craft")
             return
         }
         for (ml in craft.hitBox) {
-            val testLoc = ml.toBukkit(craft.w)
-            if (PlanetCollection.getPlanetAt(testLoc, extraMassShadowRangeOfPlanets) != null || StarCollection.getStarAt(testLoc, extraMassShadowRangeOfStars) != null || GravityWellManager.getActiveGravityWellAt(
+            val testLoc = ml.toBukkit(craft.world)
+            if (PlanetCollection.getPlanetAt(testLoc, extraMassShadowRangeOfPlanets) != null || StarCollection.getStarAt(testLoc, extraMassShadowRangeOfStars) != null || (GravityWellManager.processor as Movecraft8GravityWellProcessor).getActiveGravityWellAt(
                     testLoc,
                     craft
                 ) != null) {
-                craft.notificationPlayer!!.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Craft is within the range of a mass shadow. Move out of the mass shadow to initiate hyperspace jump")
+                craft.pilot.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Craft is within the range of a mass shadow. Move out of the mass shadow to initiate hyperspace jump")
                 return
             }
         }
-        if (GravityWellManager.craftHasActiveGravityWell(craft)) {
-            craft.notificationPlayer!!.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Your craft cannot enter hyperspace because it has an active gravity well on it")
+        if ((GravityWellManager.processor as Movecraft8GravityWellProcessor).craftHasActiveGravityWell(craft)) {
+            craft.pilot.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Your craft cannot enter hyperspace because it has an active gravity well on it")
             return
         }
 
 
 
 
-        if (HyperspaceManager.runnableMap.containsKey(craft.notificationPlayer!!.uniqueId)) {
-            craft.notificationPlayer!!.sendMessage("You are already processing hyperspace warmup")
+        if (HyperspaceManager.runnableMap.containsKey(craft.pilot.uniqueId)) {
+            craft.pilot.sendMessage("You are already processing hyperspace warmup")
             return
         }
         var warmupTime = 0
@@ -147,7 +150,7 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
             sign.update()
         }
         if (!foundHypermatter) {
-            craft.notificationPlayer!!.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "There is no hypermatter in any of the hyperdrives on the craft")
+            craft.pilot.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "There is no hypermatter in any of the hyperdrives on the craft")
             return
         }
         warmupTime /= hyperdrivesWithHypermatter
@@ -164,12 +167,12 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
         }
         dest = ExpansionManager.worldBoundrary(dest.world!!).nearestLocWithin(dest, buffer)
         if (dest != destination) {
-            craft.audience.sendMessage(Component.text().content(MSUtils.COMMAND_PREFIX + MSUtils.WARNING + "Destination location ${destination.toVector()} in world ${destination.world?.name} is outside of the world boundary. New adjusted target location is now ${dest.toVector()}"))
+            craft.audience.sendMessage(Component.text().content(MSUtils.COMMAND_PREFIX + MSUtils.WARNING + "Destination location ${destination.toVector()} in world ${destination.world?.name} is outside of the world boundary. New adjusted target location is now ${dest.toVector()}").asComponent())
         }
         val entry = Movecraft8HyperspaceTravelEntry(craft, origin, dest, beaconTravel)
-        entry.progressBar.addPlayer(craft.notificationPlayer!!)
+        entry.progressBar.addPlayer(craft.pilot)
         entry.progressBar.setTitle("$str Warmup 0.0%")
-        val notifyP = craft.notificationPlayer!!
+        val notifyP = craft.pilot
         val runnable = object : BukkitRunnable() {
 
             val timeStarted = System.currentTimeMillis()
@@ -213,7 +216,8 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
                 while (hitboxObstructed) {
                     hitboxObstructed = Bukkit.getScheduler().callSyncMethod(plugin) {
                         MSUtils.hitboxObstructed(
-                            craft,
+                            craft.hitBox.asSet(),
+                            craft.type.getMaterialSetProperty(CraftType.PASSTHROUGH_BLOCKS),
                             null,
                             hyperspaceWorld,
                             MovecraftLocation(x - midpoint.x, y - midpoint.y, z - midpoint.z)
@@ -232,15 +236,15 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
                 entry.stage = HyperspaceTravelEntry.Stage.TRAVEL
                 val dx = x - midpoint.x
                 val dz = z - midpoint.z
-                HyperspaceManager.runnableMap.remove(craft.notificationPlayer!!.uniqueId)?.cancel()
+                HyperspaceManager.runnableMap.remove(craft.pilot.uniqueId)?.cancel()
                 HyperspaceManager.craftsWithinBeaconRange.remove(craft)
-                craft.burningFuel += craft.type.getFuelBurnRate(craft.w)
+                craft.burningFuel += craft.type.getPerWorldProperty(CraftType.PER_WORLD_FUEL_BURN_RATE, craft.world) as Double
                 craft.translate(hyperspaceWorld, dx, 0, dz)
                 entry.lastTeleportTime = System.currentTimeMillis()
             }
 
         }
-        HyperspaceManager.runnableMap[craft.notificationPlayer!!.uniqueId] = runnable
+        HyperspaceManager.runnableMap[craft.pilot.uniqueId] = runnable
         runnable.runTaskTimerAsynchronously(plugin, 0, 1)
     }
 
@@ -268,7 +272,7 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
                     break
                 }
                 val foundGravityWell = Bukkit.getScheduler().callSyncMethod(plugin) {
-                    GravityWellManager.getActiveGravityWellAt(
+                    (GravityWellManager.processor as Movecraft8GravityWellProcessor).getActiveGravityWellAt(
                         testLoc,
                         entry.craft
                     )
@@ -320,14 +324,14 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
         }
     }
 
-    override fun pullOutOfHyperspace(entry: HyperspaceTravelEntry<Craft>, target : Location, exitMessage : String) {
+    override fun pullOutOfHyperspace(entry: HyperspaceTravelEntry<PlayerCraft>, target : Location, exitMessage : String) {
         if (entry.stage == HyperspaceTravelEntry.Stage.FINISHED)
             return
         entry.stage = HyperspaceTravelEntry.Stage.FINISHED
         entry.craft.setProcessing(false)
         val midPoint = entry.craft.hitBox.midPoint
-        entry.craft.notificationPlayer!!.sendMessage(exitMessage)
-        entry.craft.burningFuel += entry.craft.type.getFuelBurnRate(entry.craft.w)
+        entry.craft.pilot.sendMessage(exitMessage)
+        entry.craft.burningFuel += entry.craft.type.getPerWorldProperty(CraftType.PER_WORLD_FUEL_BURN_RATE, entry.craft.world) as Double
         entry.progressBar.isVisible = false
         val finalTarget = nearestUnobstructedLoc(target, entry.craft)
         Bukkit.getScheduler().callSyncMethod(plugin) {
@@ -340,10 +344,10 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
         processingEntries.remove(entry.craft)
         entry.lastTeleportTime = System.currentTimeMillis()
         entry.craft.translate(entry.destination.world, finalTarget.blockX - midPoint.x, finalTarget.blockY - midPoint.y, finalTarget.blockZ - midPoint.z)
-        entry.craft.notificationPlayer!!.playSound(entry.craft.notificationPlayer!!.location, ExpansionSettings.hyperspaceExitSound, 3f, 0f)
+        entry.craft.pilot.playSound(entry.craft.pilot.location, ExpansionSettings.hyperspaceExitSound, 3f, 0f)
     }
 
-    private fun processHyperspaceBeaconDetection(craft : Craft, hitBox: HitBox = craft.hitBox, world: World = craft.w) {
+    private fun processHyperspaceBeaconDetection(craft : PlayerCraft, hitBox: HitBox = craft.hitBox, world: World = craft.w) {
         var foundLoc : Location? = null
         var str = ""
         if (hitBox.isEmpty || craft.world == hyperspaceWorld)
@@ -361,13 +365,13 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
             }
         }
         if (foundLoc == null && HyperspaceManager.craftsWithinBeaconRange.contains(craft)) {
-            craft.notificationPlayer!!.sendMessage("Exiting hyperspace beacon range")
+            craft.pilot.sendMessage("Exiting hyperspace beacon range")
             HyperspaceManager.craftsWithinBeaconRange.remove(craft)
             return
         }
-        if (HyperspaceManager.runnableMap.containsKey(craft.notificationPlayer!!.uniqueId)) {
-            HyperspaceManager.runnableMap.remove(craft.notificationPlayer!!.uniqueId)!!.cancel()
-            craft.notificationPlayer!!.sendMessage(MSUtils.COMMAND_PREFIX + "Space craft was moved during warmup. Cancelling hyperspace warmup")
+        if (HyperspaceManager.runnableMap.containsKey(craft.pilot.uniqueId)) {
+            HyperspaceManager.runnableMap.remove(craft.pilot.uniqueId)!!.cancel()
+            craft.pilot.sendMessage(MSUtils.COMMAND_PREFIX + "Space craft was moved during warmup. Cancelling hyperspace warmup")
             var entry = processingEntries.remove(craft)
             if (entry == null)
                 entry = pendingEntries.remove(craft)
@@ -378,7 +382,7 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
         if (foundLoc != null && !HyperspaceManager.craftsWithinBeaconRange.contains(craft)) {
             val clickText = TextComponent("§2[Accept]")
             clickText.clickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/hyperspace travel")
-            craft.notificationPlayer!!.spigot().sendMessage(
+            craft.pilot.spigot().sendMessage(
                 TextComponent("Entered the range of $str hyperspace beacon "),
                 clickText
             )
@@ -386,14 +390,14 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
         }
     }
 
-    override fun nearestUnobstructedLoc(loc : Location, craft: Craft) : Location {
+    override fun nearestUnobstructedLoc(loc : Location, craft: PlayerCraft) : Location {
         if (loc.world == null)
             throw UnsupportedOperationException("Supplied location cannot have a null world")
         val hitBox = BitmapHitBox(craft.hitBox)
         if (hitBox.isEmpty)
             return loc
-        val minHeight = min(craft.type.getMinHeightLimit(loc.world!!), (if (Settings.IsV1_17) loc.world!!.minHeight else 0)) + (hitBox.yLength / 2)
-        val maxHeight = max(craft.type.getMaxHeightLimit(loc.world!!), loc.world!!.maxHeight) - (hitBox.yLength / 2)
+        val minHeight = min(craft.type.getPerWorldProperty(CraftType.PER_WORLD_MIN_HEIGHT_LIMIT, loc.world!!) as Int, (if (Settings.IsV1_17) loc.world!!.minHeight else 0)) + (hitBox.yLength / 2)
+        val maxHeight = max(craft.type.getPerWorldProperty(CraftType.PER_WORLD_MAX_HEIGHT_LIMIT, loc.world!!) as Int, loc.world!!.maxHeight) - (hitBox.yLength / 2)
         var foundLoc = loc.clone()
         foundLoc.y = min(foundLoc.y, (foundLoc.world!!.maxHeight - 1 - craft.hitBox.yLength / 2).toDouble())
         foundLoc.y = max(foundLoc.y, ((if (Settings.IsV1_17) foundLoc.world!!.minHeight else 0) + 1 + craft.hitBox.yLength / 2).toDouble())
@@ -418,7 +422,7 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
                 val displacement = MathUtils.bukkit2MovecraftLoc(foundLoc).subtract(craft.hitBox.midPoint)
                 if (craft.hitBox.any { ml ->
                         val targ = ml.add(displacement).toBukkit(foundLoc.world)
-                        !targ.block.type.name.endsWith("AIR") && !craft.type.passthroughBlocks.contains(targ.block.type) } )
+                        !targ.block.type.name.endsWith("AIR") && !craft.type.getMaterialSetProperty(CraftType.PASSTHROUGH_BLOCKS).contains(targ.block.type) } )
                     continue
             }
         }
@@ -429,7 +433,7 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
         return HyperspaceManager.beaconLocations.firstOrNull { beacon -> beacon.origin == loc || beacon.destination == loc }
     }
 
-    override fun addEntry(craft: Craft, entry: HyperspaceTravelEntry<Craft>) {
+    override fun addEntry(craft: PlayerCraft, entry: HyperspaceTravelEntry<PlayerCraft>) {
         pendingEntries[craft] = entry
     }
 
@@ -437,33 +441,41 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
     @EventHandler
     fun onRelease(event : CraftReleaseEvent) {
         val craft = event.craft
-        if (craft.w != ExpansionSettings.hyperspaceWorld) {
+        if (craft !is PlayerCraft)
+            return
+        if (craft.world != ExpansionSettings.hyperspaceWorld) {
             return
         }
         if (event.reason == CraftReleaseEvent.Reason.FORCE) {
             return
         }
-        craft.notificationPlayer!!.sendMessage("Cannot release a craft in hyperspace")
+        craft.pilot.sendMessage("Cannot release a craft in hyperspace")
         event.isCancelled = true
     }
 
     @EventHandler
     fun onRotate(event : CraftRotateEvent) {
-        if (processingEntries.containsKey(event.craft)) {
+        val craft = event.craft
+        if (craft !is PlayerCraft)
+            return
+        if (processingEntries.containsKey(craft)) {
             event.failMessage = MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Cannot move ship while travelling in hyperspace"
             event.isCancelled = true
             return
         }
-        processHyperspaceBeaconDetection(event.craft, event.newHitBox)
+        processHyperspaceBeaconDetection(craft, event.newHitBox)
     }
 
     @EventHandler
     fun onTranslate(event : CraftTranslateEvent) {
-        if (craftsSunkInHyperspace.contains(event.craft)) {
-            craftsSunkInHyperspace.remove(event.craft)
+        val craft = event.craft
+        if (craft !is PlayerCraft)
+            return
+        if (craftsSunkInHyperspace.contains(craft)) {
+            craftsSunkInHyperspace.remove(craft)
             object : BukkitRunnable() {
                 override fun run() {
-                    event.craft.sink()
+                    craft.sink()
                 }
             }.runTaskLater(plugin, 3)
         }
@@ -472,18 +484,20 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
             event.isCancelled = true
             return
         }
-        val entry = pendingEntries[event.craft]
+        val entry = pendingEntries[craft]
         if (entry != null && event.world == ExpansionSettings.hyperspaceWorld) {
-            pendingEntries.remove(event.craft)
-            processingEntries[event.craft] = entry
+            pendingEntries.remove(craft)
+            processingEntries[craft] = entry
         }
-        processHyperspaceBeaconDetection(event.craft, event.newHitBox, event.world)
+        processHyperspaceBeaconDetection(craft, event.newHitBox, event.world)
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     fun onDetect(event : CraftDetectEvent) {
         val craft = event.craft
-        val result = HyperdriveManager.onCraftDetect(craft.notificationPlayer!!, craft.type.craftName, craft.hitBox.asSet(), craft.w)
+        if (craft !is PlayerCraft)
+            return
+        val result = HyperdriveManager.onCraftDetect(craft.pilot, craft.type.getStringProperty(CraftType.NAME), craft.hitBox.asSet(), craft.w)
         if (result.isNotEmpty()) {
             event.failMessage = result
             event.isCancelled = true
@@ -491,7 +505,7 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
         }
         if (craft.w != hyperspaceWorld)
             return
-        if (craft.type.cruiseOnPilot) {
+        if (craft.type.getBoolProperty(CraftType.CRUISE_ON_PILOT)) {
             event.failMessage = "Cannot launch cruiseOnPilot crafts in hyperspace"
             event.isCancelled = true
             return
@@ -501,14 +515,14 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
             override fun run() {
                 var target = HyperspaceManager.targetLocations[midpoint]
                 if (target == null) {
-                    craft.notificationPlayer!!.sendMessage("Could not find a target location for the craft trapped in hyperspace. Please contact an administrator")
+                    craft.pilot.sendMessage("Could not find a target location for the craft trapped in hyperspace. Please contact an administrator")
                     return
                 }
                 target = nearestUnobstructedLoc(target, craft)
                 val dx = target.blockX - midpoint.x
                 val dy = target.blockY - midpoint.y
                 val dz = target.blockZ - midpoint.z
-                craft.notificationPlayer!!.sendMessage("Craft was detected in hyperspace. Pulling you out of hyperspace")
+                craft.pilot.sendMessage("Craft was detected in hyperspace. Pulling you out of hyperspace")
                 craft.translate(target.world, dx, dy, dz)
                 HyperspaceManager.targetLocations.remove(midpoint)
             }
@@ -520,8 +534,10 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
     @EventHandler
     fun onSink(event : CraftSinkEvent) {
         val craft = event.craft
-        val notifyP = craft.notificationPlayer
-        if (craft.w != ExpansionSettings.hyperspaceWorld)
+        if (craft !is PlayerCraft)
+            return
+        val notifyP = craft.pilot
+        if (craft.world != hyperspaceWorld)
             return
         val target = HyperspaceManager.targetLocations[craft.hitBox.midPoint]
         event.isCancelled = true
@@ -616,8 +632,8 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
             e.player.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "You can only use hyperspace travel in space worlds")
             return
         }
-        if (!ExpansionSettings.allowedCraftTypesForHyperspaceSign.contains(craft.type.craftName)) {
-            e.player.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Craft type " + craft.type.craftName + " is not allowed for hyperspace travel using sign")
+        if (!ExpansionSettings.allowedCraftTypesForHyperspaceSign.contains(craft.type.getStringProperty(CraftType.NAME))) {
+            e.player.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Craft type " + craft.type.getStringProperty(CraftType.NAME) + " is not allowed for hyperspace travel using sign")
             return
         }
         val hyperdrivesOnCraft = HyperdriveManager.getHyperdrivesOnCraft(craft.hitBox.asSet(), craft.world)

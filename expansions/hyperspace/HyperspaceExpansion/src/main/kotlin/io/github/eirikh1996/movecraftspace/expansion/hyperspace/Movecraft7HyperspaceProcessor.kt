@@ -7,9 +7,7 @@ import io.github.eirikh1996.movecraftspace.expansion.hyperspace.events.Hyperspac
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.events.HyperspaceEnterEvent
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.events.HyperspaceExitEvent
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.events.HyperspaceTravelEvent
-import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.GravityWellManager
-import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.HyperdriveManager
-import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.HyperspaceManager
+import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.*
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects.HyperspaceBeacon
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects.HyperspaceTravelEntry
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
@@ -76,7 +74,7 @@ class Movecraft7HyperspaceProcessor (plugin: Plugin) : HyperspaceManager.Hypersp
                     ExpansionSettings.extraMassShadowRangeOfPlanets
                 ) != null || StarCollection.getStarAt(testLoc,
                     ExpansionSettings.extraMassShadowRangeOfStars
-                ) != null || GravityWellManager.getActiveGravityWellAt(
+                ) != null || (GravityWellManager.processor as Movecraft7GravityWellProcessor).getActiveGravityWellAt(
                     testLoc,
                     craft
                 ) != null) {
@@ -84,7 +82,7 @@ class Movecraft7HyperspaceProcessor (plugin: Plugin) : HyperspaceManager.Hypersp
                 return
             }
         }
-        if (GravityWellManager.craftHasActiveGravityWell(craft)) {
+        if ((GravityWellManager.processor as Movecraft7GravityWellProcessor).craftHasActiveGravityWell(craft)) {
             craft.notificationPlayer!!.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Your craft cannot enter hyperspace because it has an active gravity well on it")
             return
         }
@@ -208,7 +206,8 @@ class Movecraft7HyperspaceProcessor (plugin: Plugin) : HyperspaceManager.Hypersp
                 while (hitboxObstructed) {
                     hitboxObstructed = Bukkit.getScheduler().callSyncMethod(MSUtils.plugin) {
                         MSUtils.hitboxObstructed(
-                            craft,
+                            craft.hitBox.asSet(),
+                            craft.type.passthroughBlocks,
                             null,
                             ExpansionSettings.hyperspaceWorld,
                             MovecraftLocation(x - midpoint.x, y - midpoint.y, z - midpoint.z)
@@ -263,7 +262,7 @@ class Movecraft7HyperspaceProcessor (plugin: Plugin) : HyperspaceManager.Hypersp
                     break
                 }
                 val foundGravityWell = Bukkit.getScheduler().callSyncMethod(MSUtils.plugin) {
-                    GravityWellManager.getActiveGravityWellAt(
+                    (GravityWellManager.processor as Movecraft7GravityWellProcessor).getActiveGravityWellAt(
                         testLoc,
                         entry.craft
                     )

@@ -126,7 +126,8 @@ object Movecraft7Listener : Listener {
                 }
                 val obstructed = getScheduler().callSyncMethod(MovecraftSpace.instance) {
                     hitboxObstructed(
-                        craft,
+                        craft.hitBox.asSet(),
+                        craft.type.passthroughBlocks,
                         planet,
                         destWorld,
                         diff
@@ -162,7 +163,8 @@ object Movecraft7Listener : Listener {
                 ChunkManager.syncLoadChunks(chunks)
                 val obstructed = getScheduler().callSyncMethod(MovecraftSpace.instance) {
                     hitboxObstructed(
-                        craft,
+                        craft.hitBox.asSet(),
+                        craft.type.passthroughBlocks,
                         planet,
                         destWorld,
                         diff

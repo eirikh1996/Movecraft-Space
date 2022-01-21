@@ -68,14 +68,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.18-R0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>net.countercraft</groupId>
-            <artifactId>Movecraft</artifactId>
-            <version>7.0.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/libs/Movecraft.jar</systemPath>
+            <version>1.18.1-R0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <build>
