@@ -343,6 +343,7 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
         Bukkit.getPluginManager().callEvent(HyperspaceExitEvent(entry.craft))
         processingEntries.remove(entry.craft)
         entry.lastTeleportTime = System.currentTimeMillis()
+        Bukkit.broadcastMessage(finalTarget.toString())
         entry.craft.translate(entry.destination.world, finalTarget.blockX - midPoint.x, finalTarget.blockY - midPoint.y, finalTarget.blockZ - midPoint.z)
         entry.craft.pilot.playSound(entry.craft.pilot.location, ExpansionSettings.hyperspaceExitSound, 3f, 0f)
     }
@@ -396,11 +397,11 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
         val hitBox = BitmapHitBox(craft.hitBox)
         if (hitBox.isEmpty)
             return loc
-        val minHeight = min(craft.type.getPerWorldProperty(CraftType.PER_WORLD_MIN_HEIGHT_LIMIT, loc.world!!) as Int, (if (Settings.IsV1_17) loc.world!!.minHeight else 0)) + (hitBox.yLength / 2)
-        val maxHeight = max(craft.type.getPerWorldProperty(CraftType.PER_WORLD_MAX_HEIGHT_LIMIT, loc.world!!) as Int, loc.world!!.maxHeight) - (hitBox.yLength / 2)
+        val minHeight = min(max(craft.type.getPerWorldProperty(CraftType.PER_WORLD_MIN_HEIGHT_LIMIT, loc.world!!) as Int, loc.world!!.minHeight), loc.world!!.minHeight) + (hitBox.yLength / 2)
+        val maxHeight = max(min(craft.type.getPerWorldProperty(CraftType.PER_WORLD_MAX_HEIGHT_LIMIT, loc.world!!) as Int, loc.world!!.maxHeight), loc.world!!.maxHeight) - (hitBox.yLength / 2)
         var foundLoc = loc.clone()
         foundLoc.y = min(foundLoc.y, (foundLoc.world!!.maxHeight - 1 - craft.hitBox.yLength / 2).toDouble())
-        foundLoc.y = max(foundLoc.y, ((if (Settings.IsV1_17) foundLoc.world!!.minHeight else 0) + 1 + craft.hitBox.yLength / 2).toDouble())
+        foundLoc.y = max(foundLoc.y, (foundLoc.world!!.minHeight + 1 + craft.hitBox.yLength / 2).toDouble())
         val bound = ExpansionManager.worldBoundrary(loc.world!!)
         val extraLength = ((if (hitBox.xLength > hitBox.zLength) hitBox.xLength else hitBox.zLength) / 2) + 1
         foundLoc = bound.nearestLocWithin(foundLoc, extraLength)
@@ -408,8 +409,8 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
         var planet = PlanetCollection.getPlanetAt(foundLoc, ExpansionSettings.extraMassShadowRangeOfPlanets + extraLength, true)
         var star = StarCollection.getStarAt(foundLoc, ExpansionSettings.extraMassShadowRangeOfStars + extraLength)
         var beacon = getBeaconAt(foundLoc)
-        if (!foundLoc.block.type.name.endsWith("AIR") || planet != null || star != null || beacon != null) {
-            while (!foundLoc.block.type.name.endsWith("AIR") || planet != null || star != null || beacon != null) {
+        if (!foundLoc.block.type.isAir || planet != null || star != null || beacon != null) {
+            while (!foundLoc.block.type.isAir || planet != null || star != null || beacon != null) {
                 val randomCoords = MSUtils.randomCoords(
                     loc.blockX - 250, loc.blockX + 250,
                     minHeight, maxHeight,
@@ -422,7 +423,7 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
                 val displacement = MathUtils.bukkit2MovecraftLoc(foundLoc).subtract(craft.hitBox.midPoint)
                 if (craft.hitBox.any { ml ->
                         val targ = ml.add(displacement).toBukkit(foundLoc.world)
-                        !targ.block.type.name.endsWith("AIR") && !craft.type.getMaterialSetProperty(CraftType.PASSTHROUGH_BLOCKS).contains(targ.block.type) } )
+                        !targ.block.type.isAir && !craft.type.getMaterialSetProperty(CraftType.PASSTHROUGH_BLOCKS).contains(targ.block.type) } )
                     continue
             }
         }
