@@ -88,7 +88,7 @@ class Hyperdrive(name : String, val maxRange : Int, val warmupTime : Int, val al
 
         }
         if (!allowedOnCraftTypes.isEmpty()) {
-            yaml.set("allowedOnCraftTypes", allowedOnCraftTypes)
+            yaml.set("allowedOnCraftTypes", allowedOnCraftTypes.toList())
         }
         yaml.set("blocks", mapList)
         yaml.save(hyperdriveFile)

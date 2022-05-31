@@ -7,6 +7,7 @@ import io.github.eirikh1996.movecraftspace.utils.MSUtils
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.plugin
 import net.countercraft.movecraft.craft.Craft
 import net.countercraft.movecraft.craft.CraftManager
+import net.countercraft.movecraft.craft.PilotedCraft
 import net.countercraft.movecraft.craft.PlayerCraft
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -88,7 +89,9 @@ class Movecraft8Processor : MovecraftProcessor<PlayerCraft>() {
 
     override fun craftsInHyperspaceWorld(): List<String> {
         val players = ArrayList<String>()
-        CraftManager.getInstance().getCraftsInWorld(ExpansionSettings.hyperspaceWorld).forEach { craft -> players.add(craft.notificationPlayer?.name!!) }
+        CraftManager.getInstance().getCraftsInWorld(ExpansionSettings.hyperspaceWorld).forEach { craft ->
+            if (craft is PilotedCraft)
+                players.add(craft.pilot.name) }
         return players
     }
 

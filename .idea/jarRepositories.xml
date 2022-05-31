@@ -2,11 +2,6 @@
 <project version="4">
   <component name="RemoteRepositoriesConfiguration">
     <remote-repository>
-      <option name="id" value="worldedit-repo" />
-      <option name="name" value="worldedit-repo" />
-      <option name="url" value="https://maven.enginehub.org/repo/" />
-    </remote-repository>
-    <remote-repository>
       <option name="id" value="central" />
       <option name="name" value="Central Repository" />
       <option name="url" value="https://repo.maven.apache.org/maven2" />
@@ -15,6 +10,36 @@
       <option name="id" value="jitpack.io" />
       <option name="name" value="jitpack.io" />
       <option name="url" value="https://jitpack.io" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="Maven Central repository" />
+      <option name="url" value="https://repo1.maven.org/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="dynmap-repo" />
+      <option name="name" value="dynmap-repo" />
+      <option name="url" value="https://repo.mikeprimm.com" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="github" />
+      <option name="name" value="GitHub APDevTeam/Movecraft Apache Maven Packages" />
+      <option name="url" value="https://maven.pkg.github.com/APDevTeam/Movecraft" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="central" />
+      <option name="url" value="https://repo1.maven.org/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="sk89q-repo" />
+      <option name="name" value="sk89q-repo" />
+      <option name="url" value="https://maven.enginehub.org/repo/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="worldedit-repo" />
+      <option name="name" value="worldedit-repo" />
+      <option name="url" value="https://maven.enginehub.org/repo/" />
     </remote-repository>
     <remote-repository>
       <option name="id" value="spigot-repo" />
@@ -32,19 +57,9 @@
       <option name="url" value="http://repo.mikeprimm.com/" />
     </remote-repository>
     <remote-repository>
-      <option name="id" value="central" />
-      <option name="name" value="Maven Central repository" />
-      <option name="url" value="https://repo1.maven.org/maven2" />
-    </remote-repository>
-    <remote-repository>
       <option name="id" value="redprotect-repo" />
       <option name="name" value="redprotect-repo" />
       <option name="url" value="https://raw.githubusercontent.com/FabioZumbi12/RedProtect/mvn-repo/" />
-    </remote-repository>
-    <remote-repository>
-      <option name="id" value="dynmap-repo" />
-      <option name="name" value="dynmap-repo" />
-      <option name="url" value="https://repo.mikeprimm.com" />
     </remote-repository>
     <remote-repository>
       <option name="id" value="jboss.community" />
@@ -53,13 +68,8 @@
     </remote-repository>
     <remote-repository>
       <option name="id" value="github" />
-      <option name="name" value="GitHub APDevTeam/Movecraft Apache Maven Packages" />
+      <option name="name" value="github" />
       <option name="url" value="https://maven.pkg.github.com/APDevTeam/Movecraft" />
-    </remote-repository>
-    <remote-repository>
-      <option name="id" value="sk89q-repo" />
-      <option name="name" value="sk89q-repo" />
-      <option name="url" value="https://maven.enginehub.org/repo/" />
     </remote-repository>
   </component>
 </project>

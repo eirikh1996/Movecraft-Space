@@ -72,7 +72,7 @@ object Movecraft8Listener : Listener {
                 if (craft.hitBox.contains(destination)) {
                     continue
                 }
-                planet = PlanetCollection.getPlanetAt(destination.toBukkit(craft.w))
+                planet = PlanetCollection.getPlanetAt(destination.toBukkit(craft.world))
                 if (planet == null) {
                     continue
                 }
@@ -82,12 +82,12 @@ object Movecraft8Listener : Listener {
         if (planet == null) {
             return
         }
-        val destWorld = if (planet.destination == craft.w) {
+        val destWorld = if (planet.destination == craft.world) {
             planet.space;
         } else {
             planet.destination
         }
-        if (craft.w == planet.destination && hitBox.maxY + event.dy < planet.exitHeight) {
+        if (craft.world == planet.destination && hitBox.maxY + event.dy < planet.exitHeight) {
             return
         }
         val audience = craft.audience ?: return
@@ -176,7 +176,7 @@ object Movecraft8Listener : Listener {
         priority = EventPriority.MONITOR
     )
     fun onSink(event : CraftSinkEvent) {
-        if (!Settings.ExplodeSinkingCraftsInWorlds.contains(event.craft.w.name)) {
+        if (!Settings.ExplodeSinkingCraftsInWorlds.contains(event.craft.world.name)) {
             return
         }
         event.isCancelled = true
@@ -187,21 +187,21 @@ object Movecraft8Listener : Listener {
                 for (z in hitBox.minZ..hitBox.maxZ step 5) {
                     if (!hitBox.contains(x, y, z))
                         continue
-                    explosionLocations.add(ExplosionUpdateCommand(Location(event.craft.w, x.toDouble(), y.toDouble(), z.toDouble()), 6f))
+                    explosionLocations.add(ExplosionUpdateCommand(Location(event.craft.world, x.toDouble(), y.toDouble(), z.toDouble()), 6f))
                 }
             }
         }
         if (explosionLocations.isEmpty()) {
-            explosionLocations.add(ExplosionUpdateCommand(hitBox.midPoint.toBukkit(event.craft.w), 6f))
+            explosionLocations.add(ExplosionUpdateCommand(hitBox.midPoint.toBukkit(event.craft.world), 6f))
         }
         val collapsed = BitmapHitBox(hitBox)
         event.craft.hitBox = BitmapHitBox()
-        CraftManager.getInstance().removeCraft(event.craft, CraftReleaseEvent.Reason.SUNK)
+        CraftManager.getInstance().release(event.craft, CraftReleaseEvent.Reason.SUNK, true)
         MapUpdateManager.getInstance().scheduleUpdates(explosionLocations)
         object : BukkitRunnable() {
             override fun run() {
                 event.craft.collapsedHitBox.addAll(collapsed.filter {
-                        loc -> !loc.toBukkit(event.craft.w).block.type.name.endsWith("AIR")
+                        loc -> !loc.toBukkit(event.craft.world).block.type.name.endsWith("AIR")
                 })
                 Movecraft.getInstance().asyncManager.addWreck(event.craft)
             }
@@ -218,9 +218,11 @@ object Movecraft8Listener : Listener {
             return
         }
         val craft = event.craft
+        if (craft !is PlayerCraft)
+            return
         for (ml in craft.hitBox) {
-            val intersecting = PlanetCollection.intersectingOtherPlanetaryOrbit(ml.toBukkit(craft.w)) ?: continue
-            craft.notificationPlayer!!.sendMessage("You cannot release your craft here as the craft intersects with the planetary orbit of " + intersecting.name)
+            val intersecting = PlanetCollection.intersectingOtherPlanetaryOrbit(ml.toBukkit(craft.world)) ?: continue
+            craft.pilot.sendMessage("You cannot release your craft here as the craft intersects with the planetary orbit of " + intersecting.name)
             event.isCancelled = true
             break
         }

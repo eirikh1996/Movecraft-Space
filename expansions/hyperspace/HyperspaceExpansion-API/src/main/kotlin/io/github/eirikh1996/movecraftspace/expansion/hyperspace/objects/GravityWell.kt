@@ -48,9 +48,7 @@ class GravityWell(name : String, val range : Int, val allowedOnCraftTypes : Set<
 
         }
         if (allowedOnCraftTypes.isNotEmpty()) {
-            val list = ArrayList<String>()
-            allowedOnCraftTypes.forEach { t -> list.add(t) }
-            yaml.set("allowedOnCraftTypes", list)
+            yaml.set("allowedOnCraftTypes", allowedOnCraftTypes.toList())
         }
         yaml.set("blocks", mapList)
         yaml.save(gravityWellFile)

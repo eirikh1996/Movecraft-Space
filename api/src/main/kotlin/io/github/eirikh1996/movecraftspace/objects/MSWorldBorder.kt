@@ -22,6 +22,10 @@ data class MSWorldBorder(val center : Immutable2dVector, val xRadius : Double, v
 
     val maxPoint : Immutable2dVector get() = Immutable2dVector((center.x + xRadius).toInt(), (center.z + zRadius).toInt())
 
+    override fun toString(): String {
+        return "center: $center, x-radius: $xRadius, z-radius: $zRadius, ellipsoid: $ellipsoid"
+    }
+
     fun nearestLocWithin(loc : Location, buffer : Int = 0) : Location {
         val vec = Immutable2dVector.fromLocation(loc)
         val dx = loc.x - center.x

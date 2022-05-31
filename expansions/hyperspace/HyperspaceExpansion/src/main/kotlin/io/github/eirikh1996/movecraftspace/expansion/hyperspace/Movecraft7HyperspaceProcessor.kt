@@ -587,11 +587,11 @@ class Movecraft7HyperspaceProcessor (plugin: Plugin) : HyperspaceManager.Hypersp
     fun onInteract(e : PlayerInteractEvent) {
         if (e.action != Action.RIGHT_CLICK_BLOCK)
             return
-        if (!e.clickedBlock!!.type.name.endsWith("SIGN") && !e.clickedBlock!!.type.name.equals("SIGN_POST")) {
+        if (!e.clickedBlock!!.type.name.endsWith("SIGN") && e.clickedBlock!!.type.name != "SIGN_POST") {
             return
         }
         val sign = e.clickedBlock!!.state as Sign
-        if (!sign.getLine(0).equals("§bHyperspace")) {
+        if (sign.getLine(0) != "§bHyperspace") {
             return
         }
         if (!e.player.hasPermission("movecraftspace.hyperspace.sign")) {
@@ -607,8 +607,12 @@ class Movecraft7HyperspaceProcessor (plugin: Plugin) : HyperspaceManager.Hypersp
             e.player.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Sign is not on a piloted craft")
             return
         }
+        if (pendingEntries.containsKey(craft) || processingEntries.containsKey(craft)) {
+            e.player.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Hyperspace travel is already processing")
+            return
+        }
         for (pl in PlanetCollection) {
-            if (pl.space.equals(craft.w)) {
+            if (pl.space == craft.w) {
                 continue
             }
             e.player.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "You can only use hyperspace travel in space worlds")

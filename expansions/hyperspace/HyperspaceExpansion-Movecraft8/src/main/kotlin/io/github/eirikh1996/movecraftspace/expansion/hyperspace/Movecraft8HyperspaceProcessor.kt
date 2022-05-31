@@ -28,6 +28,7 @@ import net.countercraft.movecraft.Movecraft
 import net.countercraft.movecraft.MovecraftLocation
 import net.countercraft.movecraft.craft.Craft
 import net.countercraft.movecraft.craft.CraftManager
+import net.countercraft.movecraft.craft.PilotedCraft
 import net.countercraft.movecraft.craft.PlayerCraft
 import net.countercraft.movecraft.craft.type.CraftType
 import net.countercraft.movecraft.events.*
@@ -343,7 +344,7 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
         Bukkit.getPluginManager().callEvent(HyperspaceExitEvent(entry.craft))
         processingEntries.remove(entry.craft)
         entry.lastTeleportTime = System.currentTimeMillis()
-        Bukkit.broadcastMessage(finalTarget.toString())
+        //Bukkit.broadcastMessage(finalTarget.toString())
         entry.craft.translate(entry.destination.world, finalTarget.blockX - midPoint.x, finalTarget.blockY - midPoint.y, finalTarget.blockZ - midPoint.z)
         entry.craft.pilot.playSound(entry.craft.pilot.location, ExpansionSettings.hyperspaceExitSound, 3f, 0f)
     }
@@ -444,7 +445,7 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
         val craft = event.craft
         if (craft !is PlayerCraft)
             return
-        if (craft.world != ExpansionSettings.hyperspaceWorld) {
+        if (craft.world != hyperspaceWorld) {
             return
         }
         if (event.reason == CraftReleaseEvent.Reason.FORCE) {
@@ -476,7 +477,7 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
             craftsSunkInHyperspace.remove(craft)
             object : BukkitRunnable() {
                 override fun run() {
-                    craft.sink()
+                    CraftManager.getInstance().sink(craft)
                 }
             }.runTaskLater(plugin, 3)
         }
@@ -486,7 +487,7 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
             return
         }
         val entry = pendingEntries[craft]
-        if (entry != null && event.world == ExpansionSettings.hyperspaceWorld) {
+        if (entry != null && event.world == hyperspaceWorld) {
             pendingEntries.remove(craft)
             processingEntries[craft] = entry
         }
@@ -542,11 +543,9 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
             return
         val target = HyperspaceManager.targetLocations[craft.hitBox.midPoint]
         event.isCancelled = true
-        craft.sinking
         craftsSunkInHyperspace.add(craft)
         object : BukkitRunnable() {
             override fun run() {
-                craft.notificationPlayer = notifyP
                 pullOutOfHyperspace(processingEntries[craft]!!, target!!, "Craft was sunk in hyperspace. Exiting hyperspace")
             }
 
@@ -557,7 +556,7 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
     fun onQuit(event : PlayerQuitEvent) {
         val p = event.player
         val craft = CraftManager.getInstance().getCraftByPlayer(p) ?: return
-        if (craft.w != ExpansionSettings.hyperspaceWorld)
+        if (craft.world != hyperspaceWorld)
             return
         if (!processingEntries.containsKey(craft))
             return
@@ -626,8 +625,12 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
             e.player.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Sign is not on a piloted craft")
             return
         }
+        if (pendingEntries.containsKey(craft) || processingEntries.containsKey(craft)) {
+            e.player.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Hyperspace travel is already processing")
+            return
+        }   
         for (pl in PlanetCollection) {
-            if (pl.space.equals(craft.world)) {
+            if (pl.space == craft.world) {
                 continue
             }
             e.player.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "You can only use hyperspace travel in space worlds")
@@ -668,12 +671,14 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
 
     private fun checkBrokenBlocksOnHyperdrives(block : Block): Boolean {
         val craft = CraftManager.getInstance().getCraftsInWorld(block.world).firstOrNull { c -> c.hitBox.contains(MathUtils.bukkit2MovecraftLoc(block.location)) } ?: return false
+        if (craft !is PilotedCraft)
+            return false
         if (!HyperdriveManager.getHyperdrivesOnCraft(craft.hitBox.asSet(), craft.world).any { e -> e.value.getStructure(e.key).contains(block) }) {
             return false
         }
         val entry = HyperspaceManager.processor.processingEntries[craft] as Movecraft8HyperspaceTravelEntry? ?: HyperspaceManager.processor.pendingEntries[craft] as Movecraft8HyperspaceTravelEntry? ?: return false
-        if (craft.w != ExpansionSettings.hyperspaceWorld) {
-            craft.notificationPlayer?.sendMessage(MSUtils.COMMAND_PREFIX + "Block on hyperdrive was broken. Warmup cancelled")
+        if (craft.world != hyperspaceWorld) {
+            craft.pilot.sendMessage(MSUtils.COMMAND_PREFIX + "Block on hyperdrive was broken. Warmup cancelled")
         } else {
             val targetLocation = HyperspaceManager.targetLocations[craft.hitBox.midPoint] ?: return false
             object : BukkitRunnable() {
@@ -685,7 +690,7 @@ class Movecraft8HyperspaceProcessor(plugin: Plugin) : HyperspaceManager.Hyperspa
         entry.progressBar.isVisible = false
         processingEntries.remove(craft)
         pendingEntries.remove(craft)
-        HyperspaceManager.runnableMap[craft.notificationPlayer?.uniqueId]?.cancel()
+        HyperspaceManager.runnableMap[craft.pilot.uniqueId]?.cancel()
         return true
     }
 
