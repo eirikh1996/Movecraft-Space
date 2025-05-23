@@ -4,6 +4,7 @@ import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
 import io.github.eirikh1996.movecraftspace.objects.MSBlock
 import org.bukkit.Location
+import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.data.BlockData
 import org.bukkit.configuration.serialization.ConfigurationSerializable
@@ -79,7 +80,7 @@ abstract class Structure(val name : String) : ConfigurationSerializable {
     fun copy(selection: Selection, origin : ImmutableVector = selection.center) {
         for (loc in selection) {
             val block = loc.toLocation(selection.world).block
-            if (block.type.name.endsWith("AIR"))
+            if (block.type.isAir)
                 continue
             blocks[loc.subtract(origin)] = MSBlock.fromBlock(block)
 
@@ -90,12 +91,7 @@ abstract class Structure(val name : String) : ConfigurationSerializable {
         for (vec in blocks.keys) {
             val block = blocks[vec]!!
             val b = target.world!!.getBlockAt(target.clone().add(vec.toLocation(target.world!!)))
-            if (Settings.IsLegacy) {
-                b.type = block.type
-                Block::class.java.getDeclaredMethod("setData", Byte::class.java).invoke(b, block.data)
-            } else {
-                b.blockData = block.data as BlockData
-            }
+                b.blockData = block.data
         }
     }
 

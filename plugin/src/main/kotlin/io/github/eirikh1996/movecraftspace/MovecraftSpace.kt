@@ -1,14 +1,12 @@
 package io.github.eirikh1996.movecraftspace
 
-import io.github.eirikh1996.Movecraft8Handler
-import io.github.eirikh1996.listener.Movecraft8Listener
 import io.github.eirikh1996.movecraftspace.commands.MovecraftSpaceCommand
 import io.github.eirikh1996.movecraftspace.commands.PlanetCommand
 import io.github.eirikh1996.movecraftspace.commands.StarCommand
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionManager
 import io.github.eirikh1996.movecraftspace.listener.BlockListener
 import io.github.eirikh1996.movecraftspace.listener.ExplosionListener
-import io.github.eirikh1996.movecraftspace.listener.Movecraft7Listener
+import io.github.eirikh1996.movecraftspace.listener.MovecraftListener
 import io.github.eirikh1996.movecraftspace.listener.PlayerListener
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
 import io.github.eirikh1996.movecraftspace.objects.StarCollection
@@ -44,10 +42,6 @@ class MovecraftSpace : JavaPlugin() {
         } catch ( e : ClassNotFoundException) {
             Settings.IsMovecraft8 = false
         }
-        if (Settings.IsMovecraft8)
-            movecraftHandler = Movecraft8Handler()
-        else
-            movecraftHandler = Movecraft7Handler()
         Settings.IsLegacy = ver <= 12
         Settings.IsV1_17 = ver >= 17
         Settings.IsV1_13 = ver >= 13
@@ -58,7 +52,7 @@ class MovecraftSpace : JavaPlugin() {
         PlanetCollection.loadPlanets()
         StarCollection.pl = this
         StarCollection.loadStars()
-        server.pluginManager.registerEvents(if (Settings.IsMovecraft8) Movecraft8Listener else Movecraft7Listener, this)
+        server.pluginManager.registerEvents(MovecraftListener, this)
         server.pluginManager.registerEvents(PlayerListener, this)
         server.pluginManager.registerEvents(ExplosionListener, this)
         server.pluginManager.registerEvents(BlockListener, this)

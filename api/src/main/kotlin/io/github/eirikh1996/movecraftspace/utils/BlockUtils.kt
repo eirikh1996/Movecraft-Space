@@ -37,6 +37,11 @@ object BlockUtils {
 
     }
 
+    @Deprecated(
+        message = "Legacy compatibility will no longer be needed in future versions",
+        level = DeprecationLevel.WARNING
+
+    )
     fun blockDataFromMaterialandLegacyData(type : Material, data : Byte) : BlockData {
         val nmsBlockData = getBlock.invoke(null, type, data)
         return fromData.invoke(null, nmsBlockData) as BlockData

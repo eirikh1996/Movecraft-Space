@@ -11,52 +11,39 @@ import org.bukkit.block.data.BlockData
 import org.bukkit.configuration.serialization.ConfigurationSerializable
 import org.bukkit.material.Directional
 
-data class MSBlock(val type : Material, val data : Any = if (Settings.IsLegacy) 0 else Bukkit.createBlockData(type), val facing : BlockFace = BlockFace.SELF) : ConfigurationSerializable {
+data class MSBlock(val type : Material, val data : BlockData = Bukkit.createBlockData(type), val facing : BlockFace = BlockFace.SELF) : ConfigurationSerializable {
 
     override fun serialize(): MutableMap<String, Any> {
         val map = HashMap<String, Any>()
-        map.put("type", type.name)
-        map.put("data", if (Settings.IsLegacy) data else (data as BlockData).asString)
-        map.put("facing", facing.name)
+        map["type"] = type.name
+        map["data"] = data.asString
+        map["facing"] = facing.name
         return map;
     }
 
     fun rotate(facing : BlockFace) : MSBlock {
-        return if (Settings.IsLegacy) {
-            val materialData = type.getNewData(data as Byte)
-            if (materialData !is Directional)
-                return this
-            materialData.setFacingDirection(facing)
-            MSBlock(type, materialData.data)
-        } else {
-            val blockData = data as BlockData
-            if (blockData !is org.bukkit.block.data.Directional)
-                return this
-            blockData.facing = facing
-            MSBlock(type, blockData, facing)
-        }
+        val blockData = data as BlockData
+        if (blockData !is org.bukkit.block.data.Directional)
+            return this
+        blockData.facing = facing
+        return MSBlock(type, blockData, facing)
     }
 
     fun isSimilar(block: Block) : Boolean {
         var similar = block.type == type
-        if (Settings.IsLegacy) {
-            similar = block.data == data
-        } else {
-            val bData = data as BlockData
-
-            if (bData is Directional) {
-                val otherBData = block.blockData
-                if (otherBData !is Directional)
-                    return false
-                similar = bData.facing == otherBData.facing
-            }
-            if (bData is Bisected) {
-                val otherBData = block.blockData
-                if (otherBData !is Bisected)
-                    return false
-                similar = bData.half == otherBData.half
-            }
+        if (data is Directional) {
+            val otherBData = block.blockData
+            if (otherBData !is Directional)
+                return false
+            similar = data.facing == otherBData.facing
         }
+        if (data is Bisected) {
+            val otherBData = block.blockData
+            if (otherBData !is Bisected)
+                return false
+            similar = data.half == otherBData.half
+        }
+
         return similar
     }
 
@@ -67,9 +54,7 @@ data class MSBlock(val type : Material, val data : Any = if (Settings.IsLegacy) 
             val type = Material.getMaterial(map["type"] as String)!!
             return MSBlock(
                 type,
-                if (Settings.IsLegacy)
-                    data.toString().toByte()
-                else if (!Settings.IsLegacy && data is Int)
+                if (data is Int)
                     BlockUtils.blockDataFromMaterialandLegacyData(type, data.toByte())
                 else Bukkit.createBlockData(data as String),
                 BlockFace.valueOf(map["facing"] as String)
@@ -77,23 +62,12 @@ data class MSBlock(val type : Material, val data : Any = if (Settings.IsLegacy) 
         }
 
         fun fromBlock(block : Block) : MSBlock {
-            val data : Any
-            val face = if (Settings.IsLegacy) {
-                data = block.data
-                if (block.state.data is Directional) {
-                    val dir = block.state.data as Directional
-                    dir.facing
-                } else {
-                    BlockFace.SELF
-                }
+            val data = block.blockData
+            val face = if (block.blockData is org.bukkit.block.data.Directional) {
+                val dir = block.blockData as org.bukkit.block.data.Directional
+                dir.facing
             } else {
-                data = block.blockData
-                if (block.blockData is org.bukkit.block.data.Directional) {
-                    val dir = block.blockData as org.bukkit.block.data.Directional
-                    dir.facing
-                } else {
-                    BlockFace.SELF
-                }
+                BlockFace.SELF
             }
             return MSBlock(block.type, data, face)
         }

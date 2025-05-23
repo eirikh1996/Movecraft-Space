@@ -11,7 +11,7 @@ import net.countercraft.movecraft.craft.Craft
 import net.countercraft.movecraft.craft.CraftManager
 import net.countercraft.movecraft.mapUpdater.MapUpdateManager
 import net.countercraft.movecraft.mapUpdater.update.UpdateCommand
-import net.countercraft.movecraft.utils.MathUtils
+import net.countercraft.movecraft.util.MathUtils
 import org.bukkit.Bukkit
 import org.bukkit.scheduler.BukkitRunnable
 import java.util.*

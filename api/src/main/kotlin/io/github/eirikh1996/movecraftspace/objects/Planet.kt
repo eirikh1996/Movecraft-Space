@@ -10,6 +10,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World
+import org.bukkit.block.data.BlockData
 import org.bukkit.util.Vector
 import java.lang.Exception
 import java.lang.reflect.Method
@@ -117,10 +118,10 @@ data class Planet(
             }
         }
 
-        val newLocMap = HashMap<ImmutableVector, Pair<Material, Any>>()
+        val newLocMap = HashMap<ImmutableVector, Pair<Material, BlockData>>()
         for (loc in visited) {
             val b = loc.toLocation(space).block
-            newLocMap.put(loc.add(displacement), Pair(b.type, if (Settings.IsLegacy) b.data else b.blockData))
+            newLocMap[loc.add(displacement)] = Pair(b.type, b.blockData)
         }
         for (loc in newLocMap.keys) {
             val pair = newLocMap[loc]!!
