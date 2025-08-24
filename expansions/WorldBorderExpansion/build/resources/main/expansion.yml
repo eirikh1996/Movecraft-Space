@@ -1,0 +1,5 @@
+name: WorldBorderExpansion
+main: io.github.eirikh1996.movecraftspace.expansion.worldborder.WorldBorderExpansion
+version: '${project.version}'
+depend:
+  - WorldBorder

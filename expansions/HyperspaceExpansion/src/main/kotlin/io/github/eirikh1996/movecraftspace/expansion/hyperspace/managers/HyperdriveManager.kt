@@ -46,14 +46,11 @@ object HyperdriveManager : Listener, Iterable<Hyperdrive> {
             return
         }
         val sign = event.block.state as Sign
-        val face = if (Settings.IsLegacy) {
-            val signData = sign.data as org.bukkit.material.Sign
-            signData.facing
-        } else {
+
             val signData = sign.blockData as WallSign
             signData.facing
-        }
-        val angle = angleBetweenBlockFaces(hyperdrive.blocks[ImmutableVector.ZERO]!!.facing, face)
+
+        val angle = angleBetweenBlockFaces(hyperdrive.blocks[ImmutableVector.ZERO]!!.facing, signData.facing)
         val locs = HashSet<ImmutableVector>()
         for (vec in hyperdrive.blocks.keys) {
             locs.add(ImmutableVector.fromLocation(event.block.location).add(vec.rotate(angle, ImmutableVector.ZERO).add(0,vec.y,0)))
@@ -95,14 +92,6 @@ object HyperdriveManager : Listener, Iterable<Hyperdrive> {
         return ""
     }
 
-    fun getMaxRange(hitBox: Set<MovecraftLocation>, world: World) : Int {
-        var range = 0
-        for (e in getHyperdrivesOnCraft(hitBox, world)) {
-            range += e.value.maxRange
-        }
-        return range
-    }
-
     fun getHyperdrivesOnCraft(hitBox : Set<MovecraftLocation>, world: World) : Map<Sign, Hyperdrive> {
         val returnMap = HashMap<Sign, Hyperdrive>()
         for (ml in hitBox) {
@@ -122,18 +111,12 @@ object HyperdriveManager : Listener, Iterable<Hyperdrive> {
         if (!sign.block.type.name.endsWith("WALL_SIGN"))
             return null
         var foundHyperdrive : Hyperdrive? = null
-        val face = if (Settings.IsLegacy) {
-            val signData = sign.data as org.bukkit.material.Sign
-            signData.facing
-        } else {
             val signData = sign.blockData as WallSign
-            signData.facing
-        }
         val iter = hyperdrives.iterator()
         while (iter.hasNext()) {
             val next = iter.next()
             var hyperdriveFound = true
-            val angle = angleBetweenBlockFaces(next.blocks[ImmutableVector.ZERO]!!.facing, face)
+            val angle = angleBetweenBlockFaces(next.blocks[ImmutableVector.ZERO]!!.facing, signData.facing)
             for (vec in next.blocks.keys) {
                 val hdBlock = next.blocks[vec]!!.rotate(BlockUtils.rotateBlockFace(angle, next.blocks[vec]!!.facing))
                 val block = ImmutableVector.fromLocation(sign.location).add(vec.rotate(angle, ImmutableVector.ZERO).add(0,vec.y,0)).toLocation(sign.world).block
@@ -143,7 +126,6 @@ object HyperdriveManager : Listener, Iterable<Hyperdrive> {
                     hyperdriveFound = false
                     break
                 }
-
             }
             if (!hyperdriveFound)
                 continue
@@ -164,16 +146,18 @@ object HyperdriveManager : Listener, Iterable<Hyperdrive> {
 
     fun loadHyperdrives() {
         val ex = ExpansionManager.getExpansion("HyperspaceExpansion")!!
-
         val hyperdriveDir = File(ex.dataFolder, "hyperdrives")
         if (hyperdriveDir.exists()) {
-            for (hdFile in hyperdriveDir.listFiles { dir, name -> name.endsWith(".yml", true) }) {
-                if (hdFile == null)
-                    continue
-                val drive = Hyperdrive.loadFromFile(hdFile)
-                hyperdrives.add(drive)
-                drive.save()
+            val files = hyperdriveDir.listFiles { dir, name -> name.endsWith(".yml", true) }
+            if (files != null) {
+                for (hdFile in files) {
+                    if (hdFile == null)
+                        continue
+                    val drive = Hyperdrive.loadFromFile(hdFile)
+                    hyperdrives.add(drive)
+                    drive.save()
 
+                }
             }
         }
 

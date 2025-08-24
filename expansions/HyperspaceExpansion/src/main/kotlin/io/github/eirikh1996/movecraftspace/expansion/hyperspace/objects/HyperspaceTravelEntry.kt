@@ -1,6 +1,5 @@
 package io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects
 
-import io.github.eirikh1996.movecraftspace.expansion.hyperspace.HyperspaceProcessor
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.HyperspaceManager
 import net.countercraft.movecraft.craft.PilotedCraft
 import org.bukkit.Bukkit

@@ -43,7 +43,6 @@ data class MSBlock(val type : Material, val data : BlockData = Bukkit.createBloc
                 return false
             similar = data.half == otherBData.half
         }
-
         return similar
     }
 
@@ -54,9 +53,7 @@ data class MSBlock(val type : Material, val data : BlockData = Bukkit.createBloc
             val type = Material.getMaterial(map["type"] as String)!!
             return MSBlock(
                 type,
-                if (data is Int)
-                    BlockUtils.blockDataFromMaterialandLegacyData(type, data.toByte())
-                else Bukkit.createBlockData(data as String),
+                Bukkit.createBlockData(data as String),
                 BlockFace.valueOf(map["facing"] as String)
             )
         }

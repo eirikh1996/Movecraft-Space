@@ -1,7 +1,7 @@
 plugins {
     id("buildlogic.java-conventions")
+    id("com.gradleup.shadow")
     kotlin("jvm")
-    id("io.papermc.paperweight.userdev")
 }
 
 tasks.register<Wrapper>("wrapper") {
@@ -15,10 +15,17 @@ tasks.register("prepareKotlinBuildScriptModel") {
 dependencies {
     compileOnly(project(":movecraft-space-api"))
     compileOnly(kotlin("stdlib-jdk8"))
-    paperweight.paperDevBundle("1.21.5-R0.1-SNAPSHOT")
+    compileOnly(files("/../../libs/FactionsUUID/Factions.jar"))
 }
 repositories {
     mavenCentral()
+}
+
+tasks.shadowJar {
+    archiveBaseName.set("FactionsUUIDExpansion")
+    archiveClassifier.set("")
+    archiveVersion.set("")
+    destinationDirectory.set(file("/../../plugin/build/libs/expansions"))
 }
 
 java {

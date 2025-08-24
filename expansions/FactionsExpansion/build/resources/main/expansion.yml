@@ -1,0 +1,5 @@
+name: FactionsExpansion
+main: io.github.eirikh1996.movecraftspace.expansion.factions.FactionsExpansion
+version: '${project.version}'
+depend:
+  - Factions

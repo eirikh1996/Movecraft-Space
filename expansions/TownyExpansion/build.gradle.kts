@@ -1,7 +1,7 @@
 plugins {
     id("buildlogic.java-conventions")
+    id("com.gradleup.shadow")
     kotlin("jvm")
-    id("io.papermc.paperweight.userdev")
 }
 
 tasks.register<Wrapper>("wrapper") {
@@ -15,10 +15,18 @@ tasks.register("prepareKotlinBuildScriptModel") {
 dependencies {
     compileOnly(project(":movecraft-space-api"))
     compileOnly(kotlin("stdlib-jdk8"))
-    paperweight.paperDevBundle("1.21.5-R0.1-SNAPSHOT")
+    compileOnly("com.palmergames.bukkit.towny:towny:0.101.2.0")
 }
 repositories {
     mavenCentral()
+    maven("https://repo.glaremasters.me/repository/towny/")
+}
+
+tasks.shadowJar {
+    archiveBaseName.set("TownyExpansion")
+    archiveClassifier.set("")
+    archiveVersion.set("")
+    destinationDirectory.set(file("/../../plugin/build/libs/expansions"))
 }
 
 java {

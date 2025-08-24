@@ -52,15 +52,15 @@ abstract class Expansion {
     set(state) {
         field = state
         if (state == ExpansionState.ENABLED) {
-            logMessage(LogMessageType.INFO, "Enabling expansion " + name)
+            logMessage(LogMessageType.INFO, "Enabling expansion $name")
             Bukkit.getPluginManager().callEvent(ExpansionEnableEvent(this))
             enable()
         } else if (state == ExpansionState.DISABLED) {
-            logMessage(LogMessageType.INFO, "Disabling expansion " + name)
+            logMessage(LogMessageType.INFO, "Disabling expansion $name")
             Bukkit.getPluginManager().callEvent(ExpansionDisableEvent(this))
             disable()
         } else if (state == ExpansionState.LOADED) {
-            logMessage(LogMessageType.INFO, "Loading expansion " + name)
+            logMessage(LogMessageType.INFO, "Loading expansion $name")
             Bukkit.getPluginManager().callEvent(ExpansionLoadEvent(this))
             load()
         }

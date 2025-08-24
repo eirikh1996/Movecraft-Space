@@ -14,6 +14,7 @@ import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.WARNING
 import io.github.eirikh1996.movecraftspace.utils.Paginator
+import net.kyori.adventure.text.Component
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.TextComponent
@@ -60,12 +61,9 @@ object StarCommand : TabExecutor{
             val pLoc = sender.location.clone()
             val space = pLoc.world!!
             var height = space.maxHeight.toDouble()
-            if (Settings.IsV1_17) {
-                height -= space.minHeight.toDouble()
-            }
+            height -= space.minHeight.toDouble()
             height /= 2.0
-            if (Settings.IsV1_17)
-                height += space.minHeight.toDouble()
+            height += space.minHeight.toDouble()
             height += .5
             pLoc.y = height
             val closest = StarCollection.closestStar(pLoc, Settings.MinimumDistanceBetweenStars)
@@ -175,7 +173,7 @@ object StarCommand : TabExecutor{
                 for (pl in planets) {
                     moons += pl.moons.size
                 }
-                paginator.addLine(TextComponent(star.name + " Location: " + star.loc + " Space: " + star.space.name))
+                paginator.addLine(Component.text(star.name + " Location: " + star.loc + " Space: " + star.space.name))
             }
             var pageNo = 1
             if (args.size > 1) {
@@ -185,7 +183,11 @@ object StarCommand : TabExecutor{
                     sender.sendMessage(COMMAND_PREFIX + ERROR + args[1] + " is not a number")
                 }
             }
-            paginator.getPage(pageNo, "/star list ").forEach { t -> sender.spigot().sendMessage(ChatMessageType.CHAT, t) }
+            paginator.getPage(pageNo, "/star list ").forEach { t ->
+                if (t != null) {
+                    sender.sendMessage(t)
+                }
+            }
         }
         return true
     }

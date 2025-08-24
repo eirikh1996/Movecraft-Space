@@ -4,9 +4,9 @@ import io.github.eirikh1996.movecraftspace.expansion.Expansion
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionState
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
 import io.github.eirikh1996.movecraftspace.utils.MSUtils
+import me.angeschossen.lands.api.LandsIntegration
 import me.angeschossen.lands.api.events.ChunkPreClaimEvent
 import me.angeschossen.lands.api.events.LandCreateEvent
-import me.angeschossen.lands.api.integration.LandsIntegration
 import net.countercraft.movecraft.MovecraftChunk
 import org.bukkit.Bukkit
 import org.bukkit.Bukkit.getWorld
@@ -24,21 +24,21 @@ class LandsExpansion : Expansion(), Listener {
             state = ExpansionState.DISABLED
             return
         }
-        landsAddon = LandsIntegration(plugin)
+        landsAddon = LandsIntegration.of(plugin)
         Bukkit.getPluginManager().registerEvents(this, plugin)
     }
 
     override fun allowedArea(p: Player, loc: Location): Boolean {
-        val land = landsAddon.getLand(loc)
+        val land = landsAddon.getArea(loc)
         return land != null && (land.isTrusted(p.uniqueId) || land.ownerUID == p.uniqueId)
     }
 
     @EventHandler
     fun onClaim(event : ChunkPreClaimEvent) {
-        val planet = PlanetCollection.intersectingOtherPlanetaryOrbit(MovecraftChunk(event.x, event.z, getWorld(event.worldName)))
+        val planet = PlanetCollection.intersectingOtherPlanetaryOrbit(MovecraftChunk(event.x, event.z, getWorld(event.world.name)))
         if (planet == null || config.getBoolean("Allow claiming in orbits", false))
             return
-        event.landPlayer.player!!.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Cannot claim land here as it intersect with the planetary orbit of " + planet.name)
+        event.landPlayer?.player!!.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Cannot claim land here as it intersect with the planetary orbit of " + planet.name)
         event.isCancelled = true
     }
 }

@@ -1,7 +1,7 @@
 plugins {
     id("buildlogic.java-conventions")
+    id("com.gradleup.shadow")
     kotlin("jvm")
-    id("io.papermc.paperweight.userdev")
 }
 
 group = "io.github.eirikh1996"
@@ -10,12 +10,19 @@ repositories {
     maven("https://repo.mikeprimm.com/")
     mavenCentral()
 }
-
+//project.properties.get()
 dependencies {
     compileOnly(project(":movecraft-space-api"))
+    compileOnly(project(":HyperspaceExpansion"))
     compileOnly("org.dynmap:DynmapCoreAPI:2.0")
     compileOnly(kotlin("stdlib-jdk8"))
-    paperweight.paperDevBundle("1.21.5-R0.1-SNAPSHOT")
+}
+
+tasks.shadowJar {
+    archiveBaseName.set("DynmapExpansion")
+    archiveClassifier.set("")
+    archiveVersion.set("")
+    destinationDirectory.set(file("/../../plugin/build/libs/expansions"))
 }
 
 java {

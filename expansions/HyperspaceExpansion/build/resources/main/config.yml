@@ -1,0 +1,24 @@
+Hyperspace world: Hyperspace
+Hyperspace travel speed: 300.0
+Hyperspace warmup ship size multiplier: 0.0
+Beacon range: 200
+Hyperspace enter sound: 'entity.enderman.teleport'
+Hyperspace exit sound: 'entity.enderman.teleport'
+Hyperspace charge sound: 'entity.ender_dragon.ambient'
+Max hyperdrives on craft:
+  Starfighter: 1
+  Starship: 2
+Allowed craft types for hyperspace sign:
+  - Starfighter
+  - Starship
+Allowed craft types for jump command:
+  - Starfighter
+  - Starship
+Hypermatter:
+  type: EMERALD
+  name: ''
+Extra mass shadow range:
+  planets: 0
+  stars: 0
+
+

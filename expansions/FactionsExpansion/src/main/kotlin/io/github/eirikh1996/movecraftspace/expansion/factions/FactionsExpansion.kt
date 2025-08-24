@@ -23,7 +23,7 @@ class FactionsExpansion : Expansion(){
                 continue
             return true
         }
-        return faction == FactionColl.get().none || if (!factions3) faction.isPermitted(MPerm.getPermBuild(), faction.getRelationTo(MPlayer.get(p))) else IsMPlayerPermitted!!.invoke(faction, MPlayer.get(p), MPerm.getPermBuild()) as Boolean
+        return faction == FactionColl.get().none || faction.isPermitted(MPerm.getPermBuild().id, faction.getRelationTo(MPlayer.get(p)).id)
     }
 
     override fun enable() {

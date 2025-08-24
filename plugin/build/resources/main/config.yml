@@ -1,0 +1,15 @@
+MinimumDistanceBetweenStars: 13000
+MaxRadiusFromPlanetWorldSpawn: -1
+MinDistanceToOtherCrafts: -1
+MinimumDistanceBetweenOrbits: 1000
+MaximumDistanceBetweenOrbits: 3000
+PlanetaryRotationCheckCooldown: 25
+RotatePlanets: true
+MinMoonSpacing: 500
+MaxMoonSpacing: 1000
+AllowPlayersTeleportationToPlanets: true
+ExplodeSinkingCraftsInWorlds:
+  - Space
+SinkExplosionSize: 3.0
+DisableReleaseInPlanetaryOrbits: true
+SelectionTool: STONE_HOE

@@ -1,0 +1,5 @@
+name: GriefPreventionExpansion
+main: io.github.eirikh1996.movecraftspace.expansion.griefprevention.GriefPreventionExpansion
+version: '${project.version}'
+depend:
+  - GriefPrevention

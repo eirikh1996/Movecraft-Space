@@ -1,6 +1,5 @@
 package io.github.eirikh1996.movecraftspace.expansion.hyperspace
 
-import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.expansion.Expansion
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionState
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.ExpansionSettings.allowedCraftTypesForHyperspaceSign
@@ -13,6 +12,7 @@ import io.github.eirikh1996.movecraftspace.expansion.hyperspace.command.*
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.GravityWellManager
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.HyperdriveManager
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.HyperspaceManager
+import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.NavigationComputerManager
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.sign.HyperspaceSign
 import io.github.eirikh1996.movecraftspace.expansion.selection.SelectionSupported
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
@@ -55,9 +55,9 @@ class HyperspaceExpansion : Expansion(), SelectionSupported {
         }
         HyperspaceManager.loadFile()
         ExpansionSettings.hyperspaceWorld = hsWorld
-        ExpansionSettings.hyperspaceEnterSound = config.getString("Hyperspace enter sound", "entity.enderman.teleport")!!.toLowerCase()
-        ExpansionSettings.hyperspaceChargeSound = config.getString("Hyperspace charge sound", "entity.ender_dragon.ambient")!!.toLowerCase()
-        ExpansionSettings.hyperspaceExitSound = config.getString("Hyperspace exit sound", "entity.enderman.teleport")!!.toLowerCase()
+        ExpansionSettings.hyperspaceEnterSound = config.getString("Hyperspace enter sound", "entity.enderman.teleport")!!.lowercase()
+        ExpansionSettings.hyperspaceChargeSound = config.getString("Hyperspace charge sound", "entity.ender_dragon.ambient")!!.lowercase()
+        ExpansionSettings.hyperspaceExitSound = config.getString("Hyperspace exit sound", "entity.enderman.teleport")!!.lowercase()
         ExpansionSettings.hypermatter = Material.getMaterial(config.getString("Hypermatter.type", "EMERALD")!!) ?: Material.EMERALD
         ExpansionSettings.hypermatterName = config.getString("Hypermatter.name", "")!!
         if (config.contains("Max hyperdrives on craft"))
@@ -70,14 +70,17 @@ class HyperspaceExpansion : Expansion(), SelectionSupported {
         extraMassShadowRangeOfStars = max(config.getInt("Extra mass shadow range.stars", 0), 0)
         plugin.getCommand("hyperspace")!!.setExecutor(HyperspaceCommand)
         plugin.getCommand("hyperdrive")!!.setExecutor(HyperdriveCommand)
-        plugin.getCommand("jump")!!.setExecutor(Movecraft7JumpCommand)
+        plugin.getCommand("jump")!!.setExecutor(JumpCommand)
         plugin.getCommand("gravitywell")!!.setExecutor(GravityWellCommand)
+        plugin.getCommand("navigationcomputer")!!.setExecutor(NavigationComputerCommand)
         HyperspaceManager.runTaskTimerAsynchronously(plugin, 0, 1)
         getPluginManager().registerEvents(HyperspaceManager, plugin)
         HyperdriveManager.loadHyperdrives()
         getPluginManager().registerEvents(HyperdriveManager, plugin)
         GravityWellManager.loadGravityWells()
         getPluginManager().registerEvents(GravityWellManager, plugin)
+        NavigationComputerManager.loadNavigationComputers()
+        getPluginManager().registerEvents(NavigationComputerManager, plugin)
         getPluginManager().registerEvents(HyperspaceSign, plugin)
     }
 

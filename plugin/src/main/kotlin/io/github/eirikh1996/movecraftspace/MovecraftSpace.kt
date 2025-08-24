@@ -11,7 +11,6 @@ import io.github.eirikh1996.movecraftspace.listener.PlayerListener
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
 import io.github.eirikh1996.movecraftspace.objects.StarCollection
 import io.github.eirikh1996.movecraftspace.utils.MSUtils
-import io.github.eirikh1996.movecraftspace.utils.MovecraftHandler
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitRunnable
 import java.io.File
@@ -21,7 +20,6 @@ class MovecraftSpace : JavaPlugin() {
     private var ticks = 0
     private var tickTimeStamp = 0L
     internal lateinit var imageDir : File
-    lateinit var movecraftHandler : MovecraftHandler<*>
 
     companion object {
         lateinit var instance : MovecraftSpace
@@ -34,20 +32,6 @@ class MovecraftSpace : JavaPlugin() {
         if (!imageDir.exists())
             imageDir.mkdirs()
         ConfigHolder.config = config
-        val packageName = server.javaClass.`package`.name
-        val ver = packageName.substring(packageName.lastIndexOf(".") + 1).split("_")[1].toInt()
-        try {
-            Class.forName("net.countercraft.movecraft.craft.BaseCraft")
-            Settings.IsMovecraft8 = true
-        } catch ( e : ClassNotFoundException) {
-            Settings.IsMovecraft8 = false
-        }
-        Settings.IsLegacy = ver <= 12
-        Settings.IsV1_17 = ver >= 17
-        Settings.IsV1_13 = ver >= 13
-
-
-
         PlanetCollection.pl = this
         PlanetCollection.loadPlanets()
         StarCollection.pl = this

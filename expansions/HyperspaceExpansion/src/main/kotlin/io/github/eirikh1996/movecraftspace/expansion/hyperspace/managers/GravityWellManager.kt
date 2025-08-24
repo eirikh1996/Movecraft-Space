@@ -14,15 +14,17 @@ import io.github.eirikh1996.movecraftspace.utils.MSUtils.plugin
 import net.countercraft.movecraft.MovecraftLocation
 import net.countercraft.movecraft.craft.Craft
 import net.countercraft.movecraft.craft.CraftManager
+import net.countercraft.movecraft.craft.type.CraftType
 import net.countercraft.movecraft.events.CraftDetectEvent
 import net.countercraft.movecraft.events.CraftReleaseEvent
-import net.countercraft.movecraft.utils.MathUtils
+import net.countercraft.movecraft.util.MathUtils
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.block.Sign
 import org.bukkit.block.data.type.WallSign
+import org.bukkit.block.sign.Side
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
@@ -38,18 +40,74 @@ object GravityWellManager : Iterable<GravityWell>, Listener {
     val GRAVITY_WELL_HEADER = ChatColor.AQUA.toString() + "Gravity well"
     val GRAVITY_WELL_ACTIVE_TEXT = ChatColor.GREEN.toString() + "Active"
     val GRAVITY_WELL_STANDBY_TEXT = ChatColor.DARK_RED.toString() + "Standby"
-    val processor : GravityWellProcessor<*>
 
     init {
-        val movecraftVersion = if (Settings.IsMovecraft8){ 8 }else{ 7 }
-        val clazz = Class.forName("io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.Movecraft" + movecraftVersion + "GravityWellProcessor")
-        processor = clazz.getConstructor().newInstance() as GravityWellProcessor<*>
-        Bukkit.getPluginManager().registerEvents(processor, plugin)
+        Bukkit.getPluginManager().registerEvents(this, plugin)
     }
 
-    abstract class GravityWellProcessor<Craft>() : Listener {
-        abstract fun craftHasActiveGravityWell(craft: Craft) : Boolean
-        abstract fun getActiveGravityWellAt(loc : Location, craftToExclude : Craft? = null): GravityWell?
+    fun craftHasActiveGravityWell(craft: Craft) : Boolean {
+        for (ml in craft.hitBox) {
+            val b = ml.toBukkit(craft.world).block
+            if (b.blockData !is WallSign)
+                continue
+            val sign = b.state as Sign
+            if (sign.getLine(0) != GRAVITY_WELL_HEADER)
+                continue
+            val gravityWell = getGravityWell(sign) ?: continue
+            if (sign.getLine(3) != GRAVITY_WELL_ACTIVE_TEXT)
+                continue
+            return true
+        }
+        return false
+    }
+
+    fun getActiveGravityWellAt(loc : Location, craftToExclude : Craft?): GravityWell? {
+        for (craft in CraftManager.getInstance().getCraftsInWorld(loc.world!!)) {
+            if (craft == null || craftToExclude == craft)
+                continue
+            for (ml in craft.hitBox) {
+                val b = ml.toBukkit(loc.world).block
+                if (b.blockData !is WallSign)
+                    continue
+                val sign = b.state as Sign
+                if (sign.getSide(Side.FRONT).getLine(0) != GravityWellManager.GRAVITY_WELL_HEADER)
+                    continue
+                val gravityWell = GravityWellManager.getGravityWell(sign) ?: continue
+                if (sign.location.distance(loc) > gravityWell.range)
+                    continue
+                if (!sign.getLine(3).equals(GravityWellManager.GRAVITY_WELL_ACTIVE_TEXT))
+                    continue
+                return gravityWell
+            }
+        }
+        return null
+    }
+
+    @EventHandler
+    fun onDetect(event : CraftDetectEvent) {
+        val gravityWellsOnCraft = GravityWellManager.getGravityWellsOnCraft(event.craft.hitBox.asSet(), event.craft.world)
+        val craftName = event.craft.type.getStringProperty(CraftType.NAME)
+        for (entry in gravityWellsOnCraft) {
+            if (entry.value.allowedOnCraftTypes.contains(craftName)) {
+                event.failMessage = MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Gravity well " + entry.value.name + " is not allowed on craft type " + craftName
+                event.isCancelled = true
+                return
+            }
+        }
+        if (ExpansionSettings.maxGravityWellsOnCraft.contains(craftName) && gravityWellsOnCraft.size > ExpansionSettings.maxGravityWellsOnCraft[craftName]!!) {
+            event.failMessage = MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Craft type " + craftName + " can have maximum of " + ExpansionSettings.maxGravityWellsOnCraft[craftName]!! + " gravity wells on it"
+            event.isCancelled = true
+            return
+        }
+
+    }
+
+    @EventHandler
+    fun onRelease(event : CraftReleaseEvent) {
+        for (entry in getGravityWellsOnCraft(event.craft.hitBox.asSet(), event.craft.world)) {
+            entry.key.setLine(3, GRAVITY_WELL_STANDBY_TEXT)
+            entry.key.update()
+        }
     }
 
     @EventHandler
@@ -67,14 +125,8 @@ object GravityWellManager : Iterable<GravityWell>, Listener {
             return
         }
         val sign = event.block.state as Sign
-        val face = if (Settings.IsLegacy) {
-            val signData = sign.data as org.bukkit.material.Sign
-            signData.facing
-        } else {
-            val signData = sign.blockData as WallSign
-            signData.facing
-        }
-        val angle = MSUtils.angleBetweenBlockFaces(gravityWell.blocks[ImmutableVector.ZERO]!!.facing, face)
+        val signData = sign.blockData as WallSign
+        val angle = MSUtils.angleBetweenBlockFaces(gravityWell.blocks[ImmutableVector.ZERO]!!.facing, signData.facing)
         val locs = HashSet<ImmutableVector>()
         for (vec in gravityWell.blocks.keys) {
             locs.add(ImmutableVector.fromLocation(event.block.location).add(vec.rotate(angle, ImmutableVector.ZERO).add(0,vec.y,0)))
@@ -157,18 +209,12 @@ object GravityWellManager : Iterable<GravityWell>, Listener {
         if (!sign.block.type.name.endsWith("WALL_SIGN"))
             return null
         var foundGravityWell : GravityWell? = null
-        val face = if (Settings.IsLegacy) {
-            val signData = sign.data as org.bukkit.material.Sign
-            signData.facing
-        } else {
-            val signData = sign.blockData as WallSign
-            signData.facing
-        }
+        val signData = sign.blockData as WallSign
         val iter = gravityWells.iterator()
         while (iter.hasNext()) {
             val next = iter.next()
             var gravityWellFound = true
-            val angle = MSUtils.angleBetweenBlockFaces(next.blocks[ImmutableVector.ZERO]!!.facing, face)
+            val angle = MSUtils.angleBetweenBlockFaces(next.blocks[ImmutableVector.ZERO]!!.facing, signData.facing)
             for (vec in next.blocks.keys) {
                 val hdBlock = next.blocks[vec]!!.rotate(BlockUtils.rotateBlockFace(angle, next.blocks[vec]!!.facing))
                 val block = ImmutableVector.fromLocation(sign.location).add(vec.rotate(angle, ImmutableVector.ZERO).add(0,vec.y,0)).toLocation(sign.world).block

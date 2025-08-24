@@ -1,12 +1,11 @@
 plugins {
     id("buildlogic.java-conventions")
+    id("com.gradleup.shadow")
     kotlin("jvm")
-    id("io.papermc.paperweight.userdev")
 }
 
 dependencies {
     compileOnly(project(":movecraft-space-api"))
-    paperweight.paperDevBundle("1.21.5-R0.1-SNAPSHOT")
     compileOnly("com.sk89q.worldguard:worldguard-core:7.0.9-SNAPSHOT")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.9-SNAPSHOT")
     compileOnly(kotlin("stdlib-jdk8"))
@@ -14,6 +13,13 @@ dependencies {
 repositories {
     mavenCentral()
     maven("https://maven.enginehub.org/repo/")
+}
+
+tasks.shadowJar {
+    archiveBaseName.set("WorldGuardExpansion")
+    archiveClassifier.set("")
+    archiveVersion.set("")
+    destinationDirectory.set(file("/../../plugin/build/libs/expansions"))
 }
 
 java {

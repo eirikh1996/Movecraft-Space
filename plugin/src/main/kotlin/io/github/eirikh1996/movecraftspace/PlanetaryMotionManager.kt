@@ -9,6 +9,8 @@ import net.countercraft.movecraft.MovecraftLocation
 import net.countercraft.movecraft.craft.ChunkManager
 import net.countercraft.movecraft.craft.Craft
 import net.countercraft.movecraft.craft.CraftManager
+import net.countercraft.movecraft.craft.PilotedCraft
+import net.countercraft.movecraft.craft.type.CraftType
 import net.countercraft.movecraft.mapUpdater.MapUpdateManager
 import net.countercraft.movecraft.mapUpdater.update.UpdateCommand
 import net.countercraft.movecraft.util.MathUtils
@@ -105,8 +107,11 @@ object PlanetaryMotionManager : BukkitRunnable() {
 
     private fun translateCraftsToPlanet(planet : Planet, displacement : ImmutableVector) {
         val newCenter = planet.center.add(displacement)
-        val craftsToTeleport = HashSet<Craft>()
+        val craftsToTeleport = HashSet<PilotedCraft>()
         for (craft in CraftManager.getInstance().getCraftsInWorld(planet.space)) {
+            if (craft !is PilotedCraft) {
+                continue
+            }
             for (ml in craft.hitBox) {
                 val dx = abs(newCenter.x - ml.x)
                 val dy = abs(newCenter.y - ml.y)
@@ -120,6 +125,7 @@ object PlanetaryMotionManager : BukkitRunnable() {
             }
         }
         for (craft in craftsToTeleport) {
+            val passthroughBlocks = craft.type.getMaterialSetProperty(CraftType.PASSTHROUGH_BLOCKS)
             val hitBox = craft.hitBox
             val midpoint = hitBox.midPoint
             val y = planet.exitHeight - (hitBox.yLength / 2) - 5
@@ -137,8 +143,7 @@ object PlanetaryMotionManager : BukkitRunnable() {
                 if (!MathUtils.withinWorldBorder(planet.destination, test)) {
                     continue
                 }
-
-                if (craft.notificationPlayer != null && !ExpansionManager.allowedArea(craft.notificationPlayer!!, test.toBukkit(planet.destination))) {
+                if (!ExpansionManager.allowedArea(craft.pilot, test.toBukkit(planet.destination))) {
                     continue
                 }
                 val diff = test.subtract(midpoint)
@@ -146,7 +151,7 @@ object PlanetaryMotionManager : BukkitRunnable() {
                 MovecraftChunk.addSurroundingChunks(chunks, 3)
                 ChunkManager.syncLoadChunks(chunks)
                 val testType = test.toBukkit(planet.destination).block.type
-                if (!testType.name.endsWith("AIR") && !craft.type.passthroughBlocks.contains(testType)) {
+                if (!testType.isAir && !passthroughBlocks.contains(testType)) {
                     continue
                 }
                 val obstructed = Bukkit.getScheduler().callSyncMethod(MovecraftSpace.instance) {
@@ -158,7 +163,7 @@ object PlanetaryMotionManager : BukkitRunnable() {
                             obstructed = true
                             break
                         }
-                        if (!destHitBoxLocType.name.endsWith("AIR") && !craft.type.passthroughBlocks.contains(destHitBoxLocType)) {
+                        if (!destHitBoxLocType.isAir && !passthroughBlocks.contains(destHitBoxLocType)) {
                             obstructed = true
                             break
                         }
@@ -174,7 +179,7 @@ object PlanetaryMotionManager : BukkitRunnable() {
                     continue
                 destLoc = diff
             }
-            craft.notificationPlayer!!.sendMessage("Entering " + planet.destination.name)
+            craft.pilot!!.sendMessage("Entering " + planet.destination.name)
             craft.translate(planet.destination, destLoc.x, destLoc.y, destLoc.z)
         }
     }

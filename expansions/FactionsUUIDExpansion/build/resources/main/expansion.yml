@@ -1,0 +1,5 @@
+name: FactionsUUIDExpansion
+main: io.github.eirikh1996.movecraftspace.expansion.factionsuuid.FactionsUUIDExpansion
+version: '${project.version}'
+depend:
+  - Factions

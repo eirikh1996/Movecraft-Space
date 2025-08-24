@@ -19,7 +19,7 @@ import net.countercraft.movecraft.craft.Craft
 import net.countercraft.movecraft.craft.CraftManager
 import net.countercraft.movecraft.craft.PilotedCraft
 import net.countercraft.movecraft.craft.type.CraftType
-import net.countercraft.movecraft.events.CraftReleaseEvent
+import net.countercraft.movecraft.events.*
 import net.countercraft.movecraft.util.MathUtils
 import net.countercraft.movecraft.util.hitboxes.HitBox
 import net.countercraft.movecraft.util.hitboxes.BitmapHitBox
@@ -61,21 +61,14 @@ object HyperspaceManager : BukkitRunnable(), Listener {
     val runnableMap = HashMap<UUID, BukkitRunnable>()
     val beaconLocations = HashSet<HyperspaceBeacon>()
     val craftsWithinBeaconRange = HashSet<Craft>()
+    val craftsSunkInHyperspace = HashSet<Craft>()
     val ex = ExpansionManager.getExpansion("HyperspaceExpansion")!!
     val dataFolder = ex.dataFolder
     private val file = File(dataFolder, "beacons.yml")
     private val hyperspaceLocationsFile = File(dataFolder, "hyperspaceLocations.yml")
     val targetLocations = HashMap<MovecraftLocation, Location>()
     val beaconRange = ex.config.getInt("Beacon range")
-    val processor : HyperspaceProcessor<*>
 
-    init {
-        val clazz = Class.forName("io.github.eirikh1996.movecraftspace.expansion.hyperspace.Movecraft" + (if (Settings.IsMovecraft8) "8" else "7") + "HyperspaceProcessor")
-        if (!HyperspaceProcessor::class.java.isAssignableFrom(clazz))
-            throw IllegalStateException()
-        processor = clazz.getConstructor(Plugin::class.java).newInstance(plugin) as HyperspaceProcessor<*>
-        Bukkit.getPluginManager().registerEvents(processor, plugin)
-    }
 
 
     /**
@@ -91,7 +84,7 @@ object HyperspaceManager : BukkitRunnable(), Listener {
      * @see java.lang.Thread.run
      */
     override fun run() {
-        processor.processHyperspaceTravel()
+        processHyperspaceTravel()
         processTargetLocations()
     }
 
@@ -154,8 +147,8 @@ object HyperspaceManager : BukkitRunnable(), Listener {
         craft: PilotedCraft,
         origin: Location,
         destination: Location,
-        str: String,
-        beaconTravel: Boolean
+        str: String = "",
+        beaconTravel: Boolean = false
     ) {
         val hyperdrivesOnCraft = HyperdriveManager.getHyperdrivesOnCraft(craft.hitBox.asSet(), craft.world)
         if (hyperdrivesOnCraft.isEmpty()) {
@@ -168,7 +161,7 @@ object HyperspaceManager : BukkitRunnable(), Listener {
                     ExpansionSettings.extraMassShadowRangeOfPlanets
                 ) != null || StarCollection.getStarAt(testLoc,
                     ExpansionSettings.extraMassShadowRangeOfStars
-                ) != null || (GravityWellManager.processor as Movecraft7GravityWellProcessor).getActiveGravityWellAt(
+                ) != null || GravityWellManager.getActiveGravityWellAt(
                     testLoc,
                     craft
                 ) != null) {
@@ -176,7 +169,7 @@ object HyperspaceManager : BukkitRunnable(), Listener {
                 return
             }
         }
-        if ((GravityWellManager.processor as Movecraft7GravityWellProcessor).craftHasActiveGravityWell(craft)) {
+        if (GravityWellManager.craftHasActiveGravityWell(craft)) {
             craft.pilot.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Your craft cannot enter hyperspace because it has an active gravity well on it")
             return
         }
@@ -275,8 +268,8 @@ object HyperspaceManager : BukkitRunnable(), Listener {
                 Bukkit.getPluginManager().callEvent(event)
                 if (event.isCancelled)
                     return
-                Bukkit.getScheduler().callSyncMethod(MSUtils.plugin) {
-                    for (oentry in HyperdriveManager.getHyperdrivesOnCraft(craft.hitBox.asSet(), craft.w)) {
+                Bukkit.getScheduler().callSyncMethod(plugin) {
+                    for (oentry in HyperdriveManager.getHyperdrivesOnCraft(craft.hitBox.asSet(), craft.world)) {
                         oentry.key.setLine(3, ChatColor.GOLD.toString() + "Travelling")
                         oentry.key.update()
                     }
@@ -288,7 +281,7 @@ object HyperspaceManager : BukkitRunnable(), Listener {
                 val bounds = ExpansionManager.worldBoundrary(ExpansionSettings.hyperspaceWorld)
                 val minX = (bounds.minPoint.x + (hitBox.xLength / 2)) + 10
                 val maxX = (bounds.maxPoint.x - (hitBox.xLength / 2)) - 10
-                val minY = (if (Settings.IsV1_17) ExpansionSettings.hyperspaceWorld.minHeight else 0) + (hitBox.yLength / 2) + 10
+                val minY = (ExpansionSettings.hyperspaceWorld.minHeight) + (hitBox.yLength / 2) + 10
                 val maxY = ExpansionSettings.hyperspaceWorld.maxHeight - (hitBox.yLength / 2) - 10
                 val minZ = (bounds.minPoint.z + (hitBox.zLength / 2)) + 10
                 val maxZ = (bounds.maxPoint.z - (hitBox.zLength / 2)) - 10
@@ -298,7 +291,7 @@ object HyperspaceManager : BukkitRunnable(), Listener {
                 var hitboxObstructed = true
                 val midpoint = hitBox.midPoint
                 while (hitboxObstructed) {
-                    hitboxObstructed = Bukkit.getScheduler().callSyncMethod(MSUtils.plugin) {
+                    hitboxObstructed = Bukkit.getScheduler().callSyncMethod(plugin) {
                         MSUtils.hitboxObstructed(
                             craft.hitBox.asSet(),
                             craft.type.getMaterialSetProperty(CraftType.PASSTHROUGH_BLOCKS),
@@ -329,10 +322,10 @@ object HyperspaceManager : BukkitRunnable(), Listener {
 
         }
         HyperspaceManager.runnableMap[craft.pilot.uniqueId] = runnable
-        runnable.runTaskTimerAsynchronously(MSUtils.plugin, 0, 1)
+        runnable.runTaskTimerAsynchronously(plugin, 0, 1)
     }
 
-    fun processHyperspaceTravel() {
+    private fun processHyperspaceTravel() {
         for (entry in processingEntries.values) {
             if (System.currentTimeMillis() - entry.lastTeleportTime < 500 || entry.stage != HyperspaceTravelEntry.Stage.TRAVEL)
                 continue
@@ -348,15 +341,15 @@ object HyperspaceManager : BukkitRunnable(), Listener {
                 testLoc.add(unit.clone().normalize())
                 HyperspaceManager.targetLocations[entry.craft.hitBox.midPoint] = testLoc
                 val event = HyperspaceTravelEvent(entry.craft, testLoc)
-                Bukkit.getScheduler().callSyncMethod(MSUtils.plugin) {
+                Bukkit.getScheduler().callSyncMethod(plugin) {
                     Bukkit.getPluginManager().callEvent(event)
                 }.get()
                 if (event.isCancelled) {
                     pullOutOfHyperspace(entry, event.currentLocation, event.exitMessage)
                     break
                 }
-                val foundGravityWell = Bukkit.getScheduler().callSyncMethod(MSUtils.plugin) {
-                    (GravityWellManager.processor as Movecraft7GravityWellProcessor).getActiveGravityWellAt(
+                val foundGravityWell = Bukkit.getScheduler().callSyncMethod(plugin) {
+                    GravityWellManager.getActiveGravityWellAt(
                         testLoc,
                         entry.craft
                     )
@@ -387,7 +380,8 @@ object HyperspaceManager : BukkitRunnable(), Listener {
                 var destination = entry.destination
                 if (entry.beaconTravel) {
                     while (true) {
-                        if (PlanetCollection.getPlanetAt(destination, 0, true) != null || StarCollection.getStarAt(destination) != null) {
+                        if (PlanetCollection.getPlanetAt(destination, 0, true) != null ||
+                            StarCollection.getStarAt(destination) != null) {
                             val hitbox = entry.craft.hitBox
                             val bufferedRange = beaconRange + max(hitbox.xLength, hitbox.zLength)
                             val perimeter = 2 * PI * beaconRange
@@ -422,7 +416,7 @@ object HyperspaceManager : BukkitRunnable(), Listener {
         entry.craft.burningFuel += entry.craft.type.getPerWorldProperty(CraftType.PER_WORLD_FUEL_BURN_RATE, craft.world) as Double
         entry.progressBar.isVisible = false
         val finalTarget = nearestUnobstructedLoc(target, entry.craft)
-        Bukkit.getScheduler().callSyncMethod(MSUtils.plugin) {
+        Bukkit.getScheduler().callSyncMethod(plugin) {
             for (hdentry in HyperdriveManager.getHyperdrivesOnCraft(entry.craft.hitBox.asSet(), entry.craft.world)) {
                 hdentry.key.setLine(3, ChatColor.GOLD.toString() + "Standby")
                 hdentry.key.update()
@@ -490,7 +484,7 @@ object HyperspaceManager : BukkitRunnable(), Listener {
         val maxHeight = max(craft.type.getPerWorldProperty(CraftType.PER_WORLD_MAX_HEIGHT_LIMIT, loc.world) as Int, loc.world!!.maxHeight) - (hitBox.yLength / 2)
         var foundLoc = loc.clone()
         foundLoc.y = min(foundLoc.y, (foundLoc.world!!.maxHeight - 1 - craft.hitBox.yLength / 2).toDouble())
-        foundLoc.y = max(foundLoc.y, ((if (Settings.IsV1_17) foundLoc.world!!.minHeight else 0) + 1 + craft.hitBox.yLength / 2).toDouble())
+        foundLoc.y = max(foundLoc.y, (foundLoc.world!!.minHeight + 1 + craft.hitBox.yLength / 2).toDouble())
         val bound = ExpansionManager.worldBoundrary(loc.world!!)
         val extraLength = ((if (hitBox.xLength > hitBox.zLength) hitBox.xLength else hitBox.zLength) / 2) + 1
         foundLoc = bound.nearestLocWithin(foundLoc, extraLength * 2)
@@ -520,7 +514,9 @@ object HyperspaceManager : BukkitRunnable(), Listener {
     }
 
     fun getBeaconAt(loc : Location) : HyperspaceBeacon? {
-        return HyperspaceManager.beaconLocations.firstOrNull { beacon -> beacon.origin == loc || beacon.destination == loc }
+        return HyperspaceManager.beaconLocations.firstOrNull {
+            beacon -> beacon.origin == loc ||
+                beacon.destination == loc }
     }
 
     fun addEntry(craft: Craft, entry: HyperspaceTravelEntry) {
@@ -531,7 +527,9 @@ object HyperspaceManager : BukkitRunnable(), Listener {
     @EventHandler
     fun onRelease(event : CraftReleaseEvent) {
         val craft = event.craft
-        if (craft.w != ExpansionSettings.hyperspaceWorld) {
+        if (craft !is PilotedCraft)
+            return
+        if (craft.world != ExpansionSettings.hyperspaceWorld) {
             return
         }
         if (event.reason == CraftReleaseEvent.Reason.FORCE) {
@@ -543,49 +541,60 @@ object HyperspaceManager : BukkitRunnable(), Listener {
 
     @EventHandler
     fun onRotate(event : CraftRotateEvent) {
-        if (processingEntries.containsKey(event.craft)) {
+        val craft = event.craft
+        if (craft !is PilotedCraft) {
+            return
+        }
+        if (processingEntries.containsKey(craft)) {
             event.failMessage = MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Cannot move ship while travelling in hyperspace"
             event.isCancelled = true
             return
         }
-        processHyperspaceBeaconDetection(event.craft, event.newHitBox)
+        processHyperspaceBeaconDetection(craft, event.newHitBox)
     }
 
     @EventHandler
     fun onTranslate(event : CraftTranslateEvent) {
-        if (craftsSunkInHyperspace.contains(event.craft)) {
-            craftsSunkInHyperspace.remove(event.craft)
+        val craft = event.craft
+        if (craft !is PilotedCraft) {
+            return
+        }
+        if (craftsSunkInHyperspace.contains(craft)) {
+            craftsSunkInHyperspace.remove(craft)
             object : BukkitRunnable() {
                 override fun run() {
-                    event.craft.sink()
+                    CraftManager.getInstance().sink(craft)
                 }
-            }.runTaskLater(MSUtils.plugin, 3)
+            }.runTaskLater(plugin, 3)
         }
-        if (processingEntries.containsKey(event.craft)) {
+        if (processingEntries.containsKey(craft)) {
             event.failMessage = MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Cannot move ship while travelling in hyperspace"
             event.isCancelled = true
             return
         }
-        val entry = pendingEntries[event.craft]
+        val entry = pendingEntries[craft]
         if (entry != null && event.world == ExpansionSettings.hyperspaceWorld) {
-            pendingEntries.remove(event.craft)
-            processingEntries[event.craft] = entry
+            pendingEntries.remove(craft)
+            processingEntries[craft] = entry
         }
-        processHyperspaceBeaconDetection(event.craft, event.newHitBox, event.world)
+        processHyperspaceBeaconDetection(craft, event.newHitBox, event.world)
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     fun onDetect(event : CraftDetectEvent) {
         val craft = event.craft
-        val result = HyperdriveManager.onCraftDetect(craft.pilot, craft.type.craftName, craft.hitBox.asSet(), craft.w)
+        if (craft !is PilotedCraft) {
+            return
+        }
+        val result = HyperdriveManager.onCraftDetect(craft.pilot, craft.type.getStringProperty(CraftType.NAME), craft.hitBox.asSet(), craft.world)
         if (result.isNotEmpty()) {
             event.failMessage = result
             event.isCancelled = true
             return
         }
-        if (craft.w != ExpansionSettings.hyperspaceWorld)
+        if (craft.world != ExpansionSettings.hyperspaceWorld)
             return
-        if (craft.type.cruiseOnPilot) {
+        if (craft.type.getBoolProperty(CraftType.CRUISE_ON_PILOT)) {
             event.failMessage = "Cannot launch cruiseOnPilot crafts in hyperspace"
             event.isCancelled = true
             return
@@ -604,37 +613,34 @@ object HyperspaceManager : BukkitRunnable(), Listener {
                 val dz = target.blockZ - midpoint.z
                 craft.pilot.sendMessage("Craft was detected in hyperspace. Pulling you out of hyperspace")
                 craft.translate(target.world, dx, dy, dz)
-                HyperspaceManager.targetLocations.remove(midpoint)
+                targetLocations.remove(midpoint)
             }
 
-        }.runTaskLaterAsynchronously(MSUtils.plugin, 10)
+        }.runTaskLaterAsynchronously(plugin, 10)
 
     }
 
     @EventHandler
     fun onSink(event : CraftSinkEvent) {
         val craft = event.craft
-        val notifyP = craft.notificationPlayer
-        if (craft.w != ExpansionSettings.hyperspaceWorld)
+        if (craft.world != ExpansionSettings.hyperspaceWorld || craft !is PilotedCraft)
             return
-        val target = HyperspaceManager.targetLocations[craft.hitBox.midPoint]
+        val target = targetLocations[craft.hitBox.midPoint]
         event.isCancelled = true
-        craft.sinking
         craftsSunkInHyperspace.add(craft)
         object : BukkitRunnable() {
             override fun run() {
-                craft.notificationPlayer = notifyP
                 pullOutOfHyperspace(processingEntries[craft]!!, target!!, "Craft was sunk in hyperspace. Exiting hyperspace")
             }
 
-        }.runTaskAsynchronously(MSUtils.plugin)
+        }.runTaskAsynchronously(plugin)
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     fun onQuit(event : PlayerQuitEvent) {
         val p = event.player
         val craft = CraftManager.getInstance().getCraftByPlayer(p) ?: return
-        if (craft.w != ExpansionSettings.hyperspaceWorld)
+        if (craft.world != ExpansionSettings.hyperspaceWorld)
             return
         if (!processingEntries.containsKey(craft))
             return
@@ -666,9 +672,12 @@ object HyperspaceManager : BukkitRunnable(), Listener {
     fun onDetectHyperspaceSign(e : CraftDetectEvent) {
         val craft = e.craft
         var range = 0
-        HyperdriveManager.getHyperdrivesOnCraft(craft.hitBox.asSet(), craft.w).forEach { (t, u) -> range += u.maxRange }
+        NavigationComputerManager.getNavigationComputersOnCraft(craft).forEach { (t, u) ->
+            if (range < u.maxRange)
+                range = u.maxRange
+        }
         for (ml in craft.hitBox) {
-            val b = ml.toBukkit(craft.w).block
+            val b = ml.toBukkit(craft.world).block
             if (!b.type.name.endsWith("WALL_SIGN"))
                 continue
             val sign = b.state as Sign
@@ -680,7 +689,7 @@ object HyperspaceManager : BukkitRunnable(), Listener {
         }
     }
     @EventHandler
-    fun onInteract(e : PlayerInteractEvent) {
+    fun onInteract(e : PlayerInteractEvent) { //Usage of Hyperspace travel sign
         if (e.action != Action.RIGHT_CLICK_BLOCK)
             return
         if (!e.clickedBlock!!.type.name.endsWith("SIGN") && e.clickedBlock!!.type.name != "SIGN_POST") {
@@ -708,25 +717,34 @@ object HyperspaceManager : BukkitRunnable(), Listener {
             return
         }
         for (pl in PlanetCollection) {
-            if (pl.space == craft.w) {
+            if (pl.space == craft.world) {
                 continue
             }
             e.player.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "You can only use hyperspace travel in space worlds")
             return
         }
-        if (!ExpansionSettings.allowedCraftTypesForHyperspaceSign.contains(craft.type.craftName)) {
-            e.player.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Craft type " + craft.type.craftName + " is not allowed for hyperspace travel using sign")
+        val craftName = craft.type.getStringProperty(CraftType.NAME)
+        if (!ExpansionSettings.allowedCraftTypesForHyperspaceSign.contains(craftName)) {
+            e.player.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Craft type " + craftName + " is not allowed for hyperspace travel using sign")
             return
         }
-        val hyperdrivesOnCraft = HyperdriveManager.getHyperdrivesOnCraft(craft.hitBox.asSet(), craft.w)
+        val hyperdrivesOnCraft = HyperdriveManager.getHyperdrivesOnCraft(craft.hitBox.asSet(), craft.world)
         if (hyperdrivesOnCraft.isEmpty()) {
             e.player.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "There are no hyperdrives on this craft")
             return
         }
+        val navComputersOnCraft = NavigationComputerManager.getNavigationComputersOnCraft(craft)
+        if (navComputersOnCraft.isEmpty()) {
+            e.player.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "There are no navigation computers on this craft")
+            return
+        }
         var range = 0
-        for (entry in hyperdrivesOnCraft) {
-            val hyperdrive = entry.value
-            range += hyperdrive.maxRange
+        for (entry in navComputersOnCraft) {
+            val navComputer = entry.value
+            if (range > navComputer.maxRange) {
+                continue
+            }
+            range = navComputer.maxRange;
         }
         val face = if (sign.blockData is WallSign) {
             val signData = sign.blockData as WallSign
@@ -751,21 +769,22 @@ object HyperspaceManager : BukkitRunnable(), Listener {
         if (!HyperdriveManager.getHyperdrivesOnCraft(craft.hitBox.asSet(), craft.world).any { e -> e.value.getStructure(e.key).contains(block) }) {
             return false
         }
-        val entry = HyperspaceManager.processor.processingEntries[craft] as Movecraft7HyperspaceTravelEntry? ?: HyperspaceManager.processor.pendingEntries[craft] as Movecraft7HyperspaceTravelEntry? ?: return false
+        val entry = processingEntries[craft] ?: return false
+
         if (craft.world != ExpansionSettings.hyperspaceWorld) {
             craft.pilot.sendMessage(MSUtils.COMMAND_PREFIX + "Block on hyperdrive was broken. Warmup cancelled")
         } else {
-            val targetLocation = HyperspaceManager.targetLocations[craft.hitBox.midPoint] ?: return false
+            val targetLocation = targetLocations[craft.hitBox.midPoint] ?: return false
             object : BukkitRunnable() {
                 override fun run() {
                     pullOutOfHyperspace(entry, targetLocation, "Block was broken on one of the craft's hyperdrives. Exiting hyperspace")
                 }
-            }.runTaskAsynchronously(MSUtils.plugin)
+            }.runTaskAsynchronously(plugin)
         }
         entry.progressBar.isVisible = false
         processingEntries.remove(craft)
         pendingEntries.remove(craft)
-        HyperspaceManager.runnableMap[craft.notificationPlayer?.uniqueId]?.cancel()
+        runnableMap[craft.pilot.uniqueId]?.cancel()
         return true
     }
 
@@ -790,6 +809,14 @@ object HyperspaceManager : BukkitRunnable(), Listener {
         config.save(file)
     }
 
+    fun craftsInHyperspaceWorld(): List<String> {
+        val players = ArrayList<String>()
+        CraftManager.getInstance().getCraftsInWorld(ExpansionSettings.hyperspaceWorld).forEach { craft ->
+            if (craft is PilotedCraft)
+                players.add(craft.pilot.name) }
+        return players
+    }
+
     private val SHIFTS = arrayOf(
         BlockVector(0,1,0),
         BlockVector(0,-1,0),
@@ -798,17 +825,4 @@ object HyperspaceManager : BukkitRunnable(), Listener {
         BlockVector(0,0,1),
         BlockVector(0,0,-1)
     )
-
-    abstract class HyperspaceProcessor<C> : Listener {
-        protected val ex = ExpansionManager.getExpansion("HyperspaceExpansion")!!
-        abstract val progressBars : MutableMap<C, BossBar>
-        protected val craftsSunkInHyperspace = HashSet<C>()
-        abstract fun scheduleHyperspaceTravel(craft : C, origin : Location, destination : Location, str : String = "", beaconTravel : Boolean = false)
-        abstract fun processHyperspaceTravel()
-        abstract fun pullOutOfHyperspace(entry: HyperspaceTravelEntry<C>, target : Location, exitMessage : String)
-        abstract fun addEntry(craft: C, entry: HyperspaceTravelEntry<C>)
-        abstract val pendingEntries : Map<C, HyperspaceTravelEntry<C>>
-        abstract val processingEntries : WeakHashMap<C, HyperspaceTravelEntry<C>>
-        abstract fun nearestUnobstructedLoc(loc: Location, craft: C): Location
-    }
 }

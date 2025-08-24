@@ -1,29 +1,20 @@
 package io.github.eirikh1996.movecraftspace.utils
 
-import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
 import io.github.eirikh1996.movecraftspace.objects.MSWorldBorder
 import io.github.eirikh1996.movecraftspace.objects.Planet
 import net.countercraft.movecraft.Movecraft
 import net.countercraft.movecraft.MovecraftLocation
 import net.countercraft.movecraft.WorldHandler
-import net.countercraft.movecraft.craft.Craft
-import net.countercraft.movecraft.utils.BitmapHitBox
-import net.countercraft.movecraft.utils.HitBox
-import net.countercraft.movecraft.utils.MathUtils
 import org.bukkit.*
 import org.bukkit.Bukkit.getConsoleSender
 import org.bukkit.block.BlockFace
+import org.bukkit.block.data.BlockData
 import org.bukkit.plugin.Plugin
-import org.bukkit.scheduler.BukkitRunnable
-import java.io.File
 import java.lang.Exception
 import java.lang.reflect.Method
-import java.util.concurrent.Future
-import javax.imageio.ImageIO
 import kotlin.math.PI
 import kotlin.math.abs
-import kotlin.math.sin
 import kotlin.random.Random
 
 object MSUtils {
@@ -83,14 +74,8 @@ object MSUtils {
 
 
 
-    fun setBlock(loc : Location, type : Material, data : Any) {
-        val wh = Movecraft.getInstance().worldHandler
-        if (setBlockFast == null) {
-            wh.setBlockFast(loc, type, if (Settings.IsMovecraft8) 0 else data as Byte)
-        } else {
-            setBlockFast!!.invoke(wh, loc, type, data)
-        }
-
+    fun setBlock(loc : Location, data : BlockData) {
+        Movecraft.getInstance().worldHandler.setBlockFast(loc, data)
     }
 
     fun createSphere(radius : Int, center : ImmutableVector) : Set<ImmutableVector> {

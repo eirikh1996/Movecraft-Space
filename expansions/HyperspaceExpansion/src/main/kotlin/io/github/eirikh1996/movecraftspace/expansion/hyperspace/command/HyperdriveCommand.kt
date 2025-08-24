@@ -10,6 +10,7 @@ import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.MUST_BE_PLAYER
 import net.countercraft.movecraft.craft.CraftManager
+import net.countercraft.movecraft.craft.type.CraftType
 import org.bukkit.block.Sign
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
@@ -29,7 +30,7 @@ object HyperdriveCommand : TabExecutor {
            HyperdriveManager.forEach { hd -> tabCompletions.add(hd.name) }
         }
         if (args[0].equals("save", true) && args.size >= 4) {
-            CraftManager.getInstance().craftTypes.forEach { type -> tabCompletions.add(type.craftName) }
+            CraftManager.getInstance().craftTypes.forEach { type -> tabCompletions.add(type.getStringProperty(CraftType.NAME)) }
         }
         if (args.size == 0)
             return tabCompletions
@@ -108,7 +109,7 @@ object HyperdriveCommand : TabExecutor {
             if (args.size > 4) {
                 allowedOnCraftTypes.addAll(args.copyOfRange(4, args.size - 1))
             }
-            hyperdrive = Hyperdrive(args[1], maxRange, warmupTime, allowedOnCraftTypes)
+            hyperdrive = Hyperdrive(args[1], warmupTime, allowedOnCraftTypes)
             hyperdrive.copy(sel, signLoc)
 
             val iterator = HyperdriveManager.hyperdrives.iterator()

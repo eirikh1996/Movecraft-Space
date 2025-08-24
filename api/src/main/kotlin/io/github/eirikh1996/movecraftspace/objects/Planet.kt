@@ -118,20 +118,17 @@ data class Planet(
             }
         }
 
-        val newLocMap = HashMap<ImmutableVector, Pair<Material, BlockData>>()
+        val newLocMap = HashMap<ImmutableVector, BlockData>()
         for (loc in visited) {
             val b = loc.toLocation(space).block
-            newLocMap[loc.add(displacement)] = Pair(b.type, b.blockData)
+            newLocMap[loc.add(displacement)] = b.blockData
         }
         for (loc in newLocMap.keys) {
-            val pair = newLocMap[loc]!!
-            val b = loc.toLocation(space).block
-            b.type = pair.first
-            setBlock(b.location, pair.first, pair.second)
+            val data = newLocMap[loc]!!
+            Movecraft.getInstance().worldHandler.setBlockFast(loc.toLocation(space), data)
         }
         for (loc in visited.filter { vec -> !newLocMap.containsKey(vec) }) {
-            setBlock(loc.toLocation(space), Material.AIR, if (Settings.IsLegacy) 0.toByte() else Bukkit.createBlockData(
-                Material.AIR))
+            Movecraft.getInstance().worldHandler.setBlockFast(loc.toLocation(space), Bukkit.createBlockData(Material.AIR))
         }
         center = newCenter
         if (moon)

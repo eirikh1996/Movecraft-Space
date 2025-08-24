@@ -1,0 +1,5 @@
+name: FactionsBlueExpansion
+main: io.github.eirikh1996.movecraftspace.expansion.factionsblue.FactionsBlueExpansion
+version: '${project.version}'
+depend:
+  - FactionsBlue

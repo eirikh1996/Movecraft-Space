@@ -1,16 +1,23 @@
 plugins {
     id("buildlogic.java-conventions")
+    id("com.gradleup.shadow")
     kotlin("jvm")
-    id("io.papermc.paperweight.userdev")
 }
 
 dependencies {
     compileOnly(project(":movecraft-space-api"))
     compileOnly(kotlin("stdlib-jdk8"))
-    paperweight.paperDevBundle("1.21.5-R0.1-SNAPSHOT")
+    compileOnly(files("/../../libs/WorldBorder.jar"))
 }
 repositories {
     mavenCentral()
+}
+
+tasks.shadowJar {
+    archiveBaseName.set("WorldBorderExpansion")
+    archiveClassifier.set("")
+    archiveVersion.set("")
+    destinationDirectory.set(file("/../../plugin/build/libs/expansions"))
 }
 
 java {

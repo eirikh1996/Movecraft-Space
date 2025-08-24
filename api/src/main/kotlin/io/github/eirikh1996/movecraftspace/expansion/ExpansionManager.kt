@@ -38,9 +38,7 @@ object ExpansionManager : Iterable<Expansion> {
     val craftTaskClass : Class<*>
 
     init {
-        val packageName = Bukkit.getServer().javaClass.`package`.name
-        val version = packageName.substring(packageName.lastIndexOf(".") + 1)
-        craftTaskClass = Class.forName("org.bukkit.craftbukkit." + version + ".scheduler.CraftTask")
+        craftTaskClass = Class.forName("org.bukkit.craftbukkit.scheduler.CraftTask")
     }
 
     fun worldBoundrary(world: World) : MSWorldBorder {
@@ -212,7 +210,7 @@ object ExpansionManager : Iterable<Expansion> {
         for (task in scheduler.pendingTasks) {
             if (!task.owner.equals(pl))
                 continue
-            val taskField = craftTaskClass.getDeclaredField(if (Settings.IsV1_13) "rTask" else "task")
+            val taskField = craftTaskClass.getDeclaredField("rTask")
             taskField.isAccessible = true
             val runnable = taskField.get(task)
             if (runnable.javaClass.classLoader !is ExpansionClassLoader)

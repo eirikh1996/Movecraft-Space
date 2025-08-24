@@ -7,6 +7,7 @@ import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
 import io.github.eirikh1996.movecraftspace.expansion.selection.SelectionManager
 import io.github.eirikh1996.movecraftspace.utils.MSUtils
 import net.countercraft.movecraft.craft.CraftManager
+import net.countercraft.movecraft.craft.type.CraftType
 import org.bukkit.block.Sign
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
@@ -26,7 +27,7 @@ object GravityWellCommand : TabExecutor {
             GravityWellManager.forEach( { hd -> tabCompletions.add(hd.name) })
         }
         if (args[0].equals("save", true) && args.size >= 4) {
-            CraftManager.getInstance().craftTypes.forEach { type -> tabCompletions.add(type.craftName) }
+            CraftManager.getInstance().craftTypes.forEach { type -> tabCompletions.add(type.getStringProperty(CraftType.NAME)) }
         }
         if (args.size == 0)
             return tabCompletions

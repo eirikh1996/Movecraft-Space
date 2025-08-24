@@ -1,7 +1,7 @@
 name: Movecraft-Space
 main: io.github.eirikh1996.movecraftspace.MovecraftSpace
-version: '${project.version}'
-api-version: 1.13
+version: ${projectVersion}
+api-version: 1.20
 depend:
   - Movecraft
 softdepend:
@@ -47,4 +47,4 @@ permissions:
     default: true
 
 libraries:
-- 'org.jetbrains.kotlin:kotlin-stdlib:${kotlin.version}'
+- 'org.jetbrains.kotlin:kotlin-stdlib:2.2.20-Beta2'

@@ -4,10 +4,7 @@ import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.ExpansionSettings
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects.HyperspaceBeacon
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.HyperspaceExpansion
-import io.github.eirikh1996.movecraftspace.expansion.hyperspace.HyperspaceProcessor
-import io.github.eirikh1996.movecraftspace.expansion.hyperspace.Movecraft8Processor
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.HyperspaceManager
-import io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects.MovecraftProcessor
 import io.github.eirikh1996.movecraftspace.expansion.selection.SelectionManager
 import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
 import io.github.eirikh1996.movecraftspace.objects.MSBlock
@@ -18,6 +15,7 @@ import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import net.countercraft.movecraft.craft.Craft
 import net.countercraft.movecraft.craft.CraftManager
+import net.countercraft.movecraft.craft.PilotedCraft
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -40,86 +38,6 @@ object HyperspaceCommand : TabExecutor {
     val beaconStructure = HashMap<ImmutableVector, MSBlock>()
     internal lateinit var beaconMinPoint : ImmutableVector
     internal lateinit var beaconMaxPoint : ImmutableVector
-    val processor : MovecraftProcessor<*>
-
-    class Movecraft7Processor : MovecraftProcessor<Craft>() {
-        override fun executePulloutCommand(sender: Player, args: Array<out String>) {
-            if (!sender.hasPermission("movecraftspace.command.hyperspace.pullout")) {
-                sender.sendMessage(COMMAND_PREFIX + ERROR + COMMAND_NO_PERMISSION)
-                return
-            }
-            if (args.size < 2) {
-                sender.sendMessage(COMMAND_PREFIX + ERROR + "You must specify a player")
-                return
-            }
-            val player = Bukkit.getPlayer(args[1])
-            if (player == null) {
-                sender.sendMessage(COMMAND_PREFIX + ERROR + "Player " + args[1] + " has either not joined or is offline")
-                return
-            }
-            val craft = CraftManager.getInstance().getCraftByPlayer(player)
-            if (craft == null) {
-                sender.sendMessage(COMMAND_PREFIX + ERROR + "Player " + player.name + " is not piloting a craft")
-                return
-            }
-            if (craft.w != ExpansionSettings.hyperspaceWorld) {
-                sender.sendMessage(COMMAND_PREFIX + ERROR + "Player " + player.name + "'s craft is not in hyperspace")
-                return
-            }
-            val midpoint = craft.hitBox.midPoint
-            var target = HyperspaceManager.targetLocations.remove(midpoint)
-            if (target == null) {
-                target = sender.location.clone()
-                target.add(craft.hitBox.xLength.toDouble(), 0.0, craft.hitBox.zLength.toDouble())
-            }
-            val hsProcessor = HyperspaceManager.processor as HyperspaceProcessor
-            target = hsProcessor.nearestUnobstructedLoc(target, craft)
-            object : BukkitRunnable() {
-                override fun run() {
-                    hsProcessor.pullOutOfHyperspace(hsProcessor.processingEntries[craft]!!, target, COMMAND_PREFIX + "Pulling " + player.name + "'s craft out of hyperspace")
-                }
-            }.runTaskAsynchronously(HyperspaceExpansion.instance.plugin)
-        }
-
-        override fun executeTravelCommand(sender: Player, args: Array<out String>) {
-            val craft = CraftManager.getInstance().getCraftByPlayer(sender)
-            if (craft == null) {
-                sender.sendMessage(COMMAND_PREFIX + ERROR + "You are not commanding a space craft")
-                return
-            }
-            val hitBox = craft.hitBox
-            var foundLoc : Location? = null
-            var destination : Location? = null
-            var str = ""
-            for (beacon in HyperspaceManager.beaconLocations) {
-                if (beacon.origin.world!! == craft.w && beacon.origin.distance(hitBox.midPoint.toBukkit(craft.w)) <= HyperspaceExpansion.instance.config.getInt("Beacon range")) {
-                    foundLoc = beacon.origin
-                    destination = beacon.destination
-                    str = beacon.originName + "-" + beacon.destinationName
-                    break
-                }
-                if (beacon.destination.world!! == craft.w && beacon.destination.distance(hitBox.midPoint.toBukkit(craft.w)) <= HyperspaceExpansion.instance.config.getInt("Beacon range")) {
-                    foundLoc = beacon.destination
-                    destination = beacon.origin
-                    str = beacon.destinationName + "-" + beacon.originName
-                    break
-                }
-            }
-            if (foundLoc == null) {
-                sender.sendMessage(COMMAND_PREFIX + ERROR + "You are not within the range of a hyperspace beacon")
-                return
-            }
-            (HyperspaceManager.processor as HyperspaceProcessor).scheduleHyperspaceTravel(craft, foundLoc, destination!!, str, true)
-
-        }
-
-        override fun craftsInHyperspaceWorld(): List<String> {
-            val players = ArrayList<String>()
-            CraftManager.getInstance().getCraftsInWorld(ExpansionSettings.hyperspaceWorld).forEach { craft -> players.add(craft.notificationPlayer?.name!!) }
-            return players
-        }
-
-    }
 
     init {
         val file = File(HyperspaceExpansion.instance.dataFolder, "beaconstructure.yml")
@@ -152,7 +70,6 @@ object HyperspaceCommand : TabExecutor {
             beaconMinPoint = ImmutableVector(minX, minY, minZ)
             beaconMaxPoint = ImmutableVector(maxX, maxY, maxZ)
         }
-        processor = if (Settings.IsMovecraft8) Movecraft8Processor() else Movecraft7Processor()
     }
     override fun onTabComplete(sender: CommandSender, command: Command, label: String, args: Array<out String>): List<String> {
         var tabCompletions = listOf("travel", "beacon", "pullout")
@@ -169,7 +86,7 @@ object HyperspaceCommand : TabExecutor {
             }
 
         } else if (args[0].equals("pullout", true)) {
-            val players = processor.craftsInHyperspaceWorld()
+            val players = HyperspaceManager.craftsInHyperspaceWorld()
             tabCompletions = players
         }
         return tabCompletions.filter { s -> s.startsWith(args[args.size - 1]) }.sorted()
@@ -187,7 +104,34 @@ object HyperspaceCommand : TabExecutor {
             return true
         }
         if (args[0].equals("travel", true)) {
-            processor.executeTravelCommand(sender, args)
+            val craft = CraftManager.getInstance().getCraftByPlayer(sender)
+            if (craft == null) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "You are not commanding a space craft")
+                return true
+            }
+            val hitBox = craft.hitBox
+            var foundLoc : Location? = null
+            var destination : Location? = null
+            var str = ""
+            for (beacon in HyperspaceManager.beaconLocations) {
+                if (beacon.origin.world!! == craft.world && beacon.origin.distance(hitBox.midPoint.toBukkit(craft.world)) <= HyperspaceExpansion.instance.config.getInt("Beacon range")) {
+                    foundLoc = beacon.origin
+                    destination = beacon.destination
+                    str = beacon.originName + "-" + beacon.destinationName
+                    break
+                }
+                if (beacon.destination.world!! == craft.world && beacon.destination.distance(hitBox.midPoint.toBukkit(craft.world)) <= HyperspaceExpansion.instance.config.getInt("Beacon range")) {
+                    foundLoc = beacon.destination
+                    destination = beacon.origin
+                    str = beacon.destinationName + "-" + beacon.originName
+                    break
+                }
+            }
+            if (foundLoc == null) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "You are not within the range of a hyperspace beacon")
+                return true
+            }
+            HyperspaceManager.scheduleHyperspaceTravel(craft, foundLoc, destination!!, str, true)
         } else if (args[0].equals("beacon", true)) {
             if (!sender.hasPermission("movecraftspace.command.hyperspace.beacon")) {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + COMMAND_NO_PERMISSION)
@@ -204,12 +148,9 @@ object HyperspaceCommand : TabExecutor {
                     return true
                 }
                 var height = space.maxHeight.toDouble()
-                if (Settings.IsV1_17) {
-                    height -= space.minHeight.toDouble()
-                }
+                height -= space.minHeight.toDouble()
                 height /= 2.0
-                if (Settings.IsV1_17)
-                    height += space.minHeight.toDouble()
+                height += space.minHeight.toDouble()
                 height += .5
                 var foundLoc : Location? = null
                 var str = ""
@@ -351,7 +292,40 @@ object HyperspaceCommand : TabExecutor {
             }
 
         } else if (args[0].equals("pullout", true)) {
-            processor.executePulloutCommand(sender, args)
+            if (!sender.hasPermission("movecraftspace.command.hyperspace.pullout")) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + COMMAND_NO_PERMISSION)
+                return true
+            }
+            if (args.size < 2) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "You must specify a player")
+                return true
+            }
+            val player = Bukkit.getPlayer(args[1])
+            if (player == null) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "Player " + args[1] + " has either not joined or is offline")
+                return true
+            }
+            val craft = CraftManager.getInstance().getCraftByPlayer(player)
+            if (craft == null) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "Player " + player.name + " is not piloting a craft")
+                return true
+            }
+            if (craft.world != ExpansionSettings.hyperspaceWorld) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "Player " + player.name + "'s craft is not in hyperspace")
+                return true
+            }
+            val midpoint = craft.hitBox.midPoint
+            var target = HyperspaceManager.targetLocations.remove(midpoint)
+            if (target == null) {
+                target = sender.location.clone()
+                target.add(craft.hitBox.xLength.toDouble(), 0.0, craft.hitBox.zLength.toDouble())
+            }
+            target = HyperspaceManager.nearestUnobstructedLoc(target, craft)
+            object : BukkitRunnable() {
+                override fun run() {
+                    HyperspaceManager.pullOutOfHyperspace(HyperspaceManager.processingEntries[craft]!!, target, COMMAND_PREFIX + "Pulling " + player.name + "'s craft out of hyperspace")
+                }
+            }.runTaskAsynchronously(HyperspaceExpansion.instance.plugin)
         }
         return true
     }
@@ -396,12 +370,8 @@ object HyperspaceCommand : TabExecutor {
         val center = ImmutableVector.fromLocation(loc)
         for (entry in beaconStructure) {
             val b = entry.key.add(center).toLocation(loc.world!!).block
-            if (Settings.IsLegacy) {
-                b.type = entry.value.type
-                Block::class.java.getDeclaredMethod("setData", Byte::class.java).invoke(b, entry.value.data)
-            } else {
-                b.blockData = entry.value.data as BlockData
-            }
+            b.blockData = entry.value.data
+
         }
     }
 

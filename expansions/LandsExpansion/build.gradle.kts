@@ -1,16 +1,24 @@
 plugins {
     id("buildlogic.java-conventions")
+    id("com.gradleup.shadow")
     kotlin("jvm")
-    id("io.papermc.paperweight.userdev")
 }
 
 dependencies {
     compileOnly(project(":movecraft-space-api"))
     compileOnly(kotlin("stdlib-jdk8"))
-    paperweight.paperDevBundle("1.21.5-R0.1-SNAPSHOT")
+    compileOnly("com.github.Angeschossen:LandsAPI:7.15.20")
 }
 repositories {
     mavenCentral()
+    maven("https://jitpack.io")
+}
+
+tasks.shadowJar {
+    archiveBaseName.set("LandsExpansion")
+    archiveClassifier.set("")
+    archiveVersion.set("")
+    destinationDirectory.set(file("/../../plugin/build/libs/expansions"))
 }
 
 java {

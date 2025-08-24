@@ -1,0 +1,5 @@
+name: WorldGuardExpansion
+main: io.github.eirikh1996.movecraftspace.expansion.worldguard.WorldGuardExpansion
+version: '${project.version}'
+depend:
+  - WorldGuard

@@ -14,8 +14,9 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
 
-class FactionsUUIDExpansion : Expansion(){
+class FactionsUUIDExpansion : Expansion(), Listener{
     var allowEntryInSafezone = false
     var allowEntryInWarzone = false
     override fun allowedArea(p: Player, loc: Location): Boolean {
@@ -40,6 +41,7 @@ class FactionsUUIDExpansion : Expansion(){
         saveDefaultConfig()
         allowEntryInSafezone = config.getBoolean("Allow entry to safezone")
         allowEntryInWarzone = config.getBoolean("Allow entry to warzone")
+        Bukkit.getServer().pluginManager.registerEvents(this, plugin)
     }
 
     @EventHandler

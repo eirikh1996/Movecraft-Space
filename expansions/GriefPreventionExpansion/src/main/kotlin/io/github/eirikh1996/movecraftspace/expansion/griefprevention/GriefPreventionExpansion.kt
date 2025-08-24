@@ -54,7 +54,7 @@ class GriefPreventionExpansion : Expansion(), Listener{
                 val planet = PlanetCollection.intersectingOtherPlanetaryOrbit(test)
                 if (planet == null)
                     continue
-                event.creator.sendMessage(COMMAND_PREFIX + ERROR + "Cannot create claim here as claim intersect with the orbit of " + planet.name)
+                event.creator?.sendMessage(COMMAND_PREFIX + ERROR + "Cannot create claim here as claim intersect with the orbit of " + planet.name)
                 event.isCancelled = true
                 return
             }
@@ -63,7 +63,7 @@ class GriefPreventionExpansion : Expansion(), Listener{
 
     @EventHandler
     fun onExtend(event : ClaimExtendEvent) {
-        val claim = event.claim
+        val claim = event.to
         if (claim.isAdminClaim)
             return
         val lesser = claim.lesserBoundaryCorner

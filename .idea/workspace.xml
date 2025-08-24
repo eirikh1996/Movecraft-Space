@@ -1,0 +1,698 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="ca8f34bc-0893-43fe-bf4f-31ec2bcfe175" name="Changes" comment="Migrate to Gradle, remove Movecraft 7 support">
+      <change afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/cache.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/configuration-cache/configuration-cache.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/configuration-cache/gc.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/noVersion/buildLogic.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/vcs-1/gc.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/kotlinc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/api/movecraft-space-parent.movecraft-space-api.main.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/api/movecraft-space-parent.movecraft-space-api.test.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/expansions/AsteroidBeltExpansion/movecraft-space-parent.AsteroidBeltExpansion.main.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/expansions/AsteroidBeltExpansion/movecraft-space-parent.AsteroidBeltExpansion.test.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/expansions/DynmapExpansion/movecraft-space-parent.DynmapExpansion.main.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/expansions/DynmapExpansion/movecraft-space-parent.DynmapExpansion.test.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/expansions/FactionsBlueExpansion/movecraft-space-parent.FactionsBlueExpansion.main.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/expansions/FactionsBlueExpansion/movecraft-space-parent.FactionsBlueExpansion.test.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/expansions/FactionsExpansion/movecraft-space-parent.FactionsExpansion.main.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/expansions/FactionsExpansion/movecraft-space-parent.FactionsExpansion.test.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/expansions/FactionsUUIDExpansion/movecraft-space-parent.FactionsUUIDExpansion.main.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/expansions/FactionsUUIDExpansion/movecraft-space-parent.FactionsUUIDExpansion.test.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/expansions/GriefPreventionExpansion/movecraft-space-parent.GriefPreventionExpansion.main.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/expansions/GriefPreventionExpansion/movecraft-space-parent.GriefPreventionExpansion.test.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/expansions/HyperspaceExpansion/movecraft-space-parent.HyperspaceExpansion.main.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/expansions/HyperspaceExpansion/movecraft-space-parent.HyperspaceExpansion.test.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/expansions/LandsExpansion/movecraft-space-parent.LandsExpansion.main.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/expansions/LandsExpansion/movecraft-space-parent.LandsExpansion.test.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/expansions/RedProtectExpansion/movecraft-space-parent.RedProtectExpansion.main.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/expansions/RedProtectExpansion/movecraft-space-parent.RedProtectExpansion.test.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/expansions/TownyExpansion/movecraft-space-parent.TownyExpansion.main.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/expansions/TownyExpansion/movecraft-space-parent.TownyExpansion.test.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/expansions/WorldBorderExpansion/movecraft-space-parent.WorldBorderExpansion.main.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/expansions/WorldBorderExpansion/movecraft-space-parent.WorldBorderExpansion.test.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/expansions/WorldGuardExpansion/movecraft-space-parent.WorldGuardExpansion.main.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/expansions/WorldGuardExpansion/movecraft-space-parent.WorldGuardExpansion.test.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/movecraft-space-parent.main.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/movecraft-space-parent.test.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/plugin/movecraft-space-parent.Movecraft-Space.main.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/plugin/movecraft-space-parent.Movecraft-Space.test.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api/.gradle/caches/paperweight/taskCache/mappedServerJar.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api/.gradle/caches/paperweight/taskCache/reobfMappings.tiny" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api/build.gradle.kts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api/build/kotlin/compileKotlin/local-state/build-history.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/reports/problems/problems-report.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/.gradle/8.12.1/executionHistory/executionHistory.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/.gradle/8.12.1/executionHistory/executionHistory.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/.gradle/buildOutputCleanup/cache.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/.gradle/file-system.probe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build.gradle.kts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/Buildlogic_javaConventionsPlugin.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/Buildlogic_java_conventions_gradle$$$result$1.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/Buildlogic_java_conventions_gradle$1.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/Buildlogic_java_conventions_gradle$2$1.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/Buildlogic_java_conventions_gradle$2$2.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/Buildlogic_java_conventions_gradle$2$3.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/Buildlogic_java_conventions_gradle$2$4.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/Buildlogic_java_conventions_gradle$2$5.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/Buildlogic_java_conventions_gradle$2.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/Buildlogic_java_conventions_gradle$3.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/Buildlogic_java_conventions_gradle$4$1.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/Buildlogic_java_conventions_gradle$4$inlined$sam$i$org_gradle_api_Action$0.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/Buildlogic_java_conventions_gradle$4.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/Buildlogic_java_conventions_gradle$5.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/Buildlogic_java_conventions_gradle$inlined$sam$i$org_gradle_api_Action$0.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/Buildlogic_java_conventions_gradle.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/META-INF/buildSrc.kotlin_module" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors15c80wxji7qdhvcsteytc58m6Kt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors16h8i8yvcoyu6adqodek0vazlKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors1crcmgpg53bs3tut9tzeov9zsKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors1je17tzadwn2i8n7cte4ejjucKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors1togd3myxkhlxm3hm03it918yKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors1y0x5zjrw062ti39iwig4ztsqKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors20m89wvqrtvolhrxzuq1utrarKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors21zhoq018jw7yza6oupdxasaqKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors2oadk7let745pm8ahqypkqzlkKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors2s1m7qhtdel2iy5x5gc2gv6f5Kt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors30fkku080rcvoj344u192bkfhKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors32yk85ycsljiuajc2oknj21ltKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors33qjl5yednlyp9tyvd6yykvt5Kt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors3dn3adhcpitetfd8lbt7c66zrKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors3lkj8uvuyc1fes1zjdaceqluwKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors45cftp2do14y8dm8cnj0yfjzmKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors46nwrg1rs44ofdqpi7vyy3pfcKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors49985hyy071qu5jjdlrughl86Kt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors4g3ee48g3j8ovb2sfufkb1xghKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors4ymn32ugs7fc7ez4f1y4vdr9nKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors5cx8iclyvbivcabq86i8mlot5Kt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors5dc5ntgnadimckiddcyeoreqKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors5fk7ujd52n5i4lgh9rsd3nr80Kt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors5r7od1ls1rcal14bwiw1aolf3Kt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors60wvtf0hlc6m7pu4zcziugmriKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors62xgvb04612dadp03ybl5vf12Kt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors6xcmy081jxud3rx4r453mbm9fKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors6xkpc5r938hqmmzagr5yicp7sKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors72pwwp7evk4t6494cyybv7kk7Kt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors7axcot3v1j7qpduaewb3aezf4Kt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors7pildy6t6pgcmk0gyewx4z8k1Kt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors8lcri9ibgd9oj8dt3t8z8nvfxKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors8uzlaa9ndo750hmo4da2vgu2vKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors8zd6u262ixrjkrpgx69mnl0hjKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors96b3ii45gitqpy1kb3tvcvtxvKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors9ofjxssccbksmuzem03z8pl6Kt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors9upc35ddn1m31thgty51w1nrjKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors9xbdx9ypglb5iceqwefq3l2uKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors9xim6xjdq0ry1lmc4wm5ei8ehKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsa47105wcmcbzx75lm7p2ciqqbKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsaofthkmarv0q41bodk71vcqi7Kt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsasa455whv8s4bk3c97fzgde0pKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsb13nju9doius8kxwhlptqirtrKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsblypoh2ruc9u3bx9djsfqsntgKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsbp4j8g31qsxo0ekjysvxih5jgKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsbtc8iwv8u9b0f38ikfmodj8nsKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorscchdiujech8u294vwhihsq7ghKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorscosmuqa5m4pz5v4rp16nnpsrnKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsdemns0nrfvv4tm1e985ahms6rKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsdhblu8rt4vbwuf4rib4cwj9luKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsdirr8g3rs0a9h4cvi2o23j1gyKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsdjndpeyafmkvjrxu9kp0ma1gnKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorse3bcayds3ygcyd5zodeo0v3shKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorse3nu4a2kmhhq7smy0tcmgt45gKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorse63o1t85fyc2j2y6mbe9ytoehKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorse6ex1mefr8h1znr2ivlnwcx4nKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorseessl0al0otcsbyqqruvoncpdKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsem8w6wnof1lrw3ubqr6eh9gcjKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsf2jx22njgpl8k21k7scc1t0rwKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsfbf92xd7bth9xw3u4y6q8qcdKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsw34mwj3hroscfmyxar5atwjzKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/AnnotationProcessorConfigurationAccessorsKt$sam$org_gradle_api_Action$0.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/AnnotationProcessorConfigurationAccessorsKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/ApiConfigurationAccessorsKt$sam$org_gradle_api_Action$0.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/ApiConfigurationAccessorsKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/ApiElementsConfigurationAccessorsKt$sam$org_gradle_api_Action$0.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/ApiElementsConfigurationAccessorsKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/ArchivesConfigurationAccessorsKt$sam$org_gradle_api_Action$0.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/ArchivesConfigurationAccessorsKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/CompileClasspathConfigurationAccessorsKt$sam$org_gradle_api_Action$0.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/CompileClasspathConfigurationAccessorsKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/CompileOnlyApiConfigurationAccessorsKt$sam$org_gradle_api_Action$0.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/CompileOnlyApiConfigurationAccessorsKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/CompileOnlyConfigurationAccessorsKt$sam$org_gradle_api_Action$0.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/CompileOnlyConfigurationAccessorsKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/DefaultConfigurationAccessorsKt$sam$org_gradle_api_Action$0.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/DefaultConfigurationAccessorsKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/ImplementationConfigurationAccessorsKt$sam$org_gradle_api_Action$0.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/ImplementationConfigurationAccessorsKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/MainSourceElementsConfigurationAccessorsKt$sam$org_gradle_api_Action$0.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/MainSourceElementsConfigurationAccessorsKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/RuntimeClasspathConfigurationAccessorsKt$sam$org_gradle_api_Action$0.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/RuntimeClasspathConfigurationAccessorsKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/RuntimeElementsConfigurationAccessorsKt$sam$org_gradle_api_Action$0.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/RuntimeElementsConfigurationAccessorsKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/RuntimeOnlyConfigurationAccessorsKt$sam$org_gradle_api_Action$0.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/RuntimeOnlyConfigurationAccessorsKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/TestAnnotationProcessorConfigurationAccessorsKt$sam$org_gradle_api_Action$0.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/TestAnnotationProcessorConfigurationAccessorsKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/TestCompileClasspathConfigurationAccessorsKt$sam$org_gradle_api_Action$0.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/TestCompileClasspathConfigurationAccessorsKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/TestCompileOnlyConfigurationAccessorsKt$sam$org_gradle_api_Action$0.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/TestCompileOnlyConfigurationAccessorsKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/TestImplementationConfigurationAccessorsKt$sam$org_gradle_api_Action$0.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/TestImplementationConfigurationAccessorsKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/TestResultsElementsForTestConfigurationAccessorsKt$sam$org_gradle_api_Action$0.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/TestResultsElementsForTestConfigurationAccessorsKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/TestRuntimeClasspathConfigurationAccessorsKt$sam$org_gradle_api_Action$0.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/TestRuntimeClasspathConfigurationAccessorsKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/TestRuntimeOnlyConfigurationAccessorsKt$sam$org_gradle_api_Action$0.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/classes/kotlin/main/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/TestRuntimeOnlyConfigurationAccessorsKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors15c80wxji7qdhvcsteytc58m6.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors16h8i8yvcoyu6adqodek0vazl.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors1crcmgpg53bs3tut9tzeov9zs.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors1je17tzadwn2i8n7cte4ejjuc.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors1togd3myxkhlxm3hm03it918y.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors1y0x5zjrw062ti39iwig4ztsq.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors20m89wvqrtvolhrxzuq1utrar.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors21zhoq018jw7yza6oupdxasaq.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors2oadk7let745pm8ahqypkqzlk.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors2s1m7qhtdel2iy5x5gc2gv6f5.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors30fkku080rcvoj344u192bkfh.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors32yk85ycsljiuajc2oknj21lt.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors33qjl5yednlyp9tyvd6yykvt5.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors3dn3adhcpitetfd8lbt7c66zr.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors3lkj8uvuyc1fes1zjdaceqluw.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors45cftp2do14y8dm8cnj0yfjzm.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors46nwrg1rs44ofdqpi7vyy3pfc.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors49985hyy071qu5jjdlrughl86.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors4g3ee48g3j8ovb2sfufkb1xgh.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors4ymn32ugs7fc7ez4f1y4vdr9n.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors5cx8iclyvbivcabq86i8mlot5.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors5dc5ntgnadimckiddcyeoreq.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors5fk7ujd52n5i4lgh9rsd3nr80.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors5r7od1ls1rcal14bwiw1aolf3.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors60wvtf0hlc6m7pu4zcziugmri.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors62xgvb04612dadp03ybl5vf12.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors6xcmy081jxud3rx4r453mbm9f.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors6xkpc5r938hqmmzagr5yicp7s.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors72pwwp7evk4t6494cyybv7kk7.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors7axcot3v1j7qpduaewb3aezf4.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors7pildy6t6pgcmk0gyewx4z8k1.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors8lcri9ibgd9oj8dt3t8z8nvfx.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors8uzlaa9ndo750hmo4da2vgu2v.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors8zd6u262ixrjkrpgx69mnl0hj.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors96b3ii45gitqpy1kb3tvcvtxv.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors9ofjxssccbksmuzem03z8pl6.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors9upc35ddn1m31thgty51w1nrj.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors9xbdx9ypglb5iceqwefq3l2u.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessors9xim6xjdq0ry1lmc4wm5ei8eh.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsa47105wcmcbzx75lm7p2ciqqb.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsaofthkmarv0q41bodk71vcqi7.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsasa455whv8s4bk3c97fzgde0p.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsb13nju9doius8kxwhlptqirtr.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsblypoh2ruc9u3bx9djsfqsntg.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsbp4j8g31qsxo0ekjysvxih5jg.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsbtc8iwv8u9b0f38ikfmodj8ns.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorscchdiujech8u294vwhihsq7gh.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorscosmuqa5m4pz5v4rp16nnpsrn.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsdemns0nrfvv4tm1e985ahms6r.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsdhblu8rt4vbwuf4rib4cwj9lu.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsdirr8g3rs0a9h4cvi2o23j1gy.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsdjndpeyafmkvjrxu9kp0ma1gn.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorse3bcayds3ygcyd5zodeo0v3sh.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorse3nu4a2kmhhq7smy0tcmgt45g.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorse63o1t85fyc2j2y6mbe9ytoeh.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorse6ex1mefr8h1znr2ivlnwcx4n.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorseessl0al0otcsbyqqruvoncpd.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsem8w6wnof1lrw3ubqr6eh9gcj.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsf2jx22njgpl8k21k7scc1t0rw.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsfbf92xd7bth9xw3u4y6q8qcd.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/Accessorsw34mwj3hroscfmyxar5atwjz.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/AnnotationProcessorConfigurationAccessors.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/ApiConfigurationAccessors.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/ApiElementsConfigurationAccessors.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/ArchivesConfigurationAccessors.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/CompileClasspathConfigurationAccessors.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/CompileOnlyApiConfigurationAccessors.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/CompileOnlyConfigurationAccessors.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/DefaultConfigurationAccessors.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/ImplementationConfigurationAccessors.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/MainSourceElementsConfigurationAccessors.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/RuntimeClasspathConfigurationAccessors.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/RuntimeElementsConfigurationAccessors.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/RuntimeOnlyConfigurationAccessors.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/TestAnnotationProcessorConfigurationAccessors.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/TestCompileClasspathConfigurationAccessors.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/TestCompileOnlyConfigurationAccessors.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/TestImplementationConfigurationAccessors.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/TestResultsElementsForTestConfigurationAccessors.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/TestRuntimeClasspathConfigurationAccessors.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-accessors/kotlin/gradle/kotlin/dsl/accessors/_f2a9aebd8c5798d32ebc7e5891a02610/TestRuntimeOnlyConfigurationAccessors.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/generated-sources/kotlin-dsl-plugins/kotlin/Buildlogic_javaConventionsPlugin.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin-dsl/plugins-blocks/compiled/Buildlogic_java_conventions_gradle$1.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin-dsl/plugins-blocks/compiled/Buildlogic_java_conventions_gradle.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin-dsl/plugins-blocks/extracted/buildlogic.java-conventions.gradle.kts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/inputs/source-to-output.tab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values.at" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.values.s" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/inputs/source-to-output.tab_i" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/inputs/source-to-output.tab_i.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.keystream" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.keystream.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.values.at" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab_i" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab_i.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.keystream" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.keystream.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab.values.at" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab_i" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/class-fq-name-to-source.tab_i.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.keystream" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.keystream.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.at" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.s" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab_i" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab_i.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.keystream" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.keystream.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.values.at" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab_i" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab_i.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.keystream" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.keystream.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values.at" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.values.s" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab_i" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab_i.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.keystream" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.keystream.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab.values.at" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.keystream" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.keystream.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.values.at" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab_i" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab_i.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.keystream" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.keystream.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.values.at" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab_i" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab_i.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/counters.tab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/file-to-id.tab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.keystream" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.keystream.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.values.at" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/file-to-id.tab_i" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/file-to-id.tab_i.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/id-to-file.tab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.values.at" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/lookups.tab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/lookups.tab.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.at" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/lookups.tab_i" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/lookups.tab_i.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/cacheable/last-build.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/classpath-snapshot/shrunk-classpath-snapshot.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/kotlin/compileKotlin/local-state/build-history.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/libs/buildSrc.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/pluginDescriptors/buildlogic.java-conventions.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/resources/main/META-INF/gradle-plugins/buildlogic.java-conventions.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/source-roots/buildSrc/source-roots.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/build/tmp/jar/MANIFEST.MF" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/buildSrc/src/main/kotlin/buildlogic.java-conventions.gradle.kts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/AsteroidBeltExpansion/.gradle/caches/paperweight/taskCache/mappedServerJar.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/AsteroidBeltExpansion/.gradle/caches/paperweight/taskCache/reobfMappings.tiny" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/DynmapExpansion/.gradle/caches/paperweight/taskCache/mappedServerJar.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/DynmapExpansion/.gradle/caches/paperweight/taskCache/reobfMappings.tiny" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/DynmapExpansion/build/resources/main/config.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/DynmapExpansion/build/resources/main/expansion.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/FactionsBlueExpansion/.gradle/caches/paperweight/taskCache/mappedServerJar.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/FactionsBlueExpansion/.gradle/caches/paperweight/taskCache/reobfMappings.tiny" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/FactionsBlueExpansion/build/resources/main/config.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/FactionsBlueExpansion/build/resources/main/expansion.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/FactionsExpansion/.gradle/caches/paperweight/taskCache/mappedServerJar.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/FactionsExpansion/.gradle/caches/paperweight/taskCache/reobfMappings.tiny" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/FactionsExpansion/build/resources/main/config.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/FactionsExpansion/build/resources/main/expansion.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/FactionsUUIDExpansion/.gradle/caches/paperweight/taskCache/mappedServerJar.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/FactionsUUIDExpansion/.gradle/caches/paperweight/taskCache/reobfMappings.tiny" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/FactionsUUIDExpansion/build/resources/main/config.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/FactionsUUIDExpansion/build/resources/main/expansion.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/GriefPreventionExpansion/.gradle/caches/paperweight/taskCache/mappedServerJar.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/GriefPreventionExpansion/.gradle/caches/paperweight/taskCache/reobfMappings.tiny" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/GriefPreventionExpansion/build/resources/main/config.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/GriefPreventionExpansion/build/resources/main/expansion.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/.gradle/caches/paperweight/taskCache/mappedServerJar.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/.gradle/caches/paperweight/taskCache/reobfMappings.tiny" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/build/resources/main/beaconstructure.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/build/resources/main/config.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/build/resources/main/expansion.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/build/resources/main/gravitywells/ExampleWell1.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/build/resources/main/gravitywells/ExampleWell2.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/build/resources/main/hyperdrives/ExampleDrive1.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/build/resources/main/hyperdrives/ExampleDrive2.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/command/NavigationComputerCommand.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/resources/navigationcomputers/ExampleComputer1.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/resources/navigationcomputers/ExampleComputer2.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/LandsExpansion/.gradle/caches/paperweight/taskCache/mappedServerJar.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/LandsExpansion/.gradle/caches/paperweight/taskCache/reobfMappings.tiny" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/LandsExpansion/build/resources/main/config.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/LandsExpansion/build/resources/main/expansion.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/RedProtectExpansion/.gradle/caches/paperweight/taskCache/mappedServerJar.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/RedProtectExpansion/.gradle/caches/paperweight/taskCache/reobfMappings.tiny" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/RedProtectExpansion/build/resources/main/config.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/RedProtectExpansion/build/resources/main/expansion.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/TownyExpansion/.gradle/caches/paperweight/taskCache/mappedServerJar.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/TownyExpansion/.gradle/caches/paperweight/taskCache/reobfMappings.tiny" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/TownyExpansion/build/resources/main/config.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/TownyExpansion/build/resources/main/expansion.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/WorldBorderExpansion/.gradle/caches/paperweight/taskCache/mappedServerJar.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/WorldBorderExpansion/.gradle/caches/paperweight/taskCache/reobfMappings.tiny" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/WorldBorderExpansion/build/resources/main/expansion.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/WorldGuardExpansion/.gradle/caches/paperweight/taskCache/mappedServerJar.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/WorldGuardExpansion/.gradle/caches/paperweight/taskCache/reobfMappings.tiny" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expansions/WorldGuardExpansion/build/resources/main/expansion.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradle/libs.versions.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradlew" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradlew.bat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/libs/RedProtect-8.1.2-SNAPSHOT-b444-Spigot.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/libs/WorldBorder.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/plugin/.gradle/caches/paperweight/taskCache/mappedServerJar.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/plugin/.gradle/caches/paperweight/taskCache/reobfMappings.tiny" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/plugin/build/resources/main/config.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/plugin/build/resources/main/plugin.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/settings.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/Settings.kt" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/Settings.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/Expansion.kt" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/Expansion.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/ExpansionManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/ExpansionManager.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/selection/Structure.kt" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/selection/Structure.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/objects/MSBlock.kt" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/objects/MSBlock.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/objects/Planet.kt" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/objects/Planet.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/utils/BlockUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/utils/BlockUtils.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/utils/InventoryUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/utils/InventoryUtils.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/utils/MSUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/utils/MSUtils.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/utils/MovecraftHandler.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/utils/Paginator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/utils/Paginator.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/utils/image/RGBBlockColor.kt" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/utils/image/RGBBlockColor.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/DynmapExpansion/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/DynmapExpansion/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/FactionsBlueExpansion/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/FactionsBlueExpansion/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/FactionsExpansion/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/FactionsExpansion/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/FactionsExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/factions/FactionsExpansion.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/FactionsExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/factions/FactionsExpansion.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/FactionsUUIDExpansion/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/FactionsUUIDExpansion/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/FactionsUUIDExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/factionsuuid/FactionsUUIDExpansion.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/FactionsUUIDExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/factionsuuid/FactionsUUIDExpansion.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/GriefPreventionExpansion/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/GriefPreventionExpansion/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/GriefPreventionExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/griefprevention/GriefPreventionExpansion.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/GriefPreventionExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/griefprevention/GriefPreventionExpansion.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/HyperspaceExpansion.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/HyperspaceExpansion.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/HyperspaceProcessor.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/command/GravityWellCommand.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/command/GravityWellCommand.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/command/HyperdriveCommand.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/command/HyperdriveCommand.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/command/HyperspaceCommand.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/command/HyperspaceCommand.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/command/Movecraft7JumpCommand.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/command/JumpCommand.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/managers/GravityWellManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/managers/GravityWellManager.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/managers/HyperdriveManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/managers/HyperdriveManager.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/managers/HyperspaceManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/managers/HyperspaceManager.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/managers/Movecraft7GravityWellProcessor.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/managers/NavigationComputerManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/managers/NavigationComputerManager.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/objects/HyperspaceTravelEntry.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/objects/HyperspaceTravelEntry.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/objects/MovecraftProcessor.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/objects/NavigationComputer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/objects/NavigationComputer.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/validators/HyperdriveValidator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/validators/HyperdriveValidator.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/resources/1_11/beaconstructure.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/resources/1_12/beaconstructure.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/resources/1_12/gravitywells/ExampleWell1.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/resources/1_12/gravitywells/ExampleWell2.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/resources/1_12/hyperdrives/ExampleDrive1.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/resources/1_12/hyperdrives/ExampleDrive2.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/resources/expansion.yml" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/resources/expansion.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/LandsExpansion/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/LandsExpansion/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/LandsExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/lands/LandsExpansion.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/LandsExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/lands/LandsExpansion.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/RedProtectExpansion/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/RedProtectExpansion/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/TownyExpansion/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/TownyExpansion/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/WorldBorderExpansion/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/WorldBorderExpansion/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/WorldGuardExpansion/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/WorldGuardExpansion/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/libs/Factions.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/libs/GriefPrevention.jar" beforeDir="false" afterPath="$PROJECT_DIR$/libs/GriefPrevention.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/libs/MassiveCore.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/libs/Movecraft-8.0.0-a.7.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/libs/Movecraft.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/src/main/kotlin/io/github/eirikh1996/movecraftspace/MovecraftSpace.kt" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/src/main/kotlin/io/github/eirikh1996/movecraftspace/MovecraftSpace.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/src/main/kotlin/io/github/eirikh1996/movecraftspace/PlanetMoveUpdateCommand.kt" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/src/main/kotlin/io/github/eirikh1996/movecraftspace/PlanetMoveUpdateCommand.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/src/main/kotlin/io/github/eirikh1996/movecraftspace/PlanetaryMotionManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/src/main/kotlin/io/github/eirikh1996/movecraftspace/PlanetaryMotionManager.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/src/main/kotlin/io/github/eirikh1996/movecraftspace/commands/PlanetCommand.kt" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/src/main/kotlin/io/github/eirikh1996/movecraftspace/commands/PlanetCommand.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/src/main/kotlin/io/github/eirikh1996/movecraftspace/commands/StarCommand.kt" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/src/main/kotlin/io/github/eirikh1996/movecraftspace/commands/StarCommand.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/src/main/kotlin/io/github/eirikh1996/movecraftspace/listener/MovecraftListener.kt" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/src/main/kotlin/io/github/eirikh1996/movecraftspace/listener/MovecraftListener.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/src/main/kotlin/io/github/eirikh1996/movecraftspace/listener/PlayerListener.kt" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/src/main/kotlin/io/github/eirikh1996/movecraftspace/listener/PlayerListener.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/src/main/resources/plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/src/main/resources/plugin.yml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+    <projectState path="$PROJECT_DIR$/expansions/DynmapExpansion">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <task path="$PROJECT_DIR$/expansions/DynmapExpansion">
+          <activation />
+        </task>
+        <task path="$PROJECT_DIR$/expansions/AsteroidBeltExpansion">
+          <activation />
+        </task>
+        <task path="$PROJECT_DIR$/plugin">
+          <activation />
+        </task>
+        <task path="$PROJECT_DIR$">
+          <activation />
+        </task>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="movecraft-space-parent" type="f1a62948:ProjectNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="movecraft-space-parent" type="f1a62948:ProjectNode" />
+                <item name="DynmapExpansion" type="2d1252cf:ModuleNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="movecraft-space-parent" type="f1a62948:ProjectNode" />
+                <item name="DynmapExpansion" type="2d1252cf:ModuleNode" />
+                <item name="Dependencies" type="6de06a37:ExternalSystemViewDefaultContributor$MyDependenciesNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="movecraft-space-parent" type="f1a62948:ProjectNode" />
+                <item name="DynmapExpansion" type="2d1252cf:ModuleNode" />
+                <item name="Dependencies" type="6de06a37:ExternalSystemViewDefaultContributor$MyDependenciesNode" />
+                <item name="compileClasspath" type="62daadca:ExternalSystemViewDefaultContributor$DependencyScopeExternalSystemNode" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+        <option value="Kotlin Class" />
+        <option value="Kotlin Object" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="PUSH_TAGS">
+      <GitPushTagMode>
+        <option name="argument" value="--tags" />
+        <option name="title" value="All" />
+      </GitPushTagMode>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;eirikh1996&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/eirikh1996/Movecraft-Space.git&quot;,
+    &quot;accountId&quot;: &quot;768c31a9-d23a-4591-9419-aaa28a83dc12&quot;
+  }
+}</component>
+  <component name="InvalidFacetManager">
+    <ignored-facets>
+      <facet id="movecraft-space-parent.AsteroidBeltExpansion.main/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.AsteroidBeltExpansion.test/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.DynmapExpansion.main/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.DynmapExpansion.test/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.FactionsBlueExpansion.main/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.FactionsBlueExpansion.test/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.FactionsExpansion.main/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.FactionsExpansion.test/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.FactionsUUIDExpansion.main/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.FactionsUUIDExpansion.test/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.GriefPreventionExpansion.main/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.GriefPreventionExpansion.test/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.HyperspaceExpansion.main/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.HyperspaceExpansion.test/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.LandsExpansion.main/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.LandsExpansion.test/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.Movecraft-Space.main/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.Movecraft-Space.test/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.RedProtectExpansion.main/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.RedProtectExpansion.test/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.TownyExpansion.main/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.TownyExpansion.test/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.WorldBorderExpansion.main/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.WorldBorderExpansion.test/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.WorldGuardExpansion.main/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.WorldGuardExpansion.test/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.main/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.movecraft-space-api.main/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.movecraft-space-api.test/invalid/Minecraft" />
+      <facet id="movecraft-space-parent.test/invalid/Minecraft" />
+    </ignored-facets>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="2ejhSCOsNVRTvYpV1UyQomj9Og3" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Gradle.Load Gradle Dependencies.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "master",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/eirik/IdeaProjects/Movecraft-Space/expansions/HyperspaceExpansion/src/main/resources/navigationcomputers",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.66206896",
+    "settings.editor.selected.configurable": "reference.projectsettings.compiler.javacompiler"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\eirik\IdeaProjects\Movecraft-Space\expansions\HyperspaceExpansion\src\main\resources\navigationcomputers" />
+      <recent name="C:\Users\eirik\IdeaProjects\Movecraft-Space\libs" />
+      <recent name="C:\Users\eirik\IdeaProjects\Movecraft-Space\expansions\WorldGuardExpansion" />
+      <recent name="C:\Users\eirik\IdeaProjects\Movecraft-Space\expansions\AsteroidBeltExpansion" />
+      <recent name="C:\Users\eirik\IdeaProjects\Movecraft-Space\expansions\DynmapExpansion" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\eirik\IdeaProjects\Movecraft-Space\libs" />
+      <recent name="C:\Users\eirik\IdeaProjects\Movecraft-Space\expansions" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="movecraft-space-parent.WorldGuardExpansion.main" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="movecraft-space-parent.WorldGuardExpansion.main" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ca8f34bc-0893-43fe-bf4f-31ec2bcfe175" name="Changes" comment="" />
+      <created>1712423892286</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1712423892286</updated>
+    </task>
+    <task id="LOCAL−00001" summary="Migrate to Gradle, remove Movecraft 7 support">
+      <option name="closed" value="true" />
+      <created>1748041246263</created>
+      <option name="number" value="LOCAL−00001" />
+      <option name="presentableId" value="LOCAL−00001" />
+      <updated>1748041246263</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Migrate to Gradle, remove Movecraft 7 support" />
+    <option name="LAST_COMMIT_MESSAGE" value="Migrate to Gradle, remove Movecraft 7 support" />
+  </component>
+</project>

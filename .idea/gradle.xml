@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <compositeConfiguration>
+          <compositeBuild compositeDefinitionSource="SCRIPT">
+            <builds>
+              <build path="$PROJECT_DIR$/buildSrc" name="buildSrc">
+                <projects>
+                  <project path="$PROJECT_DIR$/buildSrc" />
+                </projects>
+              </build>
+            </builds>
+          </compositeBuild>
+        </compositeConfiguration>
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../../../Gradle/gradle-8.14.1" />
+        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/api" />
+            <option value="$PROJECT_DIR$/buildSrc" />
+            <option value="$PROJECT_DIR$/expansions/AsteroidBeltExpansion" />
+            <option value="$PROJECT_DIR$/expansions/DynmapExpansion" />
+            <option value="$PROJECT_DIR$/expansions/FactionsBlueExpansion" />
+            <option value="$PROJECT_DIR$/expansions/FactionsExpansion" />
+            <option value="$PROJECT_DIR$/expansions/FactionsUUIDExpansion" />
+            <option value="$PROJECT_DIR$/expansions/GriefPreventionExpansion" />
+            <option value="$PROJECT_DIR$/expansions/HyperspaceExpansion" />
+            <option value="$PROJECT_DIR$/expansions/LandsExpansion" />
+            <option value="$PROJECT_DIR$/expansions/RedProtectExpansion" />
+            <option value="$PROJECT_DIR$/expansions/TownyExpansion" />
+            <option value="$PROJECT_DIR$/expansions/WorldBorderExpansion" />
+            <option value="$PROJECT_DIR$/expansions/WorldGuardExpansion" />
+            <option value="$PROJECT_DIR$/plugin" />
+          </set>
+        </option>
+        <option name="resolveExternalAnnotations" value="true" />
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

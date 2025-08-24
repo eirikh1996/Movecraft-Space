@@ -1,19 +1,23 @@
 plugins {
     id("buildlogic.java-conventions")
+    id("com.gradleup.shadow")
     kotlin("jvm")
-    id("io.papermc.paperweight.userdev")
-    id("io.github.0ffz.github-packages") version "1.2.1"
+    //id("io.github.0ffz.github-packages") version "1.2.1"
 }
 
 dependencies {
     compileOnly(project(":movecraft-space-api"))
     compileOnly(kotlin("stdlib-jdk8"))
-    paperweight.paperDevBundle("1.21.5-R0.1-SNAPSHOT")
-    compileOnly("net.countercraft:movecraft:+")
 }
 repositories {
     mavenCentral()
-    maven { githubPackage("apdevteam/movecraft")(this) }
+}
+
+tasks.shadowJar {
+    archiveBaseName.set("HyperspaceExpansion")
+    archiveClassifier.set("")
+    archiveVersion.set("")
+    destinationDirectory.set(file("/../../plugin/build/libs/expansions"))
 }
 
 java {

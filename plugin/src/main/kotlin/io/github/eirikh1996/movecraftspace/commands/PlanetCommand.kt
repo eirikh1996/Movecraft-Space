@@ -14,6 +14,7 @@ import io.github.eirikh1996.movecraftspace.utils.MSUtils.WARNING
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.setBlock
 import io.github.eirikh1996.movecraftspace.utils.Paginator
 import io.github.eirikh1996.movecraftspace.utils.image.RGBBlockColor
+import net.kyori.adventure.text.Component
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.HoverEvent
@@ -82,6 +83,10 @@ object PlanetCommand : TabExecutor {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + args[2] + " is not a number!")
                 return true
             }
+            if (radius < 50) {
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "Minimum planet radius must be 50")
+                return true
+            }
             val destination = Bukkit.getWorld(args[1])
             if (destination == null) {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "World " + args[1] + " does not exist!")
@@ -101,7 +106,6 @@ object PlanetCommand : TabExecutor {
             var exitHeight =  destination.maxHeight - 5
             var orbitTime = 10
             var surface : Material? = Material.STONE
-            var data = 0.toByte()
             var isMoon = ""
             val planetProperties = ArrayList<String>()
             for (arg in args.drop(2)) {
@@ -117,13 +121,7 @@ object PlanetCommand : TabExecutor {
                     if (arg.startsWith("surfacematerial:", true)) {
                         planetProperties.add(arg)
                         val str = arg.replace("surfacematerial:", "", true)
-                        if (str.contains(":")) {
-                            val pts = str.split(":")
-                            surface = Material.getMaterial(pts[0].uppercase())
-                            data = pts[1].toByte()
-                        } else {
-                            surface = Material.getMaterial(str.uppercase())
-                        }
+                        surface = Material.getMaterial(str.uppercase())
                     }
                     if (arg.startsWith("isMoon:", true)) {
                         isMoon = arg.replace("isMoon:", "", true)
@@ -154,12 +152,9 @@ object PlanetCommand : TabExecutor {
             }
             val space = pLoc.world!!
             var height = space.maxHeight.toDouble()
-            if (Settings.IsV1_17) {
-                height -= space.minHeight.toDouble()
-            }
+            height -= space.minHeight.toDouble()
             height /= 2.0
-            if (Settings.IsV1_17)
-                height += space.minHeight.toDouble()
+            height += space.minHeight.toDouble()
             height += .5
             pLoc.y = height
             val planet = Planet(ImmutableVector.fromLocation(pLoc), orbitCenter, radius, space, destination, orbitTime, exitHeight)
@@ -224,8 +219,6 @@ object PlanetCommand : TabExecutor {
                         val loc = pop.toLocation(planet.space)
                         val b = loc.block
                         b.type = surface!!
-                        if (Settings.IsLegacy)
-                            Block::class.java.getDeclaredMethod("setData", Byte::class.java).invoke(b, data)
                     }
                 }
             }.runTaskTimer(MovecraftSpace.instance,0,1)
@@ -369,7 +362,7 @@ object PlanetCommand : TabExecutor {
                 } else {
                     ""
                 }
-                val component = TextComponent(pl.name + ": §cLocation:§r " + pl.center + ", §cSystem:§r " + systemName + ", §cOrbit time:§r " + pl.orbitTime + "§cSpace world:§r " + pl.space.name)
+                val component = Component.text(pl.name + ": §cLocation:§r " + pl.center + ", §cSystem:§r " + systemName + ", §cOrbit time:§r " + pl.orbitTime + "§cSpace world:§r " + pl.space.name)
                 paginator.addLine(component)
             }
             val pageNo = if (args.size > 1) {
@@ -387,7 +380,7 @@ object PlanetCommand : TabExecutor {
                 if (l == null) {
                     continue
                 }
-                sender.spigot().sendMessage(ChatMessageType.CHAT, l)
+                sender.sendMessage(l)
             }
         } else if (args[0].equals("regensphere", true)) {
             if (!sender.hasPermission("movecraftspace.command.planet.regensphere")) {
@@ -408,13 +401,7 @@ object PlanetCommand : TabExecutor {
             var data = 0.toByte()
             if (args.size >= 3) {
                 try {
-                    if (args[2].contains(":")) {
-                        val pts = args[2].split(":")
-                        surface = Material.getMaterial(pts[0].toUpperCase())
-                        data = pts[1].toByte()
-                    } else {
-                        surface = Material.getMaterial(args[2].toUpperCase())
-                    }
+                    surface = Material.getMaterial(args[2].uppercase(Locale.getDefault()))
                 } catch (e: NumberFormatException) {
                     sender.sendMessage(COMMAND_PREFIX + ERROR + "Invalid argument: " + args[2])
                     return true
@@ -463,7 +450,7 @@ object PlanetCommand : TabExecutor {
                         for (i in 1..min(newSphere.size, 25000)) {
                             val pop = newSphere.pop()
                             val loc = pop.toLocation(planet.space)
-                            setBlock(loc, surface, if (Settings.IsLegacy) data else Bukkit.createBlockData(surface))
+                            setBlock(loc, Bukkit.createBlockData(surface))
                         }
                     } else {
                         cancel()
