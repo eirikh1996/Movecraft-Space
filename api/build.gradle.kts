@@ -13,6 +13,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 dependencies {
     compileOnly("org.jetbrains.kotlin:kotlin-stdlib:1.6.0")
     compileOnly("org.jetbrains.kotlin:kotlin-test-junit:1.6.0")
+    implementation("net.kyori:adventure-text-serializer-plain:4.24.0")
     api(libs.io.papermc.paper.paper.api)
     api("net.countercraft:movecraft:+")
 }

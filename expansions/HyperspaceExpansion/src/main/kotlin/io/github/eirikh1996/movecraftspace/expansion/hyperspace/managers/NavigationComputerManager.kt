@@ -5,12 +5,17 @@ import io.github.eirikh1996.movecraftspace.expansion.Expansion
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionManager
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects.NavigationComputer
 import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
+import io.github.eirikh1996.movecraftspace.objects.StarCollection
 import io.github.eirikh1996.movecraftspace.utils.BlockUtils
 import io.github.eirikh1996.movecraftspace.utils.InventoryUtils.createItem
 import io.github.eirikh1996.movecraftspace.utils.MSUtils
 import net.countercraft.movecraft.craft.Craft
 import net.countercraft.movecraft.craft.PilotedCraft
 import net.countercraft.movecraft.craft.PlayerCraft
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -21,8 +26,9 @@ import org.bukkit.block.data.type.WallSign
 import org.bukkit.block.sign.Side
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.block.Action
 import org.bukkit.event.block.SignChangeEvent
-import org.bukkit.event.inventory.InventoryType
+import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
@@ -31,90 +37,175 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
+import kotlin.math.ceil
+import kotlin.math.max
+import kotlin.math.min
 
 object NavigationComputerManager : Iterable<NavigationComputer>, Listener {
 
     val navigationComputers = HashMap<String, NavigationComputer>()
-    private val navigationComputerInterface = Bukkit.createInventory(null, InventoryType.CHEST, "Navigation computer")
+    private val navigationComputerInterface = Bukkit.createInventory(null, 9, Component.text("Navigation computer"))
     private val beaconLocations = ArrayList<Inventory>()
-    private val solarSystems = Bukkit.createInventory(null, InventoryType.CHEST, "Solar systems")
+    private val solarSystems = ArrayList<Inventory>()//Bukkit.createInventory(null, InventoryType.CHEST, Component.text("Solar systems"))
+
+    private val FIRST_LINE = Component.text("Nav computer", NamedTextColor.AQUA)
+    private val BEACON_LOCATIONS_COMPONENT = Component.text("Beacon locations")
+    private val SOLAR_SYSTEMS_COMPONENT = Component.text("Solar systems")
+    private val PREVIOUS_PAGE = Component.text("Previous page")
+    private val NEXT_PAGE = Component.text("Next page")
+    private val MAIN_MENU = Component.text("Main menu")
 
     init {
         //Navigation computer interface
         val nciContents = navigationComputerInterface.contents
-        nciContents[0] = createItem(Material.REDSTONE_TORCH, "Beacon locations")
-        nciContents[1] = createItem(Material.GLOWSTONE, "Solar systems")
-
+        nciContents[0] = createItem(Material.REDSTONE_TORCH, BEACON_LOCATIONS_COMPONENT)
+        nciContents[1] = createItem(Material.GLOWSTONE, SOLAR_SYSTEMS_COMPONENT)
+        navigationComputerInterface.contents = nciContents
         //Beacon location interface
 
         val blItems = ArrayList<ItemStack>()
         for (beacon in HyperspaceManager.beaconLocations) {
             blItems.add(createItem(
                 Material.REDSTONE_TORCH,
-                beacon.originName + " - " + beacon.destinationName,
-                "Space world: " + beacon.origin.world.name,
-                "Location: x" + beacon.origin.blockX + ", z" + beacon.origin.blockZ)
+                Component.text(beacon.originName + " - " + beacon.destinationName),
+                Component.text("Space world: " + beacon.origin.world.name),
+                Component.text("Location: x" + beacon.origin.blockX + ", z" + beacon.origin.blockZ))
             )
             blItems.add(createItem(
                 Material.REDSTONE_TORCH,
-                beacon.destinationName + " - " + beacon.originName,
-                "Space world: " + beacon.destination.world.name,
-                "Location: x" + beacon.destination.blockX + ", z" + beacon.destination.blockZ)
+                Component.text(beacon.destinationName + " - " + beacon.originName),
+                Component.text("Space world: " + beacon.destination.world.name),
+                Component.text("Location: x" + beacon.destination.blockX + ", z" + beacon.destination.blockZ))
             )
         }
+        blItems.sortedBy { item -> item.itemMeta.customName().toString() }
         var max = blItems.size
-        var count = 1
-        var totalCount = 1
-        var totalPages = Math.ceil(blItems.size / 45.0).toInt()
-        var page = 1
-        var inv = Bukkit.createInventory(null, InventoryType.CHEST, "Beacon locations")
-        for (item in blItems) {
-            inv.contents[count - 1] = item
-            if (count == 45 || totalCount >= max) {
-                count = 1
-                for (i in 45..53) {
-                    when (i) {
-                        46 -> { //previous
-                            inv.contents[i] = createItem(
-                                if (page == 1 || totalPages == 1)
-                                    Material.RED_STAINED_GLASS_PANE
-                                else
-                                    Material.GREEN_STAINED_GLASS_PANE,
-                                "Previous page",
-                            )
-                        }
-                        52 -> { //next
-                            inv.contents[i] = createItem(
-                                if (page == 1 && totalPages == 1 || page == totalPages)
-                                    Material.RED_STAINED_GLASS_PANE
-                                else
-                                    Material.GREEN_STAINED_GLASS_PANE,
-                                "Next page",
-                            )
-                        }
-                        else -> {
-                            inv.contents[i] = ItemStack(Material.BLACK_STAINED_GLASS_PANE)
-                        }
+        var blItemsList = ArrayList<List<ItemStack>>()
+        var pageItems = ArrayList<ItemStack>()
+        blItems.forEach { item ->
+            pageItems.add(item)
+            if (pageItems.size == min(max, 45)) {
+                blItemsList.add(pageItems)
+                max -= 45
+                pageItems = ArrayList()
+            }
+        }
+
+        var totalPages = max(ceil(blItems.size / 45.0).toInt(), 1)
+        for (p in 1..totalPages) {
+            val inv = Bukkit.createInventory(null, 54, Component.text("Beacon locations, page $p/$totalPages"))
+            val contents = inv.contents
+            if (blItemsList.isNotEmpty()) {
+                val items = blItemsList[p - 1]
+                for (i in items.indices) {
+                    contents[i] = items[i]
+                }
+            }
+            for (i in 45..53) {
+                when (i) {
+                    46 -> { //previous
+                        contents[i] = createItem(
+                            if (p == 1)
+                                Material.RED_STAINED_GLASS_PANE
+                            else
+                                Material.GREEN_STAINED_GLASS_PANE,
+                            PREVIOUS_PAGE,
+                        )
+                    }
+                    49 -> { //main menu
+                        contents[i] = createItem(
+                            Material.BLUE_STAINED_GLASS_PANE,
+                            MAIN_MENU
+                        )
+                    }
+                    52 -> { //next
+                        contents[i] = createItem(
+                            if (p == 1 && totalPages == 1 || p == totalPages)
+                                Material.RED_STAINED_GLASS_PANE
+                            else
+                                Material.GREEN_STAINED_GLASS_PANE,
+                            NEXT_PAGE,
+                        )
+                    }
+                    else -> {
+                        contents[i] = ItemStack(Material.BLACK_STAINED_GLASS_PANE)
                     }
                 }
-                beaconLocations.add(inv)
-                if (totalCount >= max) {
-                    break
-                }
-                page++
-                continue
             }
-            count++
-
+            inv.contents = contents
+            beaconLocations.add(inv)
         }
 
         //Solar system
-        max = blItems.size
-        count = 1
-        totalCount = 1
-        totalPages = Math.ceil(blItems.size / 45.0).toInt()
-        page = 1
-        inv = Bukkit.createInventory(null, InventoryType.CHEST, "Beacon locations")
+        val ssItems = ArrayList<ItemStack>()
+        for (star in StarCollection) {
+            ssItems.add(
+                createItem(
+                    Material.GLOWSTONE,
+                    Component.text(star.name),
+                    Component.text("Space world: ${star.space.name}"),
+                    Component.text("x: ${star.loc.x}"),
+                    Component.text("y: ${star.loc.y}"),
+                    Component.text("z: ${star.loc.z}")
+                )
+            )
+        }
+        val ssItemsList = ArrayList<List<ItemStack>>()
+        pageItems = ArrayList<ItemStack>()
+        ssItems.sortedBy { s -> s.itemMeta.customName()?.let { PlainTextComponentSerializer.plainText().serialize(it) } }
+        max = ssItems.size
+        ssItems.forEach { s ->
+            pageItems.add(s)
+            if (pageItems.size == min(max, 45)) {
+                ssItemsList.add(pageItems)
+                pageItems = ArrayList()
+                max -= 45
+            }
+        }
+        totalPages = max(ceil(ssItems.size / 45.0).toInt(), 1)
+        for (p in 1..totalPages) {
+            val inv = Bukkit.createInventory(null, 54, Component.text("Solar systems, page $p/$totalPages"))
+            val contents = inv.contents
+            if (ssItemsList.isNotEmpty()) {
+                val items = ssItemsList[p - 1]
+                for (i in items.indices) {
+                    contents[i] = items[i]
+                }
+            }
+            for (i in 45..53) {
+                when (i) {
+                    46 -> { //previous
+                        contents[i] = createItem(
+                            if (p == 1)
+                                Material.RED_STAINED_GLASS_PANE
+                            else
+                                Material.GREEN_STAINED_GLASS_PANE,
+                            PREVIOUS_PAGE,
+                        )
+                    }
+                    49 -> { //main menu
+                        contents[i] = createItem(
+                            Material.BLUE_STAINED_GLASS_PANE,
+                            MAIN_MENU
+                        )
+                    }
+                    52 -> { //next
+                        contents[i] = createItem(
+                            if (p == 1 && totalPages == 1 || p == totalPages)
+                                Material.RED_STAINED_GLASS_PANE
+                            else
+                                Material.GREEN_STAINED_GLASS_PANE,
+                            NEXT_PAGE,
+                        )
+                    }
+                    else -> {
+                        contents[i] = ItemStack(Material.BLACK_STAINED_GLASS_PANE)
+                    }
+                }
+            }
+            inv.contents = contents
+            solarSystems.add(inv)
+        }
     }
 
     private fun closestMultipleOf9(number : Int) : Int {
@@ -146,7 +237,6 @@ object NavigationComputerManager : Iterable<NavigationComputer>, Listener {
         if (sign !is Sign || wallSign !is WallSign)
             return
         val navigationComputer = getNavigationComputer(sign)
-        Bukkit.broadcastMessage(wallSign.facing.name)
         if (navigationComputer == null) {
             event.player.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "Sign is either not attached to a navigation computer structure or attached at the wrong location on the navigation computer structure")
             event.isCancelled = true
@@ -179,13 +269,61 @@ object NavigationComputerManager : Iterable<NavigationComputer>, Listener {
                 }
             }
         }
-
-        event.setLine(0, ChatColor.AQUA.toString() + "Nav computer")
-        event.setLine(1, ChatColor.RED.toString() + navigationComputer.name)
-
+        event.line(0, FIRST_LINE)
+        event.line(1, Component.text(navigationComputer.name, NamedTextColor.RED))
     }
 
+    @EventHandler
     fun onSignClick(event : PlayerInteractEvent) {
+        if (event.action != Action.RIGHT_CLICK_BLOCK)
+            return
+        val clicked = event.clickedBlock ?: return
+        if (clicked.blockData !is WallSign)
+            return
+        val sign = clicked.state as Sign
+        if (sign.getSide(Side.FRONT).line(0) != FIRST_LINE) {
+            return
+        }
+        event.isCancelled = true
+        val player = event.player
+        player.openInventory(navigationComputerInterface)
+    }
+
+    @EventHandler
+    fun onInventoryClick(event : InventoryClickEvent) {
+        val inv = event.inventory
+        if (inv != navigationComputerInterface && inv != solarSystems)
+            return
+        event.isCancelled = true
+        val clickedItem = event.currentItem ?: return
+        val meta = clickedItem.itemMeta
+        if (!meta.hasCustomName())
+            return
+        val view = event.view
+        val title = PlainTextComponentSerializer.plainText().serialize(view.title())
+
+        if (meta.customName() == BEACON_LOCATIONS_COMPONENT) {
+            event.whoClicked.openInventory(beaconLocations[0])
+        } else if (meta.customName() == SOLAR_SYSTEMS_COMPONENT) {
+            event.whoClicked.openInventory(solarSystems[0])
+        } else if (title.startsWith("Beacon locations, page ")) {//Beacon locations
+            val fraction = title.replace("Beacon locations, page ", "")
+            val parts = fraction.split("/")
+            val pageNo = parts[0].toInt()
+            val page =
+            if (clickedItem.type == Material.GREEN_STAINED_GLASS_PANE && clickedItem.itemMeta.customName() == PREVIOUS_PAGE) {
+                beaconLocations[pageNo - 2]
+            } else if (clickedItem.type == Material.GREEN_STAINED_GLASS_PANE && clickedItem.itemMeta.customName() == NEXT_PAGE) {
+                beaconLocations[pageNo]
+            } else if (clickedItem.type == Material.BLUE_STAINED_GLASS_PANE && clickedItem.itemMeta.customName() == MAIN_MENU) {
+                navigationComputerInterface
+            } else {
+                null
+            }
+            if (page == null)
+                return
+            event.whoClicked.openInventory(page)
+        }
 
     }
 
