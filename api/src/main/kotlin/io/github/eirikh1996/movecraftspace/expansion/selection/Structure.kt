@@ -93,8 +93,6 @@ abstract class Structure(val name : String) : ConfigurationSerializable {
         for (vec in blocks.keys) {
             val block = blocks[vec]!!
             val b = target.world!!.getBlockAt(target.clone().add(vec.toLocation(target.world!!)))
-            if (block.data is WallSign)
-                Bukkit.broadcastMessage(block.data.asString)
             b.blockData = block.data
         }
     }

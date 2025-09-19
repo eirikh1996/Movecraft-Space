@@ -6,6 +6,7 @@ import io.github.eirikh1996.movecraftspace.objects.Planet
 import net.countercraft.movecraft.Movecraft
 import net.countercraft.movecraft.MovecraftLocation
 import net.countercraft.movecraft.WorldHandler
+import net.countercraft.movecraft.util.hitboxes.HitBox
 import org.bukkit.*
 import org.bukkit.Bukkit.getConsoleSender
 import org.bukkit.block.BlockFace
@@ -32,7 +33,7 @@ object MSUtils {
         return intArrayOf(Random.nextInt(minX, maxX), Random.nextInt(minY, maxY), Random.nextInt(minZ, maxZ))
     }
 
-    fun hitboxObstructed(hitbox : Set<MovecraftLocation>, passthroughBlocks : Set<Material>, planet: Planet?, destWorld : World, diff : MovecraftLocation) : Boolean {
+    fun hitboxObstructed(hitbox : HitBox, passthroughBlocks : Set<Material>, planet: Planet?, destWorld : World, diff : MovecraftLocation) : Boolean {
         var obstructed = false;
         val wb = MSWorldBorder.fromBukkit(destWorld.worldBorder)
         for (ml in hitbox) {

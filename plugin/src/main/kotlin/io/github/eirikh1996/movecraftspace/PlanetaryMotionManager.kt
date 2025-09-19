@@ -33,7 +33,7 @@ object PlanetaryMotionManager : BukkitRunnable() {
         processQueue()
     }
 
-    fun processPlanetaryMotion() {
+    private fun processPlanetaryMotion() {
         if (System.currentTimeMillis() - lastMotionCheck < Settings.PlanetaryRotationCheckCooldown * 60000 )
             return
 
@@ -48,12 +48,12 @@ object PlanetaryMotionManager : BukkitRunnable() {
             val newCenter = pl.center.rotate(angle, pl.orbitCenter)
             val translationVector = newCenter.subtract(pl.center)
             updates.add(PlanetMoveUpdateCommand(pl, translationVector))
-            if (!pl.moons.isEmpty()) {
+            if (pl.moons.isNotEmpty()) {
                 val moonUpdates = HashSet<UpdateCommand>()
                 for (moon in pl.moons) {
                     moonUpdates.add(PlanetMoveUpdateCommand(moon, translationVector, true))
                 }
-                this.moonUpdates.put(pl, moonUpdates)
+                this.moonUpdates[pl] = moonUpdates
             }
 
         }

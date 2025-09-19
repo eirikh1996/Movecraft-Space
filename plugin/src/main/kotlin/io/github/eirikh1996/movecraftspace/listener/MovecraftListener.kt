@@ -110,7 +110,7 @@ object MovecraftListener : Listener {
                     continue
                 }
                 val obstructed = hitboxObstructed(
-                        craft.hitBox.asSet(),
+                        craft.hitBox,
                         passthroughBlocks,
                         planet,
                         destWorld,
@@ -145,7 +145,7 @@ object MovecraftListener : Listener {
                 MovecraftChunk.addSurroundingChunks(chunks, 3)
                 ChunkManager.syncLoadChunks(chunks)
                 val obstructed = hitboxObstructed(
-                        craft.hitBox.asSet(),
+                        craft.hitBox,
                         passthroughBlocks,
                         planet,
                         destWorld,

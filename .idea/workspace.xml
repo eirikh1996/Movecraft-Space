@@ -4,18 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ca8f34bc-0893-43fe-bf4f-31ec2bcfe175" name="Changes" comment="Added navigation computers, which now determines the max range for hyperspace jumps apart from beacons">
+    <list default="true" id="ca8f34bc-0893-43fe-bf4f-31ec2bcfe175" name="Changes" comment="Fixed bugs relating to nav computers and added GUI function to nav computers">
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/api/build.gradle.kts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/build/kotlin/compileKotlin/local-state/build-history.bin" beforeDir="false" afterPath="$PROJECT_DIR$/api/build/kotlin/compileKotlin/local-state/build-history.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/utils/InventoryUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/utils/InventoryUtils.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/selection/Structure.kt" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/selection/Structure.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/objects/Planet.kt" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/objects/Planet.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/utils/MSUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/utils/MSUtils.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/buildSrc/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/buildSrc/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/buildSrc/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/buildSrc/.gradle/file-system.probe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/managers/HyperspaceManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/managers/HyperspaceManager.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/managers/NavigationComputerManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/managers/NavigationComputerManager.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/plugin/.gradle/caches/paperweight/taskCache/mappedServerJar.jar" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/.gradle/caches/paperweight/taskCache/mappedServerJar.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugin/.gradle/caches/paperweight/taskCache/reobfMappings.tiny" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/.gradle/caches/paperweight/taskCache/reobfMappings.tiny" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/src/main/kotlin/io/github/eirikh1996/movecraftspace/PlanetaryMotionManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/src/main/kotlin/io/github/eirikh1996/movecraftspace/PlanetaryMotionManager.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/src/main/kotlin/io/github/eirikh1996/movecraftspace/listener/MovecraftListener.kt" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/src/main/kotlin/io/github/eirikh1996/movecraftspace/listener/MovecraftListener.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -243,12 +246,20 @@
       <option name="presentableId" value="LOCAL−00002" />
       <updated>1755996284207</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL−00003" summary="Fixed bugs relating to nav computers and added GUI function to nav computers">
+      <option name="closed" value="true" />
+      <created>1756910547311</created>
+      <option name="number" value="LOCAL−00003" />
+      <option name="presentableId" value="LOCAL−00003" />
+      <updated>1756910547311</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Migrate to Gradle, remove Movecraft 7 support" />
     <MESSAGE value="Added navigation computers, which now determines the max range for hyperspace jumps apart from beacons" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added navigation computers, which now determines the max range for hyperspace jumps apart from beacons" />
+    <MESSAGE value="Fixed bugs relating to nav computers and added GUI function to nav computers" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed bugs relating to nav computers and added GUI function to nav computers" />
   </component>
 </project>

@@ -292,7 +292,7 @@ object NavigationComputerManager : Iterable<NavigationComputer>, Listener {
     @EventHandler
     fun onInventoryClick(event : InventoryClickEvent) {
         val inv = event.inventory
-        if (inv != navigationComputerInterface && inv != solarSystems)
+        if (inv != navigationComputerInterface && !solarSystems.contains(inv) && !beaconLocations.contains(inv))
             return
         event.isCancelled = true
         val clickedItem = event.currentItem ?: return
@@ -320,6 +320,23 @@ object NavigationComputerManager : Iterable<NavigationComputer>, Listener {
             } else {
                 null
             }
+            if (page == null)
+                return
+            event.whoClicked.openInventory(page)
+        } else if (title.startsWith("Solar systems")) {
+            val fraction = title.replace("Solar systems, page ", "")
+            val parts = fraction.split("/")
+            val pageNo = parts[0].toInt()
+            val page =
+                if (clickedItem.type == Material.GREEN_STAINED_GLASS_PANE && clickedItem.itemMeta.customName() == PREVIOUS_PAGE) {
+                    solarSystems[pageNo - 2]
+                } else if (clickedItem.type == Material.GREEN_STAINED_GLASS_PANE && clickedItem.itemMeta.customName() == NEXT_PAGE) {
+                    solarSystems[pageNo]
+                } else if (clickedItem.type == Material.BLUE_STAINED_GLASS_PANE && clickedItem.itemMeta.customName() == MAIN_MENU) {
+                    navigationComputerInterface
+                } else {
+                    null
+                }
             if (page == null)
                 return
             event.whoClicked.openInventory(page)
@@ -369,9 +386,6 @@ object NavigationComputerManager : Iterable<NavigationComputer>, Listener {
                 val hdBlock = computer.blocks[vec]!!.rotate(BlockUtils.rotateBlockFace(angle, computer.blocks[vec]!!.facing))
                 val block = ImmutableVector.fromLocation(sign.location).add(vec.rotate(angle, ImmutableVector.ZERO).add(0,vec.y,0)).toLocation(sign.world).block
                 val similar = hdBlock.isSimilar(block)
-                for (player in sign.world.players) {
-                    player.sendBlockChange(block.location, Bukkit.createBlockData(Material.GLOWSTONE))
-                }
                 if (block.type.name.endsWith("WALL_SIGN"))
                     continue
                 if (!similar) {

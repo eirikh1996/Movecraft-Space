@@ -26,6 +26,8 @@ import net.countercraft.movecraft.util.hitboxes.BitmapHitBox
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.event.ClickEvent
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.block.Sign
@@ -202,7 +204,7 @@ object HyperspaceManager : BukkitRunnable(), Listener {
             else {
                 var index = -1
                 for (e in foundFuelContainer.inventory.all(ExpansionSettings.hypermatter)) {
-                    if (e.value.itemMeta!!.displayName != ExpansionSettings.hypermatterName)
+                    if (e.value.itemMeta!!.customName()?.let { PlainTextComponentSerializer.plainText().serialize(it) } != ExpansionSettings.hypermatterName)
                         continue
                     index = e.key
                 }
@@ -293,7 +295,7 @@ object HyperspaceManager : BukkitRunnable(), Listener {
                 while (hitboxObstructed) {
                     hitboxObstructed = Bukkit.getScheduler().callSyncMethod(plugin) {
                         MSUtils.hitboxObstructed(
-                            craft.hitBox.asSet(),
+                            craft.hitBox,
                             craft.type.getMaterialSetProperty(CraftType.PASSTHROUGH_BLOCKS),
                             null,
                             ExpansionSettings.hyperspaceWorld,
@@ -339,7 +341,7 @@ object HyperspaceManager : BukkitRunnable(), Listener {
             val testLoc = entry.origin.clone().add(entry.progress)
             for (i in 1..speed.toInt()) {
                 testLoc.add(unit.clone().normalize())
-                HyperspaceManager.targetLocations[entry.craft.hitBox.midPoint] = testLoc
+                targetLocations[entry.craft.hitBox.midPoint] = testLoc
                 val event = HyperspaceTravelEvent(entry.craft, testLoc)
                 Bukkit.getScheduler().callSyncMethod(plugin) {
                     Bukkit.getPluginManager().callEvent(event)
@@ -463,10 +465,10 @@ object HyperspaceManager : BukkitRunnable(), Listener {
         }
         if (foundLoc != null && !craftsWithinBeaconRange.contains(craft)) {
             val text = Component.text("Entered the range of $str hyperspace beacon ")
-                .append(Component.text().content("§2[Accept]")
+                .append(Component.text("[Accept]", NamedTextColor.DARK_GREEN)
                     .clickEvent(
-                        ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/hyperspace travel")
-                    ).build()
+                        ClickEvent.runCommand("/hyperspace travel")
+                    )
                 )
             craft.pilot.sendMessage(text)
             craftsWithinBeaconRange.add(craft)
@@ -480,20 +482,19 @@ object HyperspaceManager : BukkitRunnable(), Listener {
         if (hitBox.isEmpty)
             return loc
         val queue = LinkedList<Location>()
-        val minHeight = min(craft.type.getPerWorldProperty(CraftType.PER_WORLD_MIN_HEIGHT_LIMIT, loc.world) as Int, loc.world.minHeight) + (hitBox.yLength / 2)
-        val maxHeight = max(craft.type.getPerWorldProperty(CraftType.PER_WORLD_MAX_HEIGHT_LIMIT, loc.world) as Int, loc.world!!.maxHeight) - (hitBox.yLength / 2)
+        val minHeight = max(craft.type.getPerWorldProperty(CraftType.PER_WORLD_MIN_HEIGHT_LIMIT, loc.world) as Int, loc.world.minHeight) + (hitBox.yLength / 2)
+        val maxHeight = min(craft.type.getPerWorldProperty(CraftType.PER_WORLD_MAX_HEIGHT_LIMIT, loc.world) as Int, loc.world.maxHeight) - (hitBox.yLength / 2)
         var foundLoc = loc.clone()
         foundLoc.y = min(foundLoc.y, (foundLoc.world!!.maxHeight - 1 - craft.hitBox.yLength / 2).toDouble())
         foundLoc.y = max(foundLoc.y, (foundLoc.world!!.minHeight + 1 + craft.hitBox.yLength / 2).toDouble())
         val bound = ExpansionManager.worldBoundrary(loc.world!!)
         val extraLength = ((if (hitBox.xLength > hitBox.zLength) hitBox.xLength else hitBox.zLength) / 2) + 1
         foundLoc = bound.nearestLocWithin(foundLoc, extraLength * 2)
-
         var planet = PlanetCollection.getPlanetAt(foundLoc, ExpansionSettings.extraMassShadowRangeOfPlanets + extraLength, true)
         var star = StarCollection.getStarAt(foundLoc, ExpansionSettings.extraMassShadowRangeOfStars + extraLength)
         var beacon = getBeaconAt(foundLoc)
-        if (!foundLoc.block.type.name.endsWith("AIR") || planet != null || star != null || beacon != null) {
-            while (!foundLoc.block.type.name.endsWith("AIR") || planet != null || star != null || beacon != null) {
+        if (!foundLoc.block.type.isAir || planet != null || star != null || beacon != null) {
+            while (!foundLoc.block.type.isAir || planet != null || star != null || beacon != null) {
                 val randomCoords = MSUtils.randomCoords(
                     loc.blockX - 250, loc.blockX + 250,
                     minHeight, maxHeight,
@@ -506,7 +507,7 @@ object HyperspaceManager : BukkitRunnable(), Listener {
                 val displacement = MathUtils.bukkit2MovecraftLoc(foundLoc).subtract(craft.hitBox.midPoint)
                 if (craft.hitBox.any { ml ->
                         val targ = ml.add(displacement).toBukkit(foundLoc.world)
-                        !targ.block.type.name.endsWith("AIR") && !craft.type.getMaterialSetProperty(CraftType.PASSTHROUGH_BLOCKS).contains(targ.block.type) } )
+                        !targ.block.type.isAir && !craft.type.getMaterialSetProperty(CraftType.PASSTHROUGH_BLOCKS).contains(targ.block.type) } )
                     continue
             }
         }
@@ -514,9 +515,9 @@ object HyperspaceManager : BukkitRunnable(), Listener {
     }
 
     fun getBeaconAt(loc : Location) : HyperspaceBeacon? {
-        return HyperspaceManager.beaconLocations.firstOrNull {
-            beacon -> beacon.origin == loc ||
-                beacon.destination == loc }
+        return beaconLocations.firstOrNull {
+            beacon -> beacon.origin.distance(loc).toInt() <= beaconRange ||
+                beacon.destination.distance(loc).toInt() <= beaconRange }
     }
 
     fun addEntry(craft: Craft, entry: HyperspaceTravelEntry) {

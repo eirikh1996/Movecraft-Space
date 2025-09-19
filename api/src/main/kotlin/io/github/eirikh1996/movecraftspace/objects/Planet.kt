@@ -97,9 +97,10 @@ data class Planet(
         moving = true
         var type = center.toLocation(space).block.type
         var y = center.y
-        while (type == Material.AIR && y <= 255) {
+        val maxHeight = space.maxHeight
+        while (type == Material.AIR && y <= maxHeight) {
             y++
-            type = space.getBlockAt(center.x, min(y, 255), center.z).type
+            type = space.getBlockAt(center.x, min(y, maxHeight), center.z).type
         }
         val start = ImmutableVector(center.x, y, center.z)
         val queue = LinkedList<ImmutableVector>()
@@ -112,7 +113,7 @@ data class Planet(
             visited.add(node)
             for (shift in SHIFTS) {
                 val test = node.add(shift)
-                if (test.toLocation(space).block.type.name.endsWith("AIR"))
+                if (test.toLocation(space).block.type.isAir)
                     continue
                 queue.add(test)
             }
