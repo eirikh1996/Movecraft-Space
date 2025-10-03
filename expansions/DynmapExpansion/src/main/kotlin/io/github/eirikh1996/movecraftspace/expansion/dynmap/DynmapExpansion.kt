@@ -1,25 +1,31 @@
 package io.github.eirikh1996.movecraftspace.expansion.dynmap
 
+import io.github.eirikh1996.movecraftspace.event.planet.PlanetMoveEvent
 import io.github.eirikh1996.movecraftspace.expansion.Expansion
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionManager
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionState
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.HyperspaceExpansion
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.HyperspaceManager
+import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
 import io.github.eirikh1996.movecraftspace.objects.StarCollection
+import net.countercraft.movecraft.util.Pair
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
 import org.bukkit.scheduler.BukkitRunnable
 import org.dynmap.DynmapCommonAPI
 import org.dynmap.markers.CircleMarker
 import org.dynmap.markers.Marker
 
-class DynmapExpansion : Expansion() {
+class DynmapExpansion : Expansion(), Listener {
     val orbitMarkerByID = HashMap<String, CircleMarker>()
     val planetMarkerByID = HashMap<String, Marker>()
     val beaconMarkerByID = HashMap<String, Marker>()
     val starMarkerByID = HashMap<String, Marker>()
+    val previousPlanetLocations = HashMap<String, Pair<ImmutableVector, ImmutableVector>>()
 
     var hyperspaceExpansion: HyperspaceExpansion? = null
     override fun allowedArea(p: Player, loc: Location): Boolean {
@@ -37,6 +43,7 @@ class DynmapExpansion : Expansion() {
         if (hsExpansion is HyperspaceExpansion && hsExpansion.state == ExpansionState.ENABLED) {
             hyperspaceExpansion = hsExpansion
         }
+        Bukkit.getPluginManager().registerEvents(this, plugin)
 
         object : BukkitRunnable() {
             val planetMarkers =
@@ -140,6 +147,14 @@ class DynmapExpansion : Expansion() {
                     if (orbitMarker != null && !orbitMarkerByID.containsKey(orbitMarkerID)) {
                         orbitMarkerByID[orbitMarkerID] = orbitMarker
                     }
+                    if (previousPlanetLocations.containsKey(planet.name)) {
+                        val minmax = previousPlanetLocations[planet.name]
+                        if (minmax != null) {
+                            val min = minmax.left
+                            val max = minmax.right
+                            dynmap.triggerRenderOfVolume(planet.space.name, min.x, min.y, min.z, max.x, max.y, max.z)
+                        }
+                    }
                     dynmap.triggerRenderOfVolume(planet.space.name, planet.minX, planet.minY, planet.minZ, planet.maxX, planet.minY, planet.maxz)
                 }
                 for (star in StarCollection) {
@@ -174,6 +189,7 @@ class DynmapExpansion : Expansion() {
                     if (starMarker != null && !starMarkerByID.containsKey(starMarkerID)) {
                         starMarkerByID.put(starMarkerID, starMarker)
                     }
+                    dynmap.triggerRenderOfVolume(star.space.name, star.loc.x - star.radius, star.loc.y - star.radius, star.loc.z - star.radius, star.loc.x + star.radius, star.loc.y + star.radius, star.loc.z + star.radius)
                 }
                 for (planetMarker in planetMarkerByID.keys) {
                     val marker = planetMarkerByID[planetMarker]!!
@@ -284,5 +300,16 @@ class DynmapExpansion : Expansion() {
 
 
         }.runTaskTimerAsynchronously(plugin, 0, 200)
+    }
+
+    @EventHandler
+    fun onPlanetMove(event : PlanetMoveEvent) {
+        val oldLoc = event.planet.center
+        val radius = event.planet.radius
+        val minMaxPair = Pair(
+            ImmutableVector(oldLoc.x - radius, oldLoc.y - radius, oldLoc.z - radius),
+            ImmutableVector(oldLoc.x + radius, oldLoc.y + radius, oldLoc.z + radius)
+        )
+        previousPlanetLocations[event.planet.name] = minMaxPair
     }
 }

@@ -1,12 +1,21 @@
 package io.github.eirikh1996.movecraftspace.objects
 
+import io.github.eirikh1996.movecraftspace.event.planet.PlanetMoveEvent
+import net.countercraft.movecraft.Movecraft
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World
+import org.bukkit.block.data.BlockData
+import java.util.*
+import kotlin.collections.HashSet
+import kotlin.math.min
 
-data class Star constructor(val name : String, val space : World, val loc : ImmutableVector, val radius : Int) {
+class Star(val name : String, space : World, var loc : ImmutableVector, val radius : Int) {
 
+    var space : World = space
+        get() = field
+        private set(value) { field = value }
     fun radius() : Int {
         var radius = this.radius
         for (p in PlanetCollection.getPlanetsWithOrbitPoint(loc)) {
@@ -29,6 +38,7 @@ data class Star constructor(val name : String, val space : World, val loc : Immu
         }
         return radius
     }
+
 
     override fun equals(other: Any?): Boolean {
         if (other !is Star)

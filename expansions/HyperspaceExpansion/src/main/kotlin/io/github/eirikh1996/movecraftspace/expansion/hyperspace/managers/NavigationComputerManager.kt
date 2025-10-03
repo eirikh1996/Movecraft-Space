@@ -3,6 +3,7 @@ package io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers
 import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.expansion.Expansion
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionManager
+import io.github.eirikh1996.movecraftspace.expansion.hyperspace.HyperspaceExpansion
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects.NavigationComputer
 import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
 import io.github.eirikh1996.movecraftspace.objects.StarCollection
@@ -32,6 +33,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import org.bukkit.scheduler.BukkitRunnable
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
@@ -41,7 +43,7 @@ import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
 
-object NavigationComputerManager : Iterable<NavigationComputer>, Listener {
+object NavigationComputerManager : Iterable<NavigationComputer>, Listener, BukkitRunnable() {
 
     val navigationComputers = HashMap<String, NavigationComputer>()
     private val navigationComputerInterface = Bukkit.createInventory(null, 9, Component.text("Navigation computer"))
@@ -56,6 +58,21 @@ object NavigationComputerManager : Iterable<NavigationComputer>, Listener {
     private val MAIN_MENU = Component.text("Main menu")
 
     init {
+        updateGUIs()
+    }
+
+    private fun closestMultipleOf9(number : Int) : Int {
+        return when (number) {
+            in 0..9 -> 9 //1
+            in 10..18 -> 18 //2
+            in 19..27 -> 27 //3
+            in 28..36 -> 36 //4
+            in 37..45 -> 45 //5
+            else -> 54
+        }
+    }
+
+    fun updateGUIs() {
         //Navigation computer interface
         val nciContents = navigationComputerInterface.contents
         nciContents[0] = createItem(Material.REDSTONE_TORCH, BEACON_LOCATIONS_COMPONENT)
@@ -206,21 +223,6 @@ object NavigationComputerManager : Iterable<NavigationComputer>, Listener {
             inv.contents = contents
             solarSystems.add(inv)
         }
-    }
-
-    private fun closestMultipleOf9(number : Int) : Int {
-        return when (number) {
-            in 0..9 -> 9 //1
-            in 10..18 -> 18 //2
-            in 19..27 -> 27 //3
-            in 28..36 -> 36 //4
-            in 37..45 -> 45 //5
-            else -> 54
-        }
-    }
-
-    fun updateGUIs() {
-
 
 
 
@@ -431,5 +433,13 @@ object NavigationComputerManager : Iterable<NavigationComputer>, Listener {
             }
             ex.logMessage(Expansion.LogMessageType.INFO, "Loaded " + navigationComputers.size + " navigation computers")
         }
+    }
+
+    override fun run() {
+        object : BukkitRunnable() {
+            override fun run() {
+                updateGUIs()
+            }
+        }.runTask(HyperspaceExpansion.instance.plugin)
     }
 }

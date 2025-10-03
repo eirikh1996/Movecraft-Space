@@ -1,42 +1,30 @@
 package io.github.eirikh1996.movecraftspace.objects
 
-import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.event.planet.PlanetMoveEvent
-import io.github.eirikh1996.movecraftspace.utils.MSUtils.setBlock
 import net.countercraft.movecraft.Movecraft
-import net.countercraft.movecraft.MovecraftLocation
-import net.countercraft.movecraft.WorldHandler
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.block.data.BlockData
-import org.bukkit.util.Vector
-import java.lang.Exception
-import java.lang.reflect.Method
 import java.util.*
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.logging.Logger
 import kotlin.collections.HashSet
 import kotlin.math.min
 
-data class Planet(
+class Planet(
     var center: ImmutableVector,
     var orbitCenter : ImmutableVector,
     val radius : Int,
-    val space : World,
+    space : World,
     val destination : World,
     val orbitTime : Int,
     val exitHeight : Int
 ) {
-    var setBlockFast : Method? = null
-    init {
-        try {
-            setBlockFast = WorldHandler::class.java.getDeclaredMethod("setBlockFast", Location::class.java, Material::class.java, Any::class.java)
-        } catch (e : Exception) {
-
+    var space : World = space
+        get() = field
+        private set(value) {
+            field = value
         }
-    }
     var moving = false
     val name : String get() { return destination.name }
     val moons = HashSet<Planet>()
@@ -98,7 +86,7 @@ data class Planet(
         var type = center.toLocation(space).block.type
         var y = center.y
         val maxHeight = space.maxHeight
-        while (type == Material.AIR && y <= maxHeight) {
+        while (type.isAir && y <= maxHeight) {
             y++
             type = space.getBlockAt(center.x, min(y, maxHeight), center.z).type
         }
@@ -132,6 +120,7 @@ data class Planet(
             Movecraft.getInstance().worldHandler.setBlockFast(loc.toLocation(space), Bukkit.createBlockData(Material.AIR))
         }
         center = newCenter
+        space = newSpace
         if (moon)
             orbitCenter = orbitCenter.add(displacement)
         minX = center.x - radius

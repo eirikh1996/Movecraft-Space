@@ -173,14 +173,24 @@ abstract class Expansion {
         connection.useCaches = false
         return connection.getInputStream()
     }
+
+    /**
+     * Called when an expansion is loaded
+     */
     open fun load() {
 
     }
 
+    /**
+     * Called when an expansion is enabled
+     */
     open fun enable() {
 
     }
 
+    /**
+     * Called when an expansion is disabled
+     */
     open fun disable() {
 
     }

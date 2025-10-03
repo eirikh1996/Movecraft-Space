@@ -80,6 +80,7 @@ class HyperspaceExpansion : Expansion(), SelectionSupported {
         GravityWellManager.loadGravityWells()
         getPluginManager().registerEvents(GravityWellManager, plugin)
         NavigationComputerManager.loadNavigationComputers()
+        NavigationComputerManager.runTaskTimerAsynchronously(plugin, 2, 40)
         getPluginManager().registerEvents(NavigationComputerManager, plugin)
         getPluginManager().registerEvents(HyperspaceSign, plugin)
     }

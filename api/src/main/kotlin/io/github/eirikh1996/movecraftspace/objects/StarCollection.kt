@@ -90,7 +90,7 @@ object StarCollection : Iterable<Star> {
         pl.server.consoleSender.sendMessage(COMMAND_PREFIX + "Loaded " + stars.size + " stars")
     }
 
-    private fun saveFile() {
+    fun saveFile() {
         if (stars.isEmpty())
             return
         val file = File(pl.dataFolder, "stars.yml")
