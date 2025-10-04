@@ -2,6 +2,7 @@ package io.github.eirikh1996.movecraftspace.objects
 
 import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
+import net.countercraft.movecraft.MovecraftLocation
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.plugin.Plugin
@@ -28,7 +29,7 @@ object StarCollection : Iterable<Star> {
         var star : Star? = null
         var lastDistance = if (maxDistance <= -1) Double.MAX_VALUE else maxDistance.toDouble()
         for (s in StarCollection) {
-            val distance = s.loc.distance(ImmutableVector.fromLocation(loc))
+            val distance = s.loc.distance(MovecraftLocation(loc.blockX, loc.blockY, loc.blockZ))
             if (s.space == loc.world && distance <= lastDistance) {
                 star = s
                 lastDistance = distance
@@ -42,7 +43,7 @@ object StarCollection : Iterable<Star> {
         var star : Star? = null
         var lastDistance = if (maxDistance <= -1) Double.MAX_VALUE else maxDistance.toDouble()
         for (s in StarCollection) {
-            val distance = s.loc.distance(ImmutableVector.fromLocation(loc)) - s.radius()
+            val distance = s.loc.distance(MovecraftLocation(loc.blockX, loc.blockY, loc.blockZ)) - s.radius()
             if (s.space == loc.world && distance <= lastDistance) {
                 star = s
                 lastDistance = distance
@@ -82,7 +83,7 @@ object StarCollection : Iterable<Star> {
                 Star(
                     entry.key,
                     space,
-                    ImmutableVector(entryData[1] as Int , entryData[2] as Int, entryData[3] as Int),
+                    MovecraftLocation(entryData[1] as Int , entryData[2] as Int, entryData[3] as Int),
                     radius
                 )
             )
@@ -123,7 +124,7 @@ object StarCollection : Iterable<Star> {
 
     fun getStarAt(testLoc: Location, extraRadius : Int = 0) : Star? {
         for (star in this) {
-            if (star.space != testLoc.world || star.loc.distance(ImmutableVector.fromLocation(testLoc)) > star.radius + extraRadius + 2)
+            if (star.space != testLoc.world || star.loc.distance(MovecraftLocation(testLoc.blockX, testLoc.blockY, testLoc.blockZ)) > star.radius + extraRadius + 2)
                 continue
             return star
         }

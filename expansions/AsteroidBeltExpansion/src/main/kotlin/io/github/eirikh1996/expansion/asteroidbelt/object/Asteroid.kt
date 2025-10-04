@@ -4,6 +4,7 @@ import io.github.eirikh1996.expansion.asteroidbelt.AsteroidBeltExpansion
 import io.github.eirikh1996.movecraftspace.expansion.selection.Structure
 import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
 import io.github.eirikh1996.movecraftspace.objects.MSBlock
+import net.countercraft.movecraft.MovecraftLocation
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
 import java.util.*
@@ -17,7 +18,11 @@ class Asteroid(name : String) : Structure(name.lowercase()) {
         val blockList = ArrayList<Map<String, Any>>()
         blocks.forEach { (t, u) ->
             val blockLocs = HashMap<String, Any>()
-            blockLocs.putAll(t.serialize())
+            val locMap = HashMap<String, Any>()
+            locMap["x"] = t.x
+            locMap["y"] = t.y
+            locMap["z"] = t.z
+            blockLocs.putAll(locMap)
             blockLocs.putAll(u.serialize())
             blockList.add(blockLocs)
         }
@@ -38,9 +43,9 @@ class Asteroid(name : String) : Structure(name.lowercase()) {
         @JvmStatic fun deserialize(data : Map<String, Any>) : Asteroid {
             val blocks = data["blocks"] as List<Map<String, Any>>
             val name = data["name"] as String
-            val blockMap = HashMap<ImmutableVector, MSBlock>()
+            val blockMap = HashMap<MovecraftLocation, MSBlock>()
             for (block in blocks) {
-                blockMap[ImmutableVector.deserialize(block)] = MSBlock.deserialize(block)
+                blockMap[MovecraftLocation(block["x"] as Int, block["y"] as Int, block["z"] as Int)] = MSBlock.deserialize(block)
             }
 
             val a =  Asteroid(name)

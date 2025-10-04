@@ -80,7 +80,7 @@ class DynmapExpansion : Expansion(), Listener {
 
             override fun run() {
                 for (planet in PlanetCollection) {
-                    val star = StarCollection.closestStar(planet.orbitCenter.toLocation(planet.space))!!
+                    val star = StarCollection.closestStar(planet.orbitCenter.toBukkit(planet.space))!!
                     val orbitMarkerID = star.name + "_" + planet.destination.name + "_orbit_" + planet.space.name
                     val orbitRadius = planet.center.distance(planet.orbitCenter).toDouble()
                     val orbitMarker = if (!orbitMarkerByID.containsKey(orbitMarkerID)) {

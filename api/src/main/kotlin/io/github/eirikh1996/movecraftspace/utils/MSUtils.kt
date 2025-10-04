@@ -79,17 +79,17 @@ object MSUtils {
         Movecraft.getInstance().worldHandler.setBlockFast(loc, data)
     }
 
-    fun createSphere(radius : Int, center : ImmutableVector) : Set<ImmutableVector> {
+    fun createSphere(radius : Int, center : MovecraftLocation) : Set<MovecraftLocation> {
         val minX = center.x - radius
         val maxX = center.x + radius
         val minZ = center.z - radius
         val maxZ = center.z + radius
         val radiusSquared = radius * radius
-        val sphere = HashSet<ImmutableVector>()
+        val sphere = HashSet<MovecraftLocation>()
         for (y in 0..255) {
             for (x in minX..maxX) {
                 for (z in minZ..maxZ) {
-                    val vec = ImmutableVector(x, y, z)
+                    val vec = MovecraftLocation(x, y, z)
                     if (abs(vec.distanceSquared(center) - radiusSquared) > radius)
                         continue
                     sphere.add(vec)

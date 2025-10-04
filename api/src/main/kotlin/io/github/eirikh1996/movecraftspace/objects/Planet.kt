@@ -2,6 +2,7 @@ package io.github.eirikh1996.movecraftspace.objects
 
 import io.github.eirikh1996.movecraftspace.event.planet.PlanetMoveEvent
 import net.countercraft.movecraft.Movecraft
+import net.countercraft.movecraft.MovecraftLocation
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -12,8 +13,8 @@ import kotlin.collections.HashSet
 import kotlin.math.min
 
 class Planet(
-    var center: ImmutableVector,
-    var orbitCenter : ImmutableVector,
+    var center: MovecraftLocation,
+    var orbitCenter : MovecraftLocation,
     val radius : Int,
     space : World,
     val destination : World,
@@ -33,7 +34,7 @@ class Planet(
         if (space != location.world) {
             return false
         }
-        return center.distance(ImmutableVector.fromLocation(location)) <= radius + extraRadius
+        return center.distance(MovecraftLocation(location.blockX, location.blockY, location.blockZ)) <= radius + extraRadius
     }
 
     fun isPlanet(world: World) : Boolean {
@@ -77,22 +78,22 @@ class Planet(
         return destination == other.destination && space == other.space && id.equals(other.id)
     }
 
-    fun move(displacement : ImmutableVector, moon : Boolean = false, newSpace : World = space) {
+    fun move(displacement : MovecraftLocation, moon : Boolean = false, newSpace : World = space) {
         val newCenter = center.add(displacement)
         //call event
         val event = PlanetMoveEvent(this, newCenter, newSpace)
         Bukkit.getPluginManager().callEvent(event)
         moving = true
-        var type = center.toLocation(space).block.type
+        var type = center.toBukkit(space).block.type
         var y = center.y
         val maxHeight = space.maxHeight
         while (type.isAir && y <= maxHeight) {
             y++
             type = space.getBlockAt(center.x, min(y, maxHeight), center.z).type
         }
-        val start = ImmutableVector(center.x, y, center.z)
-        val queue = LinkedList<ImmutableVector>()
-        val visited = HashSet<ImmutableVector>()
+        val start = MovecraftLocation(center.x, y, center.z)
+        val queue = LinkedList<MovecraftLocation>()
+        val visited = HashSet<MovecraftLocation>()
         queue.add(start)
         while (!queue.isEmpty()) {
             val node = queue.poll()
@@ -101,23 +102,23 @@ class Planet(
             visited.add(node)
             for (shift in SHIFTS) {
                 val test = node.add(shift)
-                if (test.toLocation(space).block.type.isAir)
+                if (test.toBukkit(space).block.type.isAir)
                     continue
                 queue.add(test)
             }
         }
 
-        val newLocMap = HashMap<ImmutableVector, BlockData>()
+        val newLocMap = HashMap<MovecraftLocation, BlockData>()
         for (loc in visited) {
-            val b = loc.toLocation(space).block
+            val b = loc.toBukkit(space).block
             newLocMap[loc.add(displacement)] = b.blockData
         }
         for (loc in newLocMap.keys) {
             val data = newLocMap[loc]!!
-            Movecraft.getInstance().worldHandler.setBlockFast(loc.toLocation(space), data)
+            Movecraft.getInstance().worldHandler.setBlockFast(loc.toBukkit(space), data)
         }
         for (loc in visited.filter { vec -> !newLocMap.containsKey(vec) }) {
-            Movecraft.getInstance().worldHandler.setBlockFast(loc.toLocation(space), Bukkit.createBlockData(Material.AIR))
+            Movecraft.getInstance().worldHandler.setBlockFast(loc.toBukkit(space), Bukkit.createBlockData(Material.AIR))
         }
         center = newCenter
         space = newSpace
@@ -137,19 +138,19 @@ class Planet(
 
 
     private val SHIFTS = arrayOf(
-        ImmutableVector(1,1,0),
-        ImmutableVector(1,0,0),
-        ImmutableVector(1,-1,0),
-        ImmutableVector(-1,1,0),
-        ImmutableVector(-1,0,0),
-        ImmutableVector(-1,-1,0),
-        ImmutableVector(0,1,1),
-        ImmutableVector(0,0,1),
-        ImmutableVector(0,-1,1),
-        ImmutableVector(0,1,-1),
-        ImmutableVector(0,0,-1),
-        ImmutableVector(0,-1,-1),
-        ImmutableVector(0,1,0),
-        ImmutableVector(0,-1,0)
+        MovecraftLocation(1,1,0),
+        MovecraftLocation(1,0,0),
+        MovecraftLocation(1,-1,0),
+        MovecraftLocation(-1,1,0),
+        MovecraftLocation(-1,0,0),
+        MovecraftLocation(-1,-1,0),
+        MovecraftLocation(0,1,1),
+        MovecraftLocation(0,0,1),
+        MovecraftLocation(0,-1,1),
+        MovecraftLocation(0,1,-1),
+        MovecraftLocation(0,0,-1),
+        MovecraftLocation(0,-1,-1),
+        MovecraftLocation(0,1,0),
+        MovecraftLocation(0,-1,0)
     )
 }

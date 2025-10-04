@@ -10,8 +10,10 @@ import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_NO_PERMISSION
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.MUST_BE_PLAYER
+import net.countercraft.movecraft.MovecraftLocation
 import net.countercraft.movecraft.craft.CraftManager
 import net.countercraft.movecraft.craft.type.CraftType
+import net.countercraft.movecraft.util.MathUtils
 import org.bukkit.block.Sign
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
@@ -78,11 +80,11 @@ object NavigationComputerCommand : TabExecutor {
                 return true
             }
             var foundSigns = 0
-            var signLoc = ImmutableVector(0, 0, 0)
+            var signLoc = MovecraftLocation(0, 0, 0)
             for (vec in sel) {
-                val block = vec.toLocation(sel.world).block
+                val block = vec.toBukkit(sel.world).block
                 if (block.state is Sign) {
-                    signLoc = ImmutableVector.fromLocation(block.location)
+                    signLoc = MathUtils.bukkit2MovecraftLoc(block.location)
                     foundSigns++
                 }
             }

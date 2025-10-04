@@ -14,6 +14,8 @@ import io.github.eirikh1996.movecraftspace.utils.MSUtils.WARNING
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.setBlock
 import io.github.eirikh1996.movecraftspace.utils.Paginator
 import io.github.eirikh1996.movecraftspace.utils.image.RGBBlockColor
+import net.countercraft.movecraft.MovecraftLocation
+import net.countercraft.movecraft.util.MathUtils
 import net.kyori.adventure.text.Component
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.ClickEvent
@@ -143,7 +145,7 @@ object PlanetCommand : TabExecutor {
             val pLoc = sender.location.clone()
             var nearestPlanet : Planet? = null
             if (isMoon.isEmpty() || isMoon.toBoolean())
-                nearestPlanet = PlanetCollection.nearestPlanet(pLoc.world!!, ImmutableVector.fromLocation(pLoc), Settings.MaxMoonSpacing, true)
+                nearestPlanet = PlanetCollection.nearestPlanet(pLoc.world!!, MathUtils.bukkit2MovecraftLoc(pLoc), Settings.MaxMoonSpacing, true)
 
             val orbitCenter = if (nearestPlanet != null) {
                 nearestPlanet.center
@@ -157,7 +159,7 @@ object PlanetCommand : TabExecutor {
             height += space.minHeight.toDouble()
             height += .5
             pLoc.y = height
-            val planet = Planet(ImmutableVector.fromLocation(pLoc), orbitCenter, radius, space, destination, orbitTime, exitHeight)
+            val planet = Planet(MathUtils.bukkit2MovecraftLoc(pLoc), orbitCenter, radius, space, destination, orbitTime, exitHeight)
             if (PlanetCollection.getPlanetByName(args[1]) != null) {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "Planet " + args[1] + " already exists!")
                 return true
@@ -216,7 +218,7 @@ object PlanetCommand : TabExecutor {
                         cancel()
                     for (i in 0..size) {
                         val pop = sphere.pop()
-                        val loc = pop.toLocation(planet.space)
+                        val loc = pop.toBukkit(planet.space)
                         val b = loc.block
                         b.type = surface!!
                     }
@@ -268,7 +270,7 @@ object PlanetCommand : TabExecutor {
                     if (sphere.isEmpty())
                         cancel()
                     for (i in 1..size) {
-                        sphere.pop().toLocation(planet.space).block.type = Material.AIR
+                        sphere.pop().toBukkit(planet.space).block.type = Material.AIR
                     }
                 }
             }.runTaskTimer(MovecraftSpace.instance,0,1)
@@ -313,13 +315,13 @@ object PlanetCommand : TabExecutor {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "Cannot move planet to this location as it it too far away from a star or planetary system")
                 return true
             }
-            val closestPlanet = PlanetCollection.nearestPlanet(sender.world, ImmutableVector.fromLocation(sender.location), Settings.MaxMoonSpacing, true)
-            val distance = closestStar.loc.distance(ImmutableVector(tx, 127, tz)) - closestStar.radius()
+            val closestPlanet = PlanetCollection.nearestPlanet(sender.world, MathUtils.bukkit2MovecraftLoc(sender.location), Settings.MaxMoonSpacing, true)
+            val distance = closestStar.loc.distance(MovecraftLocation(tx, 127, tz)) - closestStar.radius()
             if (distance < Settings.MinimumDistanceBetweenOrbits && closestPlanet == null) {
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "Cannot move planet to this location as it it too close to star system " + closestStar.name)
                 return true
             } else if (closestPlanet != null) {
-                if (closestPlanet.center.distance(ImmutableVector.fromLocation(sender.location)) < Settings.MinMoonSpacing) {
+                if (closestPlanet.center.distance(MathUtils.bukkit2MovecraftLoc(sender.location)) < Settings.MinMoonSpacing) {
                     sender.sendMessage(COMMAND_PREFIX + ERROR + "Cannot move planet to this location as it it too close to moon system " + closestPlanet.name)
                     return true
                 }
@@ -332,7 +334,7 @@ object PlanetCommand : TabExecutor {
             val dx = tx - planet.center.x
             val dz = tz - planet.center.z
             sender.sendMessage(COMMAND_PREFIX + "Moved planet to x: " + sender.location.blockX + ", z: " + sender.location.blockZ)
-            val displacement = ImmutableVector(dx, 0, dz)
+            val displacement = MovecraftLocation(dx, 0, dz)
             planet.move(displacement, false, sender.world)
             planet.orbitCenter = if (closestPlanet == null) closestStar.loc else closestPlanet.center
             for (pl in PlanetCollection) {
@@ -353,8 +355,8 @@ object PlanetCommand : TabExecutor {
             }
             val paginator = Paginator("Planets")
             for (pl in PlanetCollection) {
-                val orbitCenterPlanet = PlanetCollection.getPlanetAt(pl.orbitCenter.toLocation(pl.space))
-                val orbitCenterStar = StarCollection.closestStar(pl.orbitCenter.toLocation(pl.space),2)
+                val orbitCenterPlanet = PlanetCollection.getPlanetAt(pl.orbitCenter.toBukkit(pl.space))
+                val orbitCenterStar = StarCollection.closestStar(pl.orbitCenter.toBukkit(pl.space),2)
                 val systemName = if (orbitCenterPlanet != null) {
                     orbitCenterPlanet.name
                 } else if (orbitCenterStar != null) {
@@ -449,7 +451,7 @@ object PlanetCommand : TabExecutor {
 
                         for (i in 1..min(newSphere.size, 25000)) {
                             val pop = newSphere.pop()
-                            val loc = pop.toLocation(planet.space)
+                            val loc = pop.toBukkit(planet.space)
                             setBlock(loc, Bukkit.createBlockData(surface))
                         }
                     } else {

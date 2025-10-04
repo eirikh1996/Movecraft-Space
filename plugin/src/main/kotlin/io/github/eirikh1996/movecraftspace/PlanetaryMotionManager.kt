@@ -45,7 +45,7 @@ object PlanetaryMotionManager : BukkitRunnable() {
             val meterPerMinute = meterPerDay / 1440
             val arcLength = meterPerMinute * Settings.PlanetaryRotationCheckCooldown
             val angle = arcLength / pl.orbitRadius
-            val newCenter = pl.center.rotate(angle, pl.orbitCenter)
+            val newCenter = rotate(angle, pl.orbitCenter, pl.center)
             val translationVector = newCenter.subtract(pl.center)
             updates.add(PlanetMoveUpdateCommand(pl, translationVector))
             if (pl.moons.isNotEmpty()) {
@@ -70,7 +70,7 @@ object PlanetaryMotionManager : BukkitRunnable() {
             val meterPerMinute = meterPerDay / 1440
             val arcLength = meterPerMinute * Settings.PlanetaryRotationCheckCooldown
             val angle = arcLength / pl.orbitRadius
-            val newCenter = pl.center.rotate(angle, pl.orbitCenter)
+            val newCenter = rotate(angle, pl.orbitCenter, pl.center)
             val translationVector = newCenter.subtract(pl.center)
             updates.add(PlanetMoveUpdateCommand(pl, translationVector))
         }
@@ -105,7 +105,7 @@ object PlanetaryMotionManager : BukkitRunnable() {
         MapUpdateManager.getInstance().scheduleUpdate(poll)
     }
 
-    private fun translateCraftsToPlanet(planet : Planet, displacement : ImmutableVector) {
+    private fun translateCraftsToPlanet(planet : Planet, displacement : MovecraftLocation) {
         val newCenter = planet.center.add(displacement)
         val craftsToTeleport = HashSet<PilotedCraft>()
         for (craft in CraftManager.getInstance().getCraftsInWorld(planet.space)) {
@@ -182,5 +182,16 @@ object PlanetaryMotionManager : BukkitRunnable() {
             craft.pilot!!.sendMessage("Entering " + planet.destination.name)
             craft.translate(planet.destination, destLoc.x, destLoc.y, destLoc.z)
         }
+    }
+
+    private fun rotate(angle : Double, origin : MovecraftLocation, offset : MovecraftLocation) : MovecraftLocation {
+        val toRotate = offset.subtract(origin)
+        val cos = cos(angle)
+        val sin = sin(angle)
+        val x : Int = round(toRotate.x * cos + toRotate.z * -sin).toInt()
+        val y : Int = 0
+        val z : Int = round(toRotate.x * sin + toRotate.z * cos).toInt()
+
+        return MovecraftLocation(x, y, z).add(origin)
     }
 }

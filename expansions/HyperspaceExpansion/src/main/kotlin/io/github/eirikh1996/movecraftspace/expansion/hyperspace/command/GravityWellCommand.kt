@@ -3,11 +3,12 @@ package io.github.eirikh1996.movecraftspace.expansion.hyperspace.command
 import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.GravityWellManager
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects.GravityWell
-import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
 import io.github.eirikh1996.movecraftspace.expansion.selection.SelectionManager
 import io.github.eirikh1996.movecraftspace.utils.MSUtils
+import net.countercraft.movecraft.MovecraftLocation
 import net.countercraft.movecraft.craft.CraftManager
 import net.countercraft.movecraft.craft.type.CraftType
+import net.countercraft.movecraft.util.MathUtils
 import org.bukkit.block.Sign
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
@@ -64,11 +65,11 @@ object GravityWellCommand : TabExecutor {
                 return true
             }
             var foundSigns = 0
-            var signLoc = ImmutableVector(0, 0, 0)
+            var signLoc = MovecraftLocation(0, 0, 0)
             for (vec in sel) {
-                val block = vec.toLocation(sel.world).block
+                val block = vec.toBukkit(sel.world).block
                 if (block.state is Sign) {
-                    signLoc = ImmutableVector.fromLocation(block.location)
+                    signLoc = MathUtils.bukkit2MovecraftLoc(block.location)
                     foundSigns++
                 }
             }

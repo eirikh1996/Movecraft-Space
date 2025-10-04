@@ -14,6 +14,8 @@ import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.WARNING
 import io.github.eirikh1996.movecraftspace.utils.Paginator
+import net.countercraft.movecraft.MovecraftLocation
+import net.countercraft.movecraft.util.MathUtils
 import net.kyori.adventure.text.Component
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.ClickEvent
@@ -69,7 +71,7 @@ object StarCommand : TabExecutor{
             pLoc.y = height
             val closest = StarCollection.closestStar(pLoc, Settings.MinimumDistanceBetweenStars)
             if (closest != null) {
-                sender.sendMessage(COMMAND_PREFIX + ERROR + "Star is too close to " + closest.name + ". Move " + (Settings.MinimumDistanceBetweenStars - closest.loc.distance(ImmutableVector.fromLocation(sender.location))).toInt() + " blocks away")
+                sender.sendMessage(COMMAND_PREFIX + ERROR + "Star is too close to " + closest.name + ". Move " + (Settings.MinimumDistanceBetweenStars - closest.loc.distance(MathUtils.bukkit2MovecraftLoc(sender.location))).toInt() + " blocks away")
                 return true
             }
             var radius = height.toInt() - 1
@@ -81,7 +83,7 @@ object StarCommand : TabExecutor{
                     return true
                 }
             }
-            val newStar = Star(args[1], sender.world, ImmutableVector.fromLocation(pLoc), radius)
+            val newStar = Star(args[1], sender.world, MathUtils.bukkit2MovecraftLoc(pLoc), radius)
             StarCollection.add(newStar)
             sender.sendMessage(COMMAND_PREFIX + "Successfully created new star named " + newStar.name)
 
@@ -92,7 +94,7 @@ object StarCommand : TabExecutor{
                     if (sphere.isEmpty())
                         cancel()
                     for (i in 1..size) {
-                        sphere.pop().toLocation(newStar.space).block.type = Material.GLOWSTONE
+                        sphere.pop().toBukkit(newStar.space).block.type = Material.GLOWSTONE
                     }
                 }
             }.runTaskTimer(MovecraftSpace.instance,0,1)
@@ -111,7 +113,7 @@ object StarCommand : TabExecutor{
                 return true
             }
             val planetsOrbitingStar = PlanetCollection.getPlanetsWithOrbitPoint(star.loc)
-            val sphere = LinkedList<ImmutableVector>()
+            val sphere = LinkedList<MovecraftLocation>()
 
             if (!planetsOrbitingStar.isEmpty()) {
                 if (args.size < 3 || !args[2].equals("confirm", true)) {
@@ -146,7 +148,7 @@ object StarCommand : TabExecutor{
                     if (sphere.isEmpty())
                         cancel()
                     for (i in 1..size) {
-                        sphere.pop().toLocation(star.space).block.type = Material.AIR
+                        sphere.pop().toBukkit(star.space).block.type = Material.AIR
                     }
                 }
             }.runTaskTimer(MovecraftSpace.instance,0,1)
@@ -163,7 +165,7 @@ object StarCommand : TabExecutor{
                 sender.sendMessage(COMMAND_PREFIX + ERROR + "Star " + args[1] + "does not exist!")
                 return true
             }
-            val tpLoc = star.loc.toLocation(star.space)
+            val tpLoc = star.loc.toBukkit(star.space)
             tpLoc.y = 260.0
             sender.teleport(tpLoc)
         } else if (args[0].equals("list", true)) {

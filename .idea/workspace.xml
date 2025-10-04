@@ -4,18 +4,36 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ca8f34bc-0893-43fe-bf4f-31ec2bcfe175" name="Changes" comment="some fixes">
+    <list default="true" id="ca8f34bc-0893-43fe-bf4f-31ec2bcfe175" name="Changes" comment="some work on getting the AsteroidBeltExpansion working">
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/build/kotlin/compileKotlin/local-state/build-history.bin" beforeDir="false" afterPath="$PROJECT_DIR$/api/build/kotlin/compileKotlin/local-state/build-history.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/event/planet/PlanetMoveEvent.kt" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/event/planet/PlanetMoveEvent.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/selection/Selection.kt" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/selection/Selection.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/selection/Structure.kt" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/selection/Structure.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/objects/ImmutableVector.kt" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/objects/ImmutableVector.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/objects/Planet.kt" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/objects/Planet.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/objects/PlanetCollection.kt" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/objects/PlanetCollection.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/objects/Star.kt" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/objects/Star.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/objects/StarCollection.kt" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/objects/StarCollection.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/utils/MSUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/kotlin/io/github/eirikh1996/movecraftspace/utils/MSUtils.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/buildSrc/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/buildSrc/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/buildSrc/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="$PROJECT_DIR$/buildSrc/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/buildSrc/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/buildSrc/.gradle/file-system.probe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expansions/AsteroidBeltExpansion/.gradle/caches/paperweight/taskCache/mappedServerJar.jar" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/AsteroidBeltExpansion/.gradle/caches/paperweight/taskCache/mappedServerJar.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expansions/AsteroidBeltExpansion/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/AsteroidBeltExpansion/build.gradle.kts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/expansions/AsteroidBeltExpansion/src/main/kotlin/io/github/eirikh1996/expansion/asteroidbelt/command/AsteroidBeltCommand.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/AsteroidBeltExpansion/src/main/kotlin/io/github/eirikh1996/expansion/asteroidbelt/command/AsteroidBeltCommand.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/DynmapExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/dynmap/DynmapExpansion.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/DynmapExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/dynmap/DynmapExpansion.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/command/GravityWellCommand.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/command/GravityWellCommand.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/command/HyperdriveCommand.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/command/HyperdriveCommand.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/command/HyperspaceCommand.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/command/HyperspaceCommand.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/command/NavigationComputerCommand.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/command/NavigationComputerCommand.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/managers/GravityWellManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/managers/GravityWellManager.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/managers/HyperdriveManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/managers/HyperdriveManager.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/managers/NavigationComputerManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/managers/NavigationComputerManager.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/objects/GravityWell.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/objects/GravityWell.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/objects/Hyperdrive.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/objects/Hyperdrive.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/objects/NavigationComputer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/expansions/HyperspaceExpansion/src/main/kotlin/io/github/eirikh1996/movecraftspace/expansion/hyperspace/objects/NavigationComputer.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/src/main/kotlin/io/github/eirikh1996/movecraftspace/commands/PlanetCommand.kt" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/src/main/kotlin/io/github/eirikh1996/movecraftspace/commands/PlanetCommand.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugin/src/main/kotlin/io/github/eirikh1996/movecraftspace/commands/StarCommand.kt" beforeDir="false" afterPath="$PROJECT_DIR$/plugin/src/main/kotlin/io/github/eirikh1996/movecraftspace/commands/StarCommand.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -108,16 +126,6 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.papermc.paper/paper-api/1.21.5-R0.1-SNAPSHOT/cb11ef68bbd74ea4bad60da95dd140b373666052/paper-api-1.21.5-R0.1-SNAPSHOT.jar!/org/bukkit/Server.class" root0="FORCE_HIGHLIGHTING" />
-    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.papermc.paper/paper-api/1.21.8-R0.1-SNAPSHOT/18dc9035387ee4345c5075f88f4fec303958ebb4/paper-api-1.21.8-R0.1-SNAPSHOT.jar!/org/bukkit/Bukkit.class" root0="FORCE_HIGHLIGHTING" />
-    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.papermc.paper/paper-api/1.21.8-R0.1-SNAPSHOT/930820619948fd2425e00973f433fd92b23db409/paper-api-1.21.8-R0.1-SNAPSHOT.jar!/org/bukkit/inventory/Inventory.class" root0="FORCE_HIGHLIGHTING" />
-    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.papermc.paper/paper-api/1.21.8-R0.1-SNAPSHOT/930820619948fd2425e00973f433fd92b23db409/paper-api-1.21.8-R0.1-SNAPSHOT.jar!/org/bukkit/inventory/meta/ItemMeta.class" root0="FORCE_HIGHLIGHTING" />
-    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.papermc.paper/paper-api/1.21.8-R0.1-SNAPSHOT/f81644003f5397a2a86edd96147d87022e390127/paper-api-1.21.8-R0.1-SNAPSHOT.jar!/org/bukkit/Bukkit.class" root0="FORCE_HIGHLIGHTING" />
-    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.papermc.paper/paper-api/1.21.8-R0.1-SNAPSHOT/f81644003f5397a2a86edd96147d87022e390127/paper-api-1.21.8-R0.1-SNAPSHOT.jar!/org/bukkit/block/Block.class" root0="FORCE_HIGHLIGHTING" />
-    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.papermc.paper/paper-api/1.21.8-R0.1-SNAPSHOT/f81644003f5397a2a86edd96147d87022e390127/paper-api-1.21.8-R0.1-SNAPSHOT.jar!/org/bukkit/event/inventory/InventoryClickEvent.class" root0="FORCE_HIGHLIGHTING" />
-    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.papermc.paper/paper-api/1.21.8-R0.1-SNAPSHOT/f81644003f5397a2a86edd96147d87022e390127/paper-api-1.21.8-R0.1-SNAPSHOT.jar!/org/bukkit/event/inventory/InventoryInteractEvent.class" root0="FORCE_HIGHLIGHTING" />
-    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.papermc.paper/paper-api/1.21.8-R0.1-SNAPSHOT/f81644003f5397a2a86edd96147d87022e390127/paper-api-1.21.8-R0.1-SNAPSHOT.jar!/org/bukkit/inventory/ItemStack.class" root0="FORCE_HIGHLIGHTING" />
-    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.papermc.paper/paper-api/1.21.8-R0.1-SNAPSHOT/f81644003f5397a2a86edd96147d87022e390127/paper-api-1.21.8-R0.1-SNAPSHOT.jar!/org/bukkit/inventory/meta/ItemMeta.class" root0="FORCE_HIGHLIGHTING" />
     <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.kyori/adventure-api/4.21.0/12cbccf2de584413f039d2379f6cb223c891dda2/adventure-api-4.21.0.jar!/net/kyori/adventure/internal/Internals.class" root0="FORCE_HIGHLIGHTING" />
     <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.kyori/adventure-api/4.21.0/12cbccf2de584413f039d2379f6cb223c891dda2/adventure-api-4.21.0.jar!/net/kyori/adventure/text/Component.class" root0="FORCE_HIGHLIGHTING" />
     <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.kyori/adventure-api/4.21.0/12cbccf2de584413f039d2379f6cb223c891dda2/adventure-api-4.21.0.jar!/net/kyori/adventure/text/TextComponent.class" root0="FORCE_HIGHLIGHTING" />
@@ -133,6 +141,7 @@
     <setting file="jar://$PROJECT_DIR$/plugin/.gradle/caches/paperweight/taskCache/mappedServerJar.jar!/org/bukkit/craftbukkit/CraftServer.class" root0="FORCE_HIGHLIGHTING" />
     <setting file="jar://$PROJECT_DIR$/plugin/.gradle/caches/paperweight/taskCache/mappedServerJar.jar!/org/bukkit/craftbukkit/block/data/CraftBlockData.class" root0="FORCE_HIGHLIGHTING" />
     <setting file="jar://$PROJECT_DIR$/plugin/.gradle/caches/paperweight/taskCache/mappedServerJar.jar!/org/bukkit/craftbukkit/inventory/CraftMetaItem.class" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/plugin/src/main/kotlin/io/github/eirikh1996/movecraftspace/commands/PlanetCommand.kt" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="InvalidFacetManager">
     <ignored-facets>
@@ -264,7 +273,14 @@
       <option name="presentableId" value="LOCAL−00005" />
       <updated>1759523656083</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL−00006" summary="some work on getting the AsteroidBeltExpansion working">
+      <option name="closed" value="true" />
+      <created>1759563009398</created>
+      <option name="number" value="LOCAL−00006" />
+      <option name="presentableId" value="LOCAL−00006" />
+      <updated>1759563009398</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -273,6 +289,7 @@
     <MESSAGE value="Fixed bugs relating to nav computers and added GUI function to nav computers" />
     <MESSAGE value="fixed bug where ship were placed outside world height limits when exiting hyperspace" />
     <MESSAGE value="some fixes" />
-    <option name="LAST_COMMIT_MESSAGE" value="some fixes" />
+    <MESSAGE value="some work on getting the AsteroidBeltExpansion working" />
+    <option name="LAST_COMMIT_MESSAGE" value="some work on getting the AsteroidBeltExpansion working" />
   </component>
 </project>

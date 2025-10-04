@@ -12,6 +12,7 @@ import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_NO_PERMISSION
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.MUST_BE_PLAYER
+import net.countercraft.movecraft.MovecraftLocation
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -28,7 +29,7 @@ import kotlin.collections.HashSet
 import kotlin.random.Random
 
 object AsteroidBeltCommand : TabExecutor {
-    val asteroidLocations = HashMap<String, Map<ImmutableVector, Asteroid>>()
+    val asteroidLocations = HashMap<String, Map<MovecraftLocation, Asteroid>>()
 
     override fun onTabComplete(
         sender: CommandSender,
@@ -114,19 +115,32 @@ object AsteroidBeltCommand : TabExecutor {
             }
 
             val locations = HashSet<Location>()
-            val asteroids = HashMap<ImmutableVector, Asteroid>()
+            val asteroids = HashMap<MovecraftLocation, Asteroid>()
 
             var clearLocationsLeft = true
             val asteroidbeltTag = "${star.name}-$minRadius-$maxRadius".lowercase()
+            val minDistance = AsteroidBeltExpansion.instance.distanceBetweenAsteroids
             object : BukkitRunnable() {
                 override fun run() {
                     while (clearLocationsLeft) {
+                        Bukkit.broadcastMessage(locations.size.toString())
                         clearLocationsLeft = false
                         for (asteroid in AsteroidBeltExpansion.instance.asteroids.values) {
-                            val randomLoc = randomLoc(star.loc, minRadius, maxRadius, height, asteroid.xLength / 2, asteroid.yLength / 2, asteroid.zLength / 2)
+                            val randomLoc = randomLoc(
+                                star.loc,
+                                minRadius,
+                                maxRadius,
+                                height,
+                                asteroid.xLength / 2,
+                                asteroid.yLength / 2,
+                                asteroid.zLength / 2
+                            )
+                            if (locations.contains(randomLoc.toBukkit(star.space))) {
+                                continue
+                            }
                             val blockLocs = HashSet<Location>()
                             asteroid.blocks.forEach { (t, u) ->
-                                blockLocs.add(randomLoc.add(t).toLocation(star.space))
+                                blockLocs.add(randomLoc.add(t).toBukkit(star.space))
                             }
                             if (blockLocs.any { loc -> locations.contains(loc) || locations.any { o -> o.distance(loc) < AsteroidBeltExpansion.instance.distanceBetweenAsteroids } }) {
                                 continue
@@ -136,6 +150,7 @@ object AsteroidBeltCommand : TabExecutor {
                             clearLocationsLeft = true
                             break
                         }
+                        Bukkit.broadcastMessage(clearLocationsLeft.toString())
                         asteroidLocations[asteroidbeltTag] = asteroids
                     }
                     sender.sendMessage(COMMAND_PREFIX + "Started creating asteroid belt")
@@ -153,7 +168,7 @@ object AsteroidBeltCommand : TabExecutor {
                             val percent = ((initialSize - linkedList.size) / initialSize) * 100f
                             Bukkit.getScheduler().callSyncMethod(AsteroidBeltExpansion.instance.plugin) {
                                 asteroids[poll]?.paste(
-                                    poll.toLocation(star.space)
+                                    poll.toBukkit(star.space)
                                 )
                             }
 
@@ -185,7 +200,7 @@ object AsteroidBeltCommand : TabExecutor {
                 return true
             }
             locs.forEach { (t, u) ->
-                u.paste(t.toLocation(star.space))
+                u.paste(t.toBukkit(star.space))
             }
         } else if (args[0].equals("remove", true)) {
             if (args.size < 2) {
@@ -204,21 +219,21 @@ object AsteroidBeltCommand : TabExecutor {
             }
             locs.forEach { (t, u) ->
                 u.blocks.forEach { (l, b) ->
-                    l.add(t).toLocation(star.space).block.type = Material.AIR
+                    l.add(t).toBukkit(star.space).block.type = Material.AIR
                 }
             }
         }
         return true
     }
 
-    private fun randomLoc(center : ImmutableVector, minRadius : Int, maxRadius : Int, height : Int, xbuffer : Int = 0, ybuffer : Int = 0, zbuffer : Int = 0) : ImmutableVector {
-        var loc = ImmutableVector(
+    private fun randomLoc(center : MovecraftLocation, minRadius : Int, maxRadius : Int, height : Int, xbuffer : Int = 0, ybuffer : Int = 0, zbuffer : Int = 0) : MovecraftLocation {
+        var loc = MovecraftLocation(
             Random.nextInt(center.x - (maxRadius - xbuffer), center.x + (maxRadius - xbuffer)),
             Random.nextInt(center.y - ((height / 2) - ybuffer), center.y + ((height / 2) - ybuffer)),
             Random.nextInt(center.z - (maxRadius - zbuffer), center.z + (maxRadius - zbuffer))
         )
         while ((loc.distance(center).toInt() in minRadius..maxRadius)) {
-            loc = ImmutableVector(
+            loc = MovecraftLocation(
                 Random.nextInt(center.x - (maxRadius - xbuffer), center.x + (maxRadius - xbuffer)),
                 Random.nextInt(center.y - ((height / 2) - ybuffer), center.y + ((height / 2) - ybuffer)),
                 Random.nextInt(center.z - (maxRadius - zbuffer), center.z + (maxRadius - zbuffer))

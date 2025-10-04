@@ -6,16 +6,17 @@ import io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects.Hyperspa
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.HyperspaceExpansion
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers.HyperspaceManager
 import io.github.eirikh1996.movecraftspace.expansion.selection.SelectionManager
-import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
 import io.github.eirikh1996.movecraftspace.objects.MSBlock
 import io.github.eirikh1996.movecraftspace.objects.PlanetCollection
 import io.github.eirikh1996.movecraftspace.objects.StarCollection
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_NO_PERMISSION
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
+import net.countercraft.movecraft.MovecraftLocation
 import net.countercraft.movecraft.craft.Craft
 import net.countercraft.movecraft.craft.CraftManager
 import net.countercraft.movecraft.craft.PilotedCraft
+import net.countercraft.movecraft.util.MathUtils
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -35,9 +36,9 @@ import kotlin.collections.HashSet
 
 object HyperspaceCommand : TabExecutor {
     val locationMap = HashMap<UUID, Location>()
-    val beaconStructure = HashMap<ImmutableVector, MSBlock>()
-    internal lateinit var beaconMinPoint : ImmutableVector
-    internal lateinit var beaconMaxPoint : ImmutableVector
+    val beaconStructure = HashMap<MovecraftLocation, MSBlock>()
+    internal lateinit var beaconMinPoint : MovecraftLocation
+    internal lateinit var beaconMaxPoint : MovecraftLocation
 
     init {
         val file = File(HyperspaceExpansion.instance.dataFolder, "beaconstructure.yml")
@@ -51,7 +52,7 @@ object HyperspaceCommand : TabExecutor {
             var minZ = 0
             var maxZ = 0
             for (map in mapList) {
-                val vector = ImmutableVector.deserialize(map)
+                val vector = MovecraftLocation(map["x"] as Int, map["y"] as Int, map["z"] as Int)
                 beaconStructure[vector] = MSBlock.deserialize(map)
                 if (vector.x < minX)
                     minX = vector.x
@@ -67,8 +68,8 @@ object HyperspaceCommand : TabExecutor {
                     maxZ = vector.z
 
             }
-            beaconMinPoint = ImmutableVector(minX, minY, minZ)
-            beaconMaxPoint = ImmutableVector(maxX, maxY, maxZ)
+            beaconMinPoint = MovecraftLocation(minX, minY, minZ)
+            beaconMaxPoint = MovecraftLocation(maxX, maxY, maxZ)
         }
     }
     override fun onTabComplete(sender: CommandSender, command: Command, label: String, args: Array<out String>): List<String> {
@@ -187,11 +188,11 @@ object HyperspaceCommand : TabExecutor {
                         sender.sendMessage(COMMAND_PREFIX + ERROR + "No stars are present in this space world")
                         return true
                     }
-                    if (destinationStar.loc.distance(ImmutableVector.fromLocation(second)) > destinationStar.radius() + maxDistance) {
+                    if (destinationStar.loc.distance(MathUtils.bukkit2MovecraftLoc(second)) > destinationStar.radius() + maxDistance) {
                         sender.sendMessage(COMMAND_PREFIX + ERROR + "Beacon placement is too far from the nearest star system " + destinationStar.name)
                         return true
                     }
-                    if (destinationStar.loc.distance(ImmutableVector.fromLocation(second)) < destinationStar.radius() + minDistance) {
+                    if (destinationStar.loc.distance(MathUtils.bukkit2MovecraftLoc(second)) < destinationStar.radius() + minDistance) {
                         sender.sendMessage(COMMAND_PREFIX + ERROR + "Beacon placement is too close to the nearest star system " + destinationStar.name)
                         return true
                     }
@@ -226,7 +227,7 @@ object HyperspaceCommand : TabExecutor {
                     sender.sendMessage(COMMAND_PREFIX + ERROR + "No stars are present in this space world")
                     return true
                 }
-                if (originStar.loc.distance(ImmutableVector.fromLocation(origin)) > originStar.radius() + maxDistance) {
+                if (originStar.loc.distance(MathUtils.bukkit2MovecraftLoc(origin)) > originStar.radius() + maxDistance) {
                     sender.sendMessage(COMMAND_PREFIX + ERROR + "Beacon placement is too far from the nearest star system " + originStar.name)
                     return true
                 }
@@ -264,7 +265,7 @@ object HyperspaceCommand : TabExecutor {
                 val center = selection.center
                 beaconStructure.clear()
                 for (vec in selection) {
-                    val block = vec.toLocation(sender.world).block
+                    val block = vec.toBukkit(sender.world).block
                     if (block.type.name.endsWith("AIR"))
                         continue
                     beaconStructure[vec.subtract(center)] = MSBlock.fromBlock(block)
@@ -274,7 +275,12 @@ object HyperspaceCommand : TabExecutor {
                 val blockList = ArrayList<Map<String, Any>>()
                 for (entry in beaconStructure) {
                     val serialized = HashMap<String, Any>()
-                    serialized.putAll(entry.key.serialize())
+                    val loc = entry.key
+                    val locMap = HashMap<String, Any>()
+                    locMap["x"] = loc.x
+                    locMap["y"] = loc.y
+                    locMap["z"] = loc.z
+                    serialized.putAll(locMap)
                     serialized.putAll(entry.value.serialize())
                     blockList.add(serialized)
                 }
@@ -287,8 +293,8 @@ object HyperspaceCommand : TabExecutor {
             } else if (args[1].equals("paste", true)) {
                 var dz = 0
                 beaconStructure.keys.forEach { vec -> if ( vec.z < dz) dz = vec.z }
-                val center = ImmutableVector.fromLocation(sender.location).add(0, dz, 0)
-                createBeacon(center.toLocation(sender.world))
+                val center = MathUtils.bukkit2MovecraftLoc(sender.location).add(MovecraftLocation(0, dz, 0))
+                createBeacon(center.toBukkit(sender.world))
             }
 
         } else if (args[0].equals("pullout", true)) {
@@ -331,9 +337,9 @@ object HyperspaceCommand : TabExecutor {
     }
 
     private fun removeBeacon(loc : Location) {
-        val queue = LinkedList<ImmutableVector>()
-        val visited = HashSet<ImmutableVector>()
-        queue.add(ImmutableVector.fromLocation(loc))
+        val queue = LinkedList<MovecraftLocation>()
+        val visited = HashSet<MovecraftLocation>()
+        queue.add(MathUtils.bukkit2MovecraftLoc(loc))
         while (!queue.isEmpty()) {
             val poll = queue.poll()
             visited.add(poll)
@@ -345,7 +351,7 @@ object HyperspaceCommand : TabExecutor {
                 queue.add(test)
             }
 
-            if (poll.toLocation(loc.world!!).block.type.name.endsWith("AIR"))
+            if (poll.toBukkit(loc.world!!).block.type.name.endsWith("AIR"))
                 continue
             queue.clear()
             queue.add(poll)
@@ -358,41 +364,41 @@ object HyperspaceCommand : TabExecutor {
             visited.add(node)
             for (shift in SHIFTS) {
                 val test = node.add(shift)
-                if (test.toLocation(loc.world!!).block.type.name.endsWith("AIR"))
+                if (test.toBukkit(loc.world!!).block.type.name.endsWith("AIR"))
                     continue
                 queue.add(test)
             }
         }
-        visited.forEach { l -> l.toLocation(loc.world!!).block.type = Material.AIR }
+        visited.forEach { l -> l.toBukkit(loc.world!!).block.type = Material.AIR }
     }
 
     private fun createBeacon(loc : Location) {
-        val center = ImmutableVector.fromLocation(loc)
+        val center = MathUtils.bukkit2MovecraftLoc(loc)
         for (entry in beaconStructure) {
-            val b = entry.key.add(center).toLocation(loc.world!!).block
+            val b = entry.key.add(center).toBukkit(loc.world!!).block
             b.blockData = entry.value.data
 
         }
     }
 
     private val SHIFTS = arrayOf(
-        ImmutableVector(1,1,0),
-        ImmutableVector(1,0,0),
-        ImmutableVector(1,-1,0),
-        ImmutableVector(-1,1,0),
-        ImmutableVector(-1,0,0),
-        ImmutableVector(-1,-1,0),
-        ImmutableVector(0,1,1),
-        ImmutableVector(0,0,1),
-        ImmutableVector(0,-1,1),
-        ImmutableVector(0,1,-1),
-        ImmutableVector(0,0,-1),
-        ImmutableVector(0,-1,-1),
-        ImmutableVector(0,1,0),
-        ImmutableVector(0,-1,0),
-        ImmutableVector(1, 0, 1),
-        ImmutableVector(-1, 0, 1),
-        ImmutableVector(1, 0, -1),
-        ImmutableVector(-1, 0, -1)
+        MovecraftLocation(1,1,0),
+        MovecraftLocation(1,0,0),
+        MovecraftLocation(1,-1,0),
+        MovecraftLocation(-1,1,0),
+        MovecraftLocation(-1,0,0),
+        MovecraftLocation(-1,-1,0),
+        MovecraftLocation(0,1,1),
+        MovecraftLocation(0,0,1),
+        MovecraftLocation(0,-1,1),
+        MovecraftLocation(0,1,-1),
+        MovecraftLocation(0,0,-1),
+        MovecraftLocation(0,-1,-1),
+        MovecraftLocation(0,1,0),
+        MovecraftLocation(0,-1,0),
+        MovecraftLocation(1, 0, 1),
+        MovecraftLocation(-1, 0, 1),
+        MovecraftLocation(1, 0, -1),
+        MovecraftLocation(-1, 0, -1)
     )
 }

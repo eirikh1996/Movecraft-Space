@@ -3,6 +3,7 @@ package io.github.eirikh1996.movecraftspace.objects
 import io.github.eirikh1996.movecraftspace.event.planet.PlanetRemoveEvent
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import net.countercraft.movecraft.MovecraftChunk
+import net.countercraft.movecraft.MovecraftLocation
 import org.bukkit.Bukkit
 import org.bukkit.Bukkit.broadcastMessage
 import org.bukkit.Location
@@ -24,7 +25,7 @@ object PlanetCollection : Iterable<Planet> {
     private val planets : MutableSet<Planet> = ConcurrentHashMap.newKeySet()
     lateinit var pl : Plugin
 
-    fun getPlanetsWithOrbitPoint(orbitPoint : ImmutableVector) : Set<Planet> {
+    fun getPlanetsWithOrbitPoint(orbitPoint : MovecraftLocation) : Set<Planet> {
         val returnSet = HashSet<Planet>()
         for (p in PlanetCollection) {
             if (p.orbitCenter != orbitPoint)
@@ -34,7 +35,7 @@ object PlanetCollection : Iterable<Planet> {
         return returnSet
     }
 
-    fun nearestPlanet(space : World, loc : ImmutableVector, maxDistance : Int = -1, excludeMoons : Boolean = false) : Planet? {
+    fun nearestPlanet(space : World, loc : MovecraftLocation, maxDistance : Int = -1, excludeMoons : Boolean = false) : Planet? {
         var foundPlanet : Planet? = null
         var lastDistance = Int.MAX_VALUE
         for (p in this) {
@@ -110,8 +111,8 @@ object PlanetCollection : Iterable<Planet> {
             val orbitCenterData = entryData.get("orbitCenter") as Map<String, Any>
             val moons = entryData.getOrDefault("moons", ArrayList<String>()) as List<String>
             val planet = Planet(
-                ImmutableVector.deserialize(centerData),
-                ImmutableVector.deserialize(orbitCenterData),
+                deserializeMovecraftLocation(centerData),
+                deserializeMovecraftLocation(orbitCenterData),
                 entryData.get("radius") as Int,
                 Bukkit.getWorld(entryData["space"] as String)!!,
                 destination,
@@ -139,12 +140,16 @@ object PlanetCollection : Iterable<Planet> {
             val orbitCenterDistance = planet.orbitCenter.distance(planet.center)
             val minDistance = orbitCenterDistance - planet.radius
             val maxDistance = orbitCenterDistance + planet.radius
-            val distanceToLocation = ImmutableVector.fromLocation(loc).distance(planet.orbitCenter)
+            val distanceToLocation = MovecraftLocation(loc.blockX, loc.blockY, loc.blockZ).distance(planet.orbitCenter)
             if (distanceToLocation < minDistance || distanceToLocation > maxDistance)
                 continue
             return true
         }
         return false
+    }
+
+    private fun deserializeMovecraftLocation(data : Map<String, Any>) : MovecraftLocation {
+        return MovecraftLocation(data["x"] as Int, data["y"] as Int, data["z"] as Int)
     }
 
     fun saveFile() {
@@ -220,7 +225,7 @@ object PlanetCollection : Iterable<Planet> {
             val distance = pl.orbitCenter.distance(pl.center)
             val minDistance = distance - pl.radius
             val maxDistance = distance + pl.radius
-            val planetDistance = pl.orbitCenter.distance(ImmutableVector.fromLocation(loc))
+            val planetDistance = pl.orbitCenter.distance(MovecraftLocation(loc.blockX, loc.blockY, loc.blockZ))
             if (planetDistance >= minDistance && planetDistance <= maxDistance)
                 return pl
 

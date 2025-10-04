@@ -4,9 +4,10 @@ package io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects
 import io.github.eirikh1996.movecraftspace.expansion.Expansion
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionManager
 import io.github.eirikh1996.movecraftspace.expansion.selection.Structure
-import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
 import io.github.eirikh1996.movecraftspace.objects.MSBlock
 import io.github.eirikh1996.movecraftspace.utils.MSUtils
+import net.countercraft.movecraft.MovecraftLocation
+import net.countercraft.movecraft.util.MathUtils
 import org.bukkit.block.Block
 import org.bukkit.block.Sign
 import org.bukkit.block.data.type.WallSign
@@ -27,7 +28,11 @@ class NavigationComputer(name : String, val maxRange: Int, val allowedOnCraftTyp
         val mapList = ArrayList<Map<String, Any>>()
         for (loc in blocks.keys) {
             val map = HashMap<String, Any>()
-            map.putAll(loc.serialize())
+            val locMap = HashMap<String, Any>()
+            locMap["x"] = loc.x
+            locMap["y"] = loc.y
+            locMap["z"] = loc.z
+            map.putAll(locMap)
             map.putAll(blocks[loc]!!.serialize())
             mapList.add(map)
 
@@ -42,10 +47,10 @@ class NavigationComputer(name : String, val maxRange: Int, val allowedOnCraftTyp
     fun isStructure(sign: Sign): Boolean {
         val signData = sign.blockData as WallSign
         val face = signData.facing
-        val angle = MSUtils.angleBetweenBlockFaces(face, blocks[ImmutableVector.ZERO]!!.facing)
+        val angle = MSUtils.angleBetweenBlockFaces(face, blocks[zeroVector]!!.facing)
         for (b in getStructure(sign)) {
-            val vec = ImmutableVector.fromLocation(b.location.subtract(sign.location))
-            val rotated = vec.rotate(angle, ImmutableVector.ZERO).add(0,vec.y,0)
+            val vec = MathUtils.bukkit2MovecraftLoc(b.location.subtract(sign.location))
+            val rotated = rotate(angle, zeroVector, vec).add(MovecraftLocation(0,vec.y,0))
             val ncBlock = blocks[rotated]
             if (ncBlock != null && ncBlock.type == b.type)
                 continue
@@ -57,11 +62,11 @@ class NavigationComputer(name : String, val maxRange: Int, val allowedOnCraftTyp
     fun getStructure(sign: Sign) : List<Block> {
         val signData = sign.blockData as WallSign
         val face = signData.facing
-        val angle = MSUtils.angleBetweenBlockFaces(blocks[ImmutableVector.ZERO]!!.facing, face)
+        val angle = MSUtils.angleBetweenBlockFaces(blocks[zeroVector]!!.facing, face)
 
         val blockList = ArrayList<Block>()
         for (vec in blocks.keys) {
-            blockList.add(sign.location.add(vec.rotate(angle, ImmutableVector.ZERO).add(0, vec.y, 0).toLocation(sign.world)).block)
+            blockList.add(sign.location.add(rotate(angle, zeroVector, vec).add(MovecraftLocation(0, vec.y, 0)).toBukkit(sign.world)).block)
         }
         return blockList
     }
@@ -87,9 +92,9 @@ class NavigationComputer(name : String, val maxRange: Int, val allowedOnCraftTyp
             val blocks = data["blocks"] as List<Map<String, Any>>
             val name = data["name"] as String
             val maxRange = data["maxRange"] as Int
-            val blockMap = HashMap<ImmutableVector, MSBlock>()
+            val blockMap = HashMap<MovecraftLocation, MSBlock>()
             for (block in blocks) {
-                blockMap[ImmutableVector.deserialize(block)] = MSBlock.deserialize(block)
+                blockMap[MovecraftLocation(block["x"] as Int, block["y"] as Int, block["z"] as Int)] = MSBlock.deserialize(block)
             }
             val allowedOnCraftTypes = ((data["allowedOnCraftTypes"] as Iterable<String>?)?:ArrayList()).toSet()
             val nc = NavigationComputer(name, maxRange, allowedOnCraftTypes)

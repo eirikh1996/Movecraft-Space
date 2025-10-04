@@ -5,14 +5,15 @@ import io.github.eirikh1996.movecraftspace.expansion.Expansion
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionManager
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.HyperspaceExpansion
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects.NavigationComputer
-import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
 import io.github.eirikh1996.movecraftspace.objects.StarCollection
 import io.github.eirikh1996.movecraftspace.utils.BlockUtils
 import io.github.eirikh1996.movecraftspace.utils.InventoryUtils.createItem
 import io.github.eirikh1996.movecraftspace.utils.MSUtils
+import net.countercraft.movecraft.MovecraftLocation
 import net.countercraft.movecraft.craft.Craft
 import net.countercraft.movecraft.craft.PilotedCraft
 import net.countercraft.movecraft.craft.PlayerCraft
+import net.countercraft.movecraft.util.MathUtils
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
@@ -39,9 +40,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
-import kotlin.math.ceil
-import kotlin.math.max
-import kotlin.math.min
+import kotlin.math.*
 
 object NavigationComputerManager : Iterable<NavigationComputer>, Listener, BukkitRunnable() {
 
@@ -49,6 +48,8 @@ object NavigationComputerManager : Iterable<NavigationComputer>, Listener, Bukki
     private val navigationComputerInterface = Bukkit.createInventory(null, 9, Component.text("Navigation computer"))
     private val beaconLocations = ArrayList<Inventory>()
     private val solarSystems = ArrayList<Inventory>()//Bukkit.createInventory(null, InventoryType.CHEST, Component.text("Solar systems"))
+
+    private val zeroVector = MovecraftLocation(0, 0, 0)
 
     private val FIRST_LINE = Component.text("Nav computer", NamedTextColor.AQUA)
     private val BEACON_LOCATIONS_COMPONENT = Component.text("Beacon locations")
@@ -249,21 +250,22 @@ object NavigationComputerManager : Iterable<NavigationComputer>, Listener, Bukki
             return
         }
             val signData = sign.blockData as WallSign
-        val angle = MSUtils.angleBetweenBlockFaces(navigationComputer.blocks[ImmutableVector.ZERO]!!.facing, signData.facing)
-        val locs = HashSet<ImmutableVector>()
+        val angle = MSUtils.angleBetweenBlockFaces(navigationComputer.blocks[zeroVector]!!.facing, signData.facing)
+        val locs = HashSet<MovecraftLocation>()
         for (vec in navigationComputer.blocks.keys) {
-            locs.add(ImmutableVector.fromLocation(event.block.location).add(vec.rotate(angle, ImmutableVector.ZERO).add(0,vec.y,0)))
+            locs.add(MathUtils.bukkit2MovecraftLoc(event.block.location).add(rotate(angle, zeroVector, vec).add(
+                MovecraftLocation(0,vec.y,0))))
 
         }
-        val SHIFTS = arrayOf(ImmutableVector(1,0,0), ImmutableVector(-1,0,0), ImmutableVector(0,0,1), ImmutableVector(0,0,-1))
+        val SHIFTS = arrayOf(MovecraftLocation(1,0,0), MovecraftLocation(-1,0,0), MovecraftLocation(0,0,1), MovecraftLocation(0,0,-1))
         for (vec in locs) {
             for (shift in SHIFTS) {
                 val test = vec.add(shift)
-                if (locs.contains(test) || test.equals(ImmutableVector.fromLocation(event.block.location)))
+                if (locs.contains(test) || test.equals(MathUtils.bukkit2MovecraftLoc(event.block.location)))
                     continue
-                if (test.toLocation(event.block.world).block.state !is Sign)
+                if (test.toBukkit(event.block.world).block.state !is Sign)
                     continue
-                val testSign = test.toLocation(event.block.world).block.state as Sign
+                val testSign = test.toBukkit(event.block.world).block.state as Sign
                 if (testSign.getLine(0) == ChatColor.AQUA.toString() + "Nav computer" && testSign.equals(ChatColor.RED.toString() + navigationComputer.name)) {
                     event.player.sendMessage(MSUtils.COMMAND_PREFIX + MSUtils.ERROR + "This navigation computer structure already has a sign attached to it")
                     event.isCancelled = true
@@ -383,10 +385,11 @@ object NavigationComputerManager : Iterable<NavigationComputer>, Listener, Bukki
             val next = iter.next()
             var navigationComputerFound = true
             val computer = navigationComputers[next] ?: continue
-            val angle = MSUtils.angleBetweenBlockFaces(computer.blocks[ImmutableVector.ZERO]!!.facing, face)
+            val angle = MSUtils.angleBetweenBlockFaces(computer.blocks[zeroVector]!!.facing, face)
             for (vec in computer.blocks.keys) {
                 val hdBlock = computer.blocks[vec]!!.rotate(BlockUtils.rotateBlockFace(angle, computer.blocks[vec]!!.facing))
-                val block = ImmutableVector.fromLocation(sign.location).add(vec.rotate(angle, ImmutableVector.ZERO).add(0,vec.y,0)).toLocation(sign.world).block
+                val block = MathUtils.bukkit2MovecraftLoc(sign.location).add(rotate(angle, zeroVector, vec).add(
+                    MovecraftLocation(0,vec.y,0))).toBukkit(sign.world).block
                 val similar = hdBlock.isSimilar(block)
                 if (block.type.name.endsWith("WALL_SIGN"))
                     continue
@@ -441,5 +444,16 @@ object NavigationComputerManager : Iterable<NavigationComputer>, Listener, Bukki
                 updateGUIs()
             }
         }.runTask(HyperspaceExpansion.instance.plugin)
+    }
+
+    private fun rotate(angle : Double, origin : MovecraftLocation, offset : MovecraftLocation) : MovecraftLocation {
+        val toRotate = offset.subtract(origin)
+        val cos = cos(angle)
+        val sin = sin(angle)
+        val x : Int = round(toRotate.x * cos + toRotate.z * -sin).toInt()
+        val y : Int = 0
+        val z : Int = round(toRotate.x * sin + toRotate.z * cos).toInt()
+
+        return MovecraftLocation(x, y, z).add(origin)
     }
 }

@@ -1,11 +1,10 @@
 package io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects
 
-import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionManager
 import io.github.eirikh1996.movecraftspace.expansion.selection.Structure
-import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
 import io.github.eirikh1996.movecraftspace.objects.MSBlock
 import io.github.eirikh1996.movecraftspace.utils.MSUtils
+import net.countercraft.movecraft.MovecraftLocation
 import org.bukkit.block.Block
 import org.bukkit.block.Sign
 import org.bukkit.block.data.type.WallSign
@@ -17,11 +16,11 @@ class GravityWell(name : String, val range : Int, val allowedOnCraftTypes : Set<
     fun getStructure(sign: Sign) : List<Block> {
         val signData = sign.blockData as WallSign
         val face = signData.facing
-        val angle = MSUtils.angleBetweenBlockFaces(face, blocks[ImmutableVector.ZERO]!!.facing)
+        val angle = MSUtils.angleBetweenBlockFaces(face, blocks[MovecraftLocation(0,0,0)]!!.facing)
 
         val blockList = ArrayList<Block>()
         for (vec in blocks.keys) {
-            blockList.add(sign.location.add(vec.rotate(angle, ImmutableVector.ZERO).add(0, vec.y, 0).toLocation(sign.world)).block)
+            blockList.add(sign.location.add(rotate(angle, zeroVector, vec).add(MovecraftLocation(0, vec.y, 0)).toBukkit(sign.world)).block)
         }
         return blockList
     }
@@ -37,7 +36,11 @@ class GravityWell(name : String, val range : Int, val allowedOnCraftTypes : Set<
         val mapList = ArrayList<Map<String, Any>>()
         for (loc in blocks.keys) {
             val map = HashMap<String, Any>()
-            map.putAll(loc.serialize())
+            val locMap = HashMap<String, Any>()
+            locMap["x"] = loc.x
+            locMap["y"] = loc.y
+            locMap["z"] = loc.z
+            map.putAll(locMap)
             map.putAll(blocks[loc]!!.serialize())
             mapList.add(map)
 
@@ -72,9 +75,9 @@ class GravityWell(name : String, val range : Int, val allowedOnCraftTypes : Set<
             val blocks = data["blocks"] as List<Map<String, Any>>
             val name = data["name"]!! as String
             val range = data["range"]!! as Int
-            val blockMap = HashMap<ImmutableVector, MSBlock>()
+            val blockMap = HashMap<MovecraftLocation, MSBlock>()
             for (block in blocks) {
-                blockMap[ImmutableVector.deserialize(block)] = MSBlock.deserialize(block)
+                blockMap[MovecraftLocation(block["x"] as Int, block["y"] as Int, block["z"] as Int)] = MSBlock.deserialize(block)
             }
             val allowedOnCraftTypes = (data["allowedOnCraftTypes"] as List<String>? ?: ArrayList()).toSet()
             val gw = GravityWell(name, range, allowedOnCraftTypes)

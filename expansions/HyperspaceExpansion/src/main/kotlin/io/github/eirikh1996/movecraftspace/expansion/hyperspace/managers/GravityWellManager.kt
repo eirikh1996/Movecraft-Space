@@ -1,11 +1,10 @@
 package io.github.eirikh1996.movecraftspace.expansion.hyperspace.managers
 
-import io.github.eirikh1996.movecraftspace.Settings
 import io.github.eirikh1996.movecraftspace.expansion.Expansion
 import io.github.eirikh1996.movecraftspace.expansion.ExpansionManager
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.ExpansionSettings
 import io.github.eirikh1996.movecraftspace.expansion.hyperspace.objects.GravityWell
-import io.github.eirikh1996.movecraftspace.objects.ImmutableVector
+import io.github.eirikh1996.movecraftspace.objects.ImmutableVector.Axis
 import io.github.eirikh1996.movecraftspace.utils.BlockUtils
 import io.github.eirikh1996.movecraftspace.utils.MSUtils
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
@@ -34,12 +33,16 @@ import java.io.File
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
+import kotlin.math.cos
+import kotlin.math.round
+import kotlin.math.sin
 
 object GravityWellManager : Iterable<GravityWell>, Listener {
     val gravityWells = HashSet<GravityWell>()
     val GRAVITY_WELL_HEADER = ChatColor.AQUA.toString() + "Gravity well"
     val GRAVITY_WELL_ACTIVE_TEXT = ChatColor.GREEN.toString() + "Active"
     val GRAVITY_WELL_STANDBY_TEXT = ChatColor.DARK_RED.toString() + "Standby"
+    private val zeroVector = MovecraftLocation(0, 0, 0)
 
     init {
         Bukkit.getPluginManager().registerEvents(this, plugin)
@@ -126,21 +129,21 @@ object GravityWellManager : Iterable<GravityWell>, Listener {
         }
         val sign = event.block.state as Sign
         val signData = sign.blockData as WallSign
-        val angle = MSUtils.angleBetweenBlockFaces(gravityWell.blocks[ImmutableVector.ZERO]!!.facing, signData.facing)
-        val locs = HashSet<ImmutableVector>()
+        val angle = MSUtils.angleBetweenBlockFaces(gravityWell.blocks[zeroVector]!!.facing, signData.facing)
+        val locs = HashSet<MovecraftLocation>()
         for (vec in gravityWell.blocks.keys) {
-            locs.add(ImmutableVector.fromLocation(event.block.location).add(vec.rotate(angle, ImmutableVector.ZERO).add(0,vec.y,0)))
+            locs.add(MathUtils.bukkit2MovecraftLoc(event.block.location).add(rotate(angle, zeroVector, vec).add(MovecraftLocation(0,vec.y,0))))
 
         }
-        val SHIFTS = arrayOf(ImmutableVector(1,0,0), ImmutableVector(-1,0,0), ImmutableVector(0,0,1), ImmutableVector(0,0,-1))
+        val SHIFTS = arrayOf(MovecraftLocation(1,0,0), MovecraftLocation(-1,0,0), MovecraftLocation(0,0,1), MovecraftLocation(0,0,-1))
         for (vec in locs) {
             for (shift in SHIFTS) {
                 val test = vec.add(shift)
-                if (locs.contains(test) || test == ImmutableVector.fromLocation(event.block.location))
+                if (locs.contains(test) || test == MathUtils.bukkit2MovecraftLoc(event.block.location))
                     continue
-                if (test.toLocation(event.block.world).block.state !is Sign)
+                if (test.toBukkit(event.block.world).block.state !is Sign)
                     continue
-                val testSign = test.toLocation(event.block.world).block.state as Sign
+                val testSign = test.toBukkit(event.block.world).block.state as Sign
                 if (testSign.getLine(0).equals(ChatColor.AQUA.toString() + "Gravity well") && testSign.equals(ChatColor.RED.toString() + gravityWell.name)) {
                     event.player.sendMessage(COMMAND_PREFIX + ERROR + "This gravity well structure already has a sign attached to it")
                     event.isCancelled = true
@@ -214,10 +217,10 @@ object GravityWellManager : Iterable<GravityWell>, Listener {
         while (iter.hasNext()) {
             val next = iter.next()
             var gravityWellFound = true
-            val angle = MSUtils.angleBetweenBlockFaces(next.blocks[ImmutableVector.ZERO]!!.facing, signData.facing)
+            val angle = MSUtils.angleBetweenBlockFaces(next.blocks[zeroVector]!!.facing, signData.facing)
             for (vec in next.blocks.keys) {
                 val hdBlock = next.blocks[vec]!!.rotate(BlockUtils.rotateBlockFace(angle, next.blocks[vec]!!.facing))
-                val block = ImmutableVector.fromLocation(sign.location).add(vec.rotate(angle, ImmutableVector.ZERO).add(0,vec.y,0)).toLocation(sign.world).block
+                val block = MathUtils.bukkit2MovecraftLoc(sign.location).add(rotate(angle, zeroVector, vec).add(MovecraftLocation(0,vec.y,0))).toBukkit(sign.world).block
                 if (block.type.name.endsWith("WALL_SIGN"))
                     continue
                 if (!hdBlock.isSimilar(block)) {
@@ -266,5 +269,16 @@ object GravityWellManager : Iterable<GravityWell>, Listener {
      */
     override fun iterator(): Iterator<GravityWell> {
         return Collections.unmodifiableSet(gravityWells).iterator()
+    }
+
+    private fun rotate(angle : Double, origin : MovecraftLocation, offset : MovecraftLocation) : MovecraftLocation {
+        val toRotate = offset.subtract(origin)
+        val cos = cos(angle)
+        val sin = sin(angle)
+        val x : Int = round(toRotate.x * cos + toRotate.z * -sin).toInt()
+        val y : Int = 0
+        val z : Int = round(toRotate.x * sin + toRotate.z * cos).toInt()
+
+        return MovecraftLocation(x, y, z).add(origin)
     }
 }

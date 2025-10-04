@@ -6,6 +6,9 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable
 import org.bukkit.util.Vector
 import kotlin.math.*
 
+@Deprecated(
+    message = "Use MovecraftLocation instead"
+)
 data class ImmutableVector constructor(val x : Int, val y : Int, val z : Int) : ConfigurationSerializable{
     fun add(x: Int, y: Int, z: Int) : ImmutableVector {
         return ImmutableVector(this.x + x, this.y + y, this.z + z)

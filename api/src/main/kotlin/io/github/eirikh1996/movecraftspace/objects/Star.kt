@@ -2,6 +2,7 @@ package io.github.eirikh1996.movecraftspace.objects
 
 import io.github.eirikh1996.movecraftspace.event.planet.PlanetMoveEvent
 import net.countercraft.movecraft.Movecraft
+import net.countercraft.movecraft.MovecraftLocation
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -11,7 +12,7 @@ import java.util.*
 import kotlin.collections.HashSet
 import kotlin.math.min
 
-class Star(val name : String, space : World, var loc : ImmutableVector, val radius : Int) {
+class Star(val name : String, space : World, var loc : MovecraftLocation, val radius : Int) {
 
     var space : World = space
         get() = field
