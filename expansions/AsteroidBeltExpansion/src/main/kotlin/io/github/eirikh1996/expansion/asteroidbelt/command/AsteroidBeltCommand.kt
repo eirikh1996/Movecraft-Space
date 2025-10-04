@@ -12,6 +12,7 @@ import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_NO_PERMISSION
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.COMMAND_PREFIX
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.ERROR
 import io.github.eirikh1996.movecraftspace.utils.MSUtils.MUST_BE_PLAYER
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.command.Command
@@ -45,6 +46,9 @@ object AsteroidBeltCommand : TabExecutor {
             completions.add("remove")
         } else if (args[0].equals("regenerate", true) || args[0].equals("remove", true)) {
             completions.addAll(asteroidLocations.keys)
+        } else if (args[0].equals("create", true) ) {
+            if (args.size <= 2)
+                StarCollection.stars.forEach { star -> completions.add(star.name) }
         }
         if (args.isEmpty())
             return completions
@@ -114,43 +118,56 @@ object AsteroidBeltCommand : TabExecutor {
 
             var clearLocationsLeft = true
             val asteroidbeltTag = "${star.name}-$minRadius-$maxRadius".lowercase()
-            while (clearLocationsLeft) {
-                clearLocationsLeft = false
-                for (asteroid in AsteroidBeltExpansion.instance.asteroids.values) {
-                    val randomLoc = randomLoc(star.loc, minRadius, maxRadius, height, asteroid.xLength / 2, asteroid.yLength / 2, asteroid.zLength / 2)
-                    val blockLocs = HashSet<Location>()
-                    asteroid.blocks.forEach { (t, u) ->
-                        blockLocs.add(randomLoc.add(t).toLocation(star.space))
-                    }
-                    if (blockLocs.any { loc -> locations.contains(loc) || locations.any { o -> o.distance(loc) < AsteroidBeltExpansion.instance.distanceBetweenAsteroids } }) {
-                        continue
-                    }
-                    locations.addAll(blockLocs)
-                    asteroids[randomLoc] = asteroid
-                    clearLocationsLeft = true
-                    break
-                }
-                asteroidLocations[asteroidbeltTag] = asteroids
-            }
-            sender.sendMessage(COMMAND_PREFIX + "Started creating asteroid belt")
             object : BukkitRunnable() {
-                val linkedList = LinkedList(asteroids.keys)
-                val initialSize = linkedList.size
-
                 override fun run() {
-                    if (linkedList.isEmpty()) {
-                        sender.sendMessage(COMMAND_PREFIX + "Complete")
-                        cancel()
+                    while (clearLocationsLeft) {
+                        clearLocationsLeft = false
+                        for (asteroid in AsteroidBeltExpansion.instance.asteroids.values) {
+                            val randomLoc = randomLoc(star.loc, minRadius, maxRadius, height, asteroid.xLength / 2, asteroid.yLength / 2, asteroid.zLength / 2)
+                            val blockLocs = HashSet<Location>()
+                            asteroid.blocks.forEach { (t, u) ->
+                                blockLocs.add(randomLoc.add(t).toLocation(star.space))
+                            }
+                            if (blockLocs.any { loc -> locations.contains(loc) || locations.any { o -> o.distance(loc) < AsteroidBeltExpansion.instance.distanceBetweenAsteroids } }) {
+                                continue
+                            }
+                            locations.addAll(blockLocs)
+                            asteroids[randomLoc] = asteroid
+                            clearLocationsLeft = true
+                            break
+                        }
+                        asteroidLocations[asteroidbeltTag] = asteroids
                     }
-                    val poll = linkedList.poll()
-                    val percent = ((initialSize - linkedList.size) / initialSize) * 100f
-                    asteroids[poll]?.paste(poll.toLocation(star.space))
-                    if (percent % 10.0 == 0.0)
-                        sender.sendMessage(COMMAND_PREFIX + "Current progress: $percent %")
+                    sender.sendMessage(COMMAND_PREFIX + "Started creating asteroid belt")
+                    object : BukkitRunnable() {
+                        val linkedList = LinkedList(asteroids.keys)
+                        val initialSize = linkedList.size
 
+                        override fun run() {
+                            if (linkedList.isEmpty()) {
+                                sender.sendMessage(COMMAND_PREFIX + "Complete")
+                                cancel()
+                                return
+                            }
+                            val poll = linkedList.poll()
+                            val percent = ((initialSize - linkedList.size) / initialSize) * 100f
+                            Bukkit.getScheduler().callSyncMethod(AsteroidBeltExpansion.instance.plugin) {
+                                asteroids[poll]?.paste(
+                                    poll.toLocation(star.space)
+                                )
+                            }
+
+                            if (percent % 10.0 == 0.0)
+                                sender.sendMessage(COMMAND_PREFIX + "Current progress: $percent %")
+
+                        }
+
+                    }.runTaskTimerAsynchronously(AsteroidBeltExpansion.instance.plugin, 0, 10)
                 }
 
-            }.runTaskTimer(AsteroidBeltExpansion.instance.plugin, 0, 10)
+            }.runTaskAsynchronously(AsteroidBeltExpansion.instance.plugin)
+
+
 
         } else if (args[0].equals("regenerate", true)) {
             if (args.size < 2) {
@@ -191,7 +208,7 @@ object AsteroidBeltCommand : TabExecutor {
                 }
             }
         }
-        TODO()
+        return true
     }
 
     private fun randomLoc(center : ImmutableVector, minRadius : Int, maxRadius : Int, height : Int, xbuffer : Int = 0, ybuffer : Int = 0, zbuffer : Int = 0) : ImmutableVector {
